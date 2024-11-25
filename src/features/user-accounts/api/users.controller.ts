@@ -5,7 +5,5 @@ export class UsersController {
   constructor() {}
 
   @Get()
-  async getAllUsers() {
-
-  }
+  async getAllUsers() {}
 }
