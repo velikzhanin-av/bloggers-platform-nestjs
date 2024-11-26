@@ -8,7 +8,7 @@ import { UserAccountsModule } from './features/user-accounts/user-accounts.modul
 @Module({
   imports: [
     BloggersPlatformModule,
-    MongooseModule.forRoot(Config.DB_URI, { connectionName: Config.DB_NAME }),
+    MongooseModule.forRoot('mongodb://localhost/bloggers-platform'),
     TestingModule,
     UserAccountsModule,
   ],
