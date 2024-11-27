@@ -1,5 +1,4 @@
 import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
-import {UsersService} from "../user-accounts/application/users.service";
 import {InjectModel} from "@nestjs/mongoose";
 import {User, UserModelType} from "../user-accounts/domain/users.entity";
 

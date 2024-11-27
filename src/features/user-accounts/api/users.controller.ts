@@ -5,7 +5,6 @@ import {
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
 import {CreateUserDto} from "../dto/create-user.dto";
-import {UsersRepository} from "../infrastructure/users.repository";
 import {UsersService} from "../application/users.service";
 
 @Controller('users')
