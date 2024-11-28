@@ -3,6 +3,7 @@ import {User, UserDocument, UserModelType} from '../../domain/users.entity';
 import {InjectModel} from '@nestjs/mongoose';
 import {Types} from "mongoose";
 import {GetUsersQueryParams} from "../../api/input-dto/get-users-query-params.input-dto";
+import {UserViewDto} from "../../api/output-dto/users.view-dto";
 
 @Injectable()
 export class UsersQueryRepository {
@@ -12,9 +13,9 @@ export class UsersQueryRepository {
     ) {
     }
 
-    async findAllUsers(@Query() query: GetUsersQueryParams): Promise<User[]> {
+    async findAllUsers(@Query() query: GetUsersQueryParams): Promise<UserViewDto[]> {
         const users = await this.UserModel.find({});
-        return users;
+        return users.map(user => { return UserViewDto.mapToView(user) });
     }
 
     async getByIdOrNotFoundFail(userId: string): Promise<any> {

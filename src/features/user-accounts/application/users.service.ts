@@ -11,7 +11,7 @@ export class UsersService {
     private usersRepository: UsersRepository,
   ) {}
 
-  async createUser(dto: CreateUserDto) {
+  async createUser(dto: CreateUserDto): Promise<string> {
     const passwordHash = await bcrypt.hash(dto.password, 10);
 
     const user: UserDocument = this.UserModel.createInstance({
