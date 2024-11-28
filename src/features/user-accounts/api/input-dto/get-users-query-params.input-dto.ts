@@ -3,7 +3,7 @@ import { BaseSortablePaginationParams } from '../../../../core/dto/base.query-pa
 import { UsersSortBy } from './users-sort-by';
 
 export class GetUsersQueryParams extends BaseSortablePaginationParams<UsersSortBy> {
-    sortBy = UsersSortBy.CreatedAt;
+    sortBy: UsersSortBy = UsersSortBy.CreatedAt;
     searchLoginTerm: string | null = null;
     searchEmailTerm: string | null = null;
 }

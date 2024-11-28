@@ -9,6 +9,7 @@ import {UsersService} from "../application/users.service";
 import {GetUsersQueryParams} from "./input-dto/get-users-query-params.input-dto";
 import {UserViewDto} from "./output-dto/users.view-dto";
 import {PaginatedViewDto} from "../../../core/dto/base.paginated.view-dto";
+import {UserDocument} from "../domain/users.entity";
 
 @Controller('users')
 export class UsersController {
@@ -16,12 +17,12 @@ export class UsersController {
               private usersService: UsersService,) {}
 
   @Get()
-  async getAllUsers(@Query() query: GetUsersQueryParams): Promise<UserViewDto[]> {
+  async getAllUsers(@Query() query: GetUsersQueryParams): Promise<PaginatedViewDto<UserViewDto[]>> {
     return this.usersQueryRepository.findAllUsers(query);
   }
 
   @Post()
-  async postUser(@Body() body: CreateUserDto): Promise<void> {
+  async postUser(@Body() body: CreateUserDto): Promise<UserViewDto | null> {
     const userId: string = await this.usersService.createUser(body)
 
     return await this.usersQueryRepository.getByIdOrNotFoundFail(userId)
