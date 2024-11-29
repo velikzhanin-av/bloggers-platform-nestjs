@@ -52,7 +52,7 @@ export class UsersQueryRepository {
     }
 
     async getByIdOrNotFoundFail(userId: string): Promise<UserViewDto> {
-        let user: UserDocument | null = await this.UserModel.findOne({_id: userId});
+        const user: UserDocument | null = await this.UserModel.findOne({_id: userId});
         if (!user) {
             throw new NotFoundException('user not found');
         }

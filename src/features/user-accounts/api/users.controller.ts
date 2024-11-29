@@ -9,7 +9,6 @@ import {UsersService} from "../application/users.service";
 import {GetUsersQueryParams} from "./input-dto/get-users-query-params.input-dto";
 import {UserViewDto} from "./output-dto/users.view-dto";
 import {PaginatedViewDto} from "../../../core/dto/base.paginated.view-dto";
-import {UserDocument} from "../domain/users.entity";
 
 @Controller('users')
 export class UsersController {
