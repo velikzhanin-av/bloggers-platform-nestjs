@@ -1,7 +1,8 @@
 import { Blog, BlogDocument, BlogModelType } from '../domain/blogs.entity';
-import { BlogsRepository } from '../infrastructure/blogs.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateBlogInputDto } from '../api/input-dto/blogs.input-dto';
+import { BlogsRepository } from '../infrastructure/blogs.repository';
+import { NotFoundException } from '@nestjs/common';
 
 export class BlogsService {
   constructor(
@@ -24,6 +25,9 @@ export class BlogsService {
   }
 
   async deleteBlog(blogId: string): Promise<void> {
-    await this.blogsRepository.deleteBlog(blogId);
+    const result: boolean = await this.blogsRepository.deleteBlog(blogId);
+    if (!result) {
+      throw new NotFoundException(`Blog with id ${blogId} not found`);
+    }
   }
 }

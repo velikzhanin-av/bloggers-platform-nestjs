@@ -13,12 +13,12 @@ export class UsersRepository {
     await user.save();
   }
 
-  async findOrNotFoundFail(userId: string): Promise<UserDocument> {
+  async findOrNotFoundFail(userId: string): Promise<UserDocument | null> {
     const user: UserDocument | null = await this.UserModel.findOne({
-      _id: userId
+      _id: userId,
     });
 
-    if (!user) throw new NotFoundException('user not found');
+    if (!user) return null;
     return user;
   }
 }

@@ -7,12 +7,14 @@ import {
   Delete,
   HttpStatus,
   HttpCode,
+  NotFoundException,
+  InternalServerErrorException,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { CreateBlogInputDto } from './input-dto/blogs.input-dto';
 import { BlogsQueryRepository } from '../infrastructure/query/blogs.query-repository';
 import { BlogViewDto } from './output-dto/blogs.view-dto';
-import { BlogsRepository } from '../infrastructure/blogs.repository';
+import { CreatePostInputDto } from '../../posts/api/input-dto/posts.input-dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -29,12 +31,18 @@ export class BlogsController {
   @Post()
   async postBlogs(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId: string = await this.blogsService.createBlog(body);
-    return await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+    const blog: BlogViewDto | null =
+      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+    if (!blog) throw new InternalServerErrorException();
+    return blog;
   }
 
   @Get(':blogId')
   async getBlogById(@Param('blogId') blogId: string): Promise<BlogViewDto> {
-    return await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+    const blog: BlogViewDto | null =
+      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+    if (!blog) throw new NotFoundException('blog not found');
+    return blog;
   }
 
   @Delete(':blogId')
@@ -42,5 +50,14 @@ export class BlogsController {
   async deleteBlogById(@Param('blogId') blogId: string): Promise<void> {
     await this.blogsService.deleteBlog(blogId);
     return;
+  }
+
+  @Post(':blogId/posts')
+  async createPostByBlogId(
+    @Param('blogId') blogId: string,
+    @Body() body: CreatePostInputDto,
+  ): Promise<CreatePostInputDto> {
+    #TODO posts/blogs.service
+    return body;
   }
 }

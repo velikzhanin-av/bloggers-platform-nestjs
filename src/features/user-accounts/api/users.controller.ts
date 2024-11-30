@@ -3,6 +3,8 @@ import {
   Controller,
   Delete,
   Get,
+  HttpCode,
+  HttpStatus,
   Param,
   Post,
   Query,
@@ -13,7 +15,6 @@ import { UsersService } from '../application/users.service';
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { UserViewDto } from './output-dto/users.view-dto';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
-import { BlogViewDto } from '../../bloggers-platform/blogs/api/output-dto/blogs.view-dto';
 
 @Controller('users')
 export class UsersController {
@@ -37,6 +38,7 @@ export class UsersController {
   }
 
   @Delete(':id')
+  @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUserById(@Param('id') id: string): Promise<void> {
     return await this.usersService.deleteUser(id);
   }

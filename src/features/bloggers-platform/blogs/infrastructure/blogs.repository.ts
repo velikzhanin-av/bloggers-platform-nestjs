@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { Blog, BlogDocument, BlogModelType } from '../domain/blogs.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { DeleteResult } from 'mongoose';
@@ -14,11 +14,10 @@ export class BlogsRepository {
     await blog.save();
   }
 
-  async deleteBlog(blogId: string): Promise<void> {
+  async deleteBlog(blogId: string): Promise<boolean> {
     const result: DeleteResult = await this.BlogModel.deleteOne({
       _id: blogId,
     });
-    if (result.deletedCount === 0)
-      throw new NotFoundException(`Blog with id ${blogId} not found`);
+    return result.deletedCount !== 0;
   }
 }

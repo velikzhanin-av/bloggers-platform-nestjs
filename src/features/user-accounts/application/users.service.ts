@@ -1,8 +1,9 @@
 import { UsersRepository } from '../infrastructure/users.repository';
 import { InjectModel } from '@nestjs/mongoose';
-import {DeletionStatus, User, UserDocument, UserModelType} from '../domain/users.entity';
+import { User, UserDocument, UserModelType } from '../domain/users.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import bcrypt from 'bcrypt';
+import { NotFoundException } from '@nestjs/common';
 
 export class UsersService {
   constructor(
@@ -26,9 +27,12 @@ export class UsersService {
   }
 
   async deleteUser(userId: string): Promise<void> {
-    const user: UserDocument = await this.usersRepository.findOrNotFoundFail(userId);
-
-    user.makeDeleted()
+    const user: UserDocument | null =
+      await this.usersRepository.findOrNotFoundFail(userId);
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    user.makeDeleted();
 
     await this.usersRepository.save(user);
   }
