@@ -1,11 +1,20 @@
 import { PostDocument, PostModelType } from '../domain/posts.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { Post } from '@nestjs/common';
+import { PostsRepository } from '../infrastructure/posts.repository';
 
 export class PostsService {
-  constructor(private PostModel: PostModelType) {}
+  constructor(
+    @InjectModel(Post.name)
+    private PostModel: PostModelType,
+    private postsRepository: PostsRepository,
+  ) {}
 
-  async createPost(dto: CreatePostDto): Promise<void> {
-    //#TODO добавить метод save из репозитория
-    const post: PostDocument = await this.PostModel.createInstance(dto);
+  async createPost(dto: CreatePostDto): Promise<string> {
+    const post: PostDocument = this.PostModel.createInstance(dto);
+
+    await this.postsRepository.save(post);
+    return post._id.toString();
   }
 }

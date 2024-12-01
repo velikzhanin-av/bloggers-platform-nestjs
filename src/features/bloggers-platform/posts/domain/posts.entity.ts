@@ -31,8 +31,8 @@ export class Post {
   @Prop({ type: String, require: true })
   blogName: string;
 
-  @Prop({ type: extendedLikesInfo, require: true })
-  extendedLikesInfo: extendedLikesInfo;
+  // @Prop({ type: extendedLikesInfo, require: true })
+  // extendedLikesInfo: extendedLikesInfo;
 
   static createInstance(dto: CreatePostDto): PostDocument {
     const post = new this();
