@@ -15,12 +15,15 @@ import { CreateBlogInputDto } from './input-dto/blogs.input-dto';
 import { BlogsQueryRepository } from '../infrastructure/query/blogs.query-repository';
 import { BlogViewDto } from './output-dto/blogs.view-dto';
 import { CreatePostInputDto } from '../../posts/api/input-dto/posts.input-dto';
+import { PostsService } from '../../posts/application/posts.service';
+import { CreatePostDto } from '../../posts/dto/create-post.dto';
 
 @Controller('blogs')
 export class BlogsController {
   constructor(
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
+    private postsService: PostsService,
   ) {}
 
   @Get()
@@ -57,7 +60,13 @@ export class BlogsController {
     @Param('blogId') blogId: string,
     @Body() body: CreatePostInputDto,
   ): Promise<CreatePostInputDto> {
-    #TODO posts/blogs.service
+    const blog: BlogViewDto | null =
+      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+    if (!blog) throw new NotFoundException('blog not found');
+
+    const dto: CreatePostDto = { ...body, blogId, blogName: blog.name };
+    const createPost = await this.postsService.createPost(dto);
+
     return body;
   }
 }
