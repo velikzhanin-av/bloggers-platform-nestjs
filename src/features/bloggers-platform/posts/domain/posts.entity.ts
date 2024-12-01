@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { HydratedDocument, Model } from 'mongoose';
+import { Blog, BlogSchema } from '../../blogs/domain/blogs.entity';
 
 @Schema({ _id: false })
 export class extendedLikesInfo {
@@ -48,6 +49,8 @@ export class Post {
 }
 
 export const PostSchema = SchemaFactory.createForClass(Post);
+
+PostSchema.loadClass(Post);
 
 export type PostDocument = HydratedDocument<Post>;
 
