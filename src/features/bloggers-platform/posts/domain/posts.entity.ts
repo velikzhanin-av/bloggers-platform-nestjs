@@ -1,7 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { HydratedDocument, Model } from 'mongoose';
-import { Blog, BlogSchema } from '../../blogs/domain/blogs.entity';
 
 @Schema({ _id: false })
 export class extendedLikesInfo {
@@ -32,8 +31,8 @@ export class Post {
   @Prop({ type: String, require: true })
   blogName: string;
 
-  // @Prop({ type: extendedLikesInfo, require: true })
-  // extendedLikesInfo: extendedLikesInfo;
+  @Prop({ type: extendedLikesInfo, require: true })
+  extendedLikesInfo: extendedLikesInfo;
 
   static createInstance(dto: CreatePostDto): PostDocument {
     const post = new this();
@@ -42,7 +41,7 @@ export class Post {
     post.content = dto.content;
     post.blogId = dto.blogId;
     post.blogName = dto.blogName;
-    // post.extendedLikesInfo = dto.extendedLikesInfo;
+    post.extendedLikesInfo = { likesCount: 0, dislikesCount: 0 };
 
     return post as PostDocument;
   }

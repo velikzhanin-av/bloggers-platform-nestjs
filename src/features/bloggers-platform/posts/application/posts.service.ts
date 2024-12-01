@@ -1,7 +1,7 @@
-import { PostDocument, PostModelType } from '../domain/posts.entity';
+import { Post, PostDocument, PostModelType } from '../domain/posts.entity';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
-import { Post } from '@nestjs/common';
+
 import { PostsRepository } from '../infrastructure/posts.repository';
 
 export class PostsService {

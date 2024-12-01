@@ -1,14 +1,14 @@
 import {
-  Controller,
-  Get,
-  Post,
   Body,
-  Param,
+  Controller,
   Delete,
-  HttpStatus,
+  Get,
   HttpCode,
-  NotFoundException,
+  HttpStatus,
   InternalServerErrorException,
+  NotFoundException,
+  Param,
+  Post,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { CreateBlogInputDto } from './input-dto/blogs.input-dto';
@@ -17,6 +17,8 @@ import { BlogViewDto } from './output-dto/blogs.view-dto';
 import { CreatePostInputDto } from '../../posts/api/input-dto/posts.input-dto';
 import { PostsService } from '../../posts/application/posts.service';
 import { CreatePostDto } from '../../posts/dto/create-post.dto';
+import { PostsQueryRepository } from '../../posts/infrastructure/query/posts.query-repository';
+import { PostViewDto } from '../../posts/api/output-dto/posts.view-dto';
 
 @Controller('blogs')
 export class BlogsController {
@@ -24,6 +26,7 @@ export class BlogsController {
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
     private postsService: PostsService,
+    private postsQueryRepository: PostsQueryRepository,
   ) {}
 
   @Get()
@@ -59,14 +62,13 @@ export class BlogsController {
   async createPostByBlogId(
     @Param('blogId') blogId: string,
     @Body() body: CreatePostInputDto,
-  ): Promise<CreatePostInputDto> {
+  ): Promise<PostViewDto | null> {
     const blog: BlogViewDto | null =
       await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
     if (!blog) throw new NotFoundException('blog not found');
 
     const dto: CreatePostDto = { ...body, blogId, blogName: blog.name };
-    const createPost = await this.postsService.createPost(dto);
-
-    return body;
+    const postId: string = await this.postsService.createPost(dto);
+    return this.postsQueryRepository.getByIdOrNotFoundFail(postId);
   }
 }
