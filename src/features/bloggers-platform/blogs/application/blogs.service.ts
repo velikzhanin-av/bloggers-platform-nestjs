@@ -30,4 +30,11 @@ export class BlogsService {
       throw new NotFoundException(`Blog with id ${blogId} not found`);
     }
   }
+
+  async updateBlog(blogId: string, body: CreateBlogInputDto): Promise<void> {
+    const result: boolean = await this.blogsRepository.updateBlog(blogId, body);
+    if (!result) {
+      throw new NotFoundException(`Blog with id ${blogId} not found`);
+    }
+  }
 }

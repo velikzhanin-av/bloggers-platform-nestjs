@@ -26,6 +26,6 @@ import { PostsQueryRepository } from './posts/infrastructure/query/posts.query-r
     PostsRepository,
     PostsQueryRepository,
   ],
-  exports: [],
+  exports: [MongooseModule],
 })
 export class BloggersPlatformModule {}

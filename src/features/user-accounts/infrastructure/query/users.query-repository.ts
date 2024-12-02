@@ -52,7 +52,7 @@ export class UsersQueryRepository {
     return PaginatedViewDto.mapToView({
       items,
       totalCount,
-      page: query.pageSize,
+      page: query.pageNumber,
       size: query.pageSize,
     });
   }
