@@ -21,4 +21,10 @@ export class UsersRepository {
     if (!user) return null;
     return user;
   }
+
+  async findByLoginOrEmail(loginOrEmail: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
+    });
+  }
 }
