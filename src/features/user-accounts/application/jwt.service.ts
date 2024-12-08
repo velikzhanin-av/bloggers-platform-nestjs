@@ -13,24 +13,24 @@ export class JwtService {
     });
   }
 
-  async verify(token: string) {
-    try {
-      jwt.verify(token, Config.TOKEN_SECRET_KEY);
-    } catch (err) {
-      return;
-    }
-    return await this.usersRepository.verifyJwtToken(token);
-  }
+  // async verify(token: string) {
+  //   try {
+  //     jwt.verify(token, Config.TOKEN_SECRET_KEY);
+  //   } catch (err) {
+  //     return;
+  //   }
+  //   return await this.usersRepository.verifyJwtToken(token);
+  // }
 
-  async verifyRefreshToken(token: string) {
-    try {
-      jwt.verify(token, Config.TOKEN_SECRET_KEY);
-    } catch (err) {
-      return;
-    }
-
-    return await this.usersRepository.verifyRefreshToken(token);
-  }
+  // async verifyRefreshToken(token: string) {
+  //   try {
+  //     jwt.verify(token, Config.TOKEN_SECRET_KEY);
+  //   } catch (err) {
+  //     return;
+  //   }
+  //
+  //   return await this.usersRepository.verifyRefreshToken(token);
+  // }
 
   async createRefreshToken(userId: string, deviceId: string) {
     return jwt.sign({ userId, deviceId }, Config.TOKEN_SECRET_KEY, {

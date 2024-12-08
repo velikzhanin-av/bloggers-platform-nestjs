@@ -1,6 +1,7 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/users.entity';
+import { UpdateWriteOpResult } from 'mongoose';
 
 @Injectable()
 export class UsersRepository {
@@ -26,5 +27,21 @@ export class UsersRepository {
     return this.UserModel.findOne({
       $or: [{ email: loginOrEmail }, { login: loginOrEmail }],
     });
+  }
+
+  async addJwtToken(id: string, token: string) {
+    const res: UpdateWriteOpResult = await this.UserModel.updateOne(
+      { _id: id },
+      { $set: { jwtToken: token } },
+    );
+    return res.modifiedCount;
+  }
+
+  async addRefreshToken(id: string, token: string) {
+    const res: UpdateWriteOpResult = await this.UserModel.updateOne(
+      { _id: id },
+      { $set: { refreshToken: token } },
+    );
+    return res.modifiedCount;
   }
 }
