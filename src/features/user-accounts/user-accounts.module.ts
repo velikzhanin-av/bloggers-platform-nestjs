@@ -11,6 +11,7 @@ import { AuthRepository } from './infrastructure/auth.repository';
 import { AuthService } from './application/auth.service';
 import { BcryptService } from './application/bcrypt.service';
 import { JwtService } from './application/jwt.service';
+import {JwtStrategy} from "../../core/guards/jwt.strategy";
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { JwtService } from './application/jwt.service';
     AuthRepository,
     BcryptService,
     JwtService,
+    JwtStrategy
   ],
   exports: [UsersService, MongooseModule],
 })

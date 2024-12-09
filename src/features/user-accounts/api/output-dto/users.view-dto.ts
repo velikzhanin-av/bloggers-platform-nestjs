@@ -1,4 +1,5 @@
 import { UserDocument } from '../../domain/users.entity';
+import {OmitType} from "@nestjs/mapped-types";
 
 export class UserViewDto {
   id: string;
@@ -15,5 +16,20 @@ export class UserViewDto {
     dto.createdAt = user.createdAt;
 
     return dto;
+  }
+}
+
+export class UserMeViewDto extends OmitType(UserViewDto, ['createdAt']) {
+  userId: string;
+
+  static mapToMeView(user: UserDocument): UserMeViewDto {
+    const dto = new UserMeViewDto();
+
+    dto.email = user.email;
+    dto.login = user.login;
+    dto.userId = user._id.toString();
+
+    return dto;
+
   }
 }
