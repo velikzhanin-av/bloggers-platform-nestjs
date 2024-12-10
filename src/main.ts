@@ -8,8 +8,6 @@ async function bootstrap() {
   applyAppSettings(app);
 
   await app.listen(process.env.PORT ?? 3000);
-
-  return app.getHttpAdapter().getInstance();
 }
 
-module.exports = bootstrap();
+bootstrap();
