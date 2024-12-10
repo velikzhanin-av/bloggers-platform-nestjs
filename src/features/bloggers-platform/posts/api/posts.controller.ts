@@ -6,7 +6,7 @@ import {
   NotFoundException,
   Param,
   Post, Put,
-  Query,
+  Query, UseGuards,
 } from '@nestjs/common';
 import { PostViewDto } from './output-dto/posts.view-dto';
 import { PostsQueryRepository } from '../infrastructure/query/posts.query-repository';
@@ -16,8 +16,10 @@ import { PostsService } from '../application/posts.service';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/query/blogs.query-repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { GetPostsQueryParams } from './input-dto/get-posts-query-params.input-dto';
+import {JwtAuthGuard} from "../../../../core/guards/jwt-auth.guard";
 
 @Controller('posts')
+@UseGuards(JwtAuthGuard)
 export class PostsController {
   constructor(
     private postsService: PostsService,

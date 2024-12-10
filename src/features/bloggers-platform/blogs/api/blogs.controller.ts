@@ -9,7 +9,7 @@ import {
   NotFoundException,
   Param,
   Post, Put,
-  Query,
+  Query, UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { CreateBlogInputDto } from './input-dto/blogs.input-dto';
@@ -28,8 +28,10 @@ import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { UserViewDto } from '../../../user-accounts/api/output-dto/users.view-dto';
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
 import {GetPostsQueryParams} from "../../posts/api/input-dto/get-posts-query-params.input-dto";
+import {JwtAuthGuard} from "../../../../core/guards/jwt-auth.guard";
 
 @Controller('blogs')
+@UseGuards(JwtAuthGuard)
 export class BlogsController {
   constructor(
     private blogsService: BlogsService,
