@@ -1,9 +1,9 @@
 import {BadRequestException, INestApplication, ValidationPipe} from '@nestjs/common';
 
 import { ValidationError } from '@nestjs/common';
-import {ObjectIdValidationPipe} from "../core/pipes/object-id-validation.pipes";
+import { ObjectIdValidationPipe } from "../core/pipes/object-id-validation.pipes";
 
-type ErrorResponse = { message: string; key: string };
+type ErrorResponse = { message: string; field: string };
 
 //функция использует рекурсию для обхода объекта children при вложенных полях при валидации
 //поставьте логи и разберитесь как она работает
@@ -25,7 +25,7 @@ export const errorFormatter = (
           message: error.constraints[key]
             ? `${error.constraints[key]}; Received value: ${error?.value}`
             : '',
-          key: error.property,
+          field: error.property,
         });
       }
     }
