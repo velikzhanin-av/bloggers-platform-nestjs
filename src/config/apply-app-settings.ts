@@ -9,6 +9,7 @@ export const applyAppSettings = (app: INestApplication) => {
       //сработает наследование
       //и методы классов dto
       transform: true,
+      stopAtFirstError: true,
     }),
   );
 };
