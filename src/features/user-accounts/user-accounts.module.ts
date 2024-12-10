@@ -12,6 +12,7 @@ import { AuthService } from './application/auth.service';
 import { BcryptService } from './application/bcrypt.service';
 import { JwtService } from './application/jwt.service';
 import {JwtStrategy} from "../../core/guards/jwt.strategy";
+import {AuthQueryRepository} from "./infrastructure/query/auth.query-repository";
 
 @Module({
   imports: [
@@ -25,6 +26,7 @@ import {JwtStrategy} from "../../core/guards/jwt.strategy";
     UsersQueryRepository,
     AuthService,
     AuthRepository,
+    AuthQueryRepository,
     BcryptService,
     JwtService,
     JwtStrategy

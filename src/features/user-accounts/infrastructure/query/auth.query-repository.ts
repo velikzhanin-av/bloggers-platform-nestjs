@@ -1,13 +1,19 @@
-import {Injectable} from "@nestjs/common";
-import {InjectModel} from "@nestjs/mongoose";
-import {User, UserModelType} from "../../domain/users.entity";
+import {Injectable, NotFoundException} from "@nestjs/common";
+import {UsersQueryRepository} from "./users.query-repository";
+import {UserMeViewDto, UserViewDto} from "../../api/output-dto/users.view-dto";
+import {UserDocument} from "../../domain/users.entity";
 
 @Injectable()
 export class AuthQueryRepository {
   constructor(
-    @InjectModel(User.name)
-    private UserModel: UserModelType) {}
-  // TODO куда обращаться? UserModel or queryUserRepository
-  async get
+    private usersQueryRepository: UsersQueryRepository) {}
+
+  async getUserInfo(userId: string): Promise<UserMeViewDto> {
+    const user: UserDocument | null = await this.usersQueryRepository.findById(userId);
+    if (!user) {
+      throw new NotFoundException('user not found');
+    }
+    return UserMeViewDto.mapToMeView(user)
+  }
 
 }

@@ -6,10 +6,13 @@ import { Response, Request } from 'express';
 import {JwtAuthGuard} from "../../../core/guards/jwt-auth.guard";
 import {ExtractUserFromRequest} from "../../../core/decorators/extract-user-from-request";
 import {UserContext} from "../../../core/dto/user-context";
+import {AuthQueryRepository} from "../infrastructure/query/auth.query-repository";
+import {UserMeViewDto} from "./output-dto/users.view-dto";
 
 @Controller('/auth')
 export class AuthController {
-  constructor(private authService: AuthService) {
+  constructor(private authService: AuthService,
+              private authQueryRepository: AuthQueryRepository) {
   }
 
   @Post()
@@ -38,9 +41,9 @@ export class AuthController {
   @UseGuards(JwtAuthGuard)
   async getUserInfo(
     @ExtractUserFromRequest() user: UserContext
-  ): Promise<UserContext> {
+  ): Promise<UserMeViewDto> {
+    return this.authQueryRepository.getUserInfo(user.userId)
 
-    return user
   }
 }
 
