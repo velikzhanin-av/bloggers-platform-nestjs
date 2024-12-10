@@ -57,11 +57,15 @@ export class UsersQueryRepository {
     });
   }
 
-  async getByIdOrNotFoundFail(userId: string): Promise<UserViewDto> {
-    const user: UserDocument | null = await this.UserModel.findOne({
-      _id: userId,
-      deletionStatus: DeletionStatus.NotDeleted,
+  async findById(id: string): Promise<UserDocument | null> {
+    return this.UserModel.findOne({
+      _id: id,
+      deletionStatus: { $ne: DeletionStatus.PermanentDeleted },
     });
+  }
+
+  async getByIdOrNotFoundFail(userId: string): Promise<UserViewDto> {
+    const user: UserDocument | null = await this.findById(userId)
     if (!user) {
       throw new NotFoundException('user not found');
     }
