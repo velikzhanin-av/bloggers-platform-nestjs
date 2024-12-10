@@ -31,7 +31,6 @@ import {GetPostsQueryParams} from "../../posts/api/input-dto/get-posts-query-par
 import {JwtAuthGuard} from "../../../../core/guards/jwt-auth.guard";
 
 @Controller('blogs')
-@UseGuards(JwtAuthGuard)
 export class BlogsController {
   constructor(
     private blogsService: BlogsService,

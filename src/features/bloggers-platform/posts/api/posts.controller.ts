@@ -19,7 +19,6 @@ import { GetPostsQueryParams } from './input-dto/get-posts-query-params.input-dt
 import {JwtAuthGuard} from "../../../../core/guards/jwt-auth.guard";
 
 @Controller('posts')
-@UseGuards(JwtAuthGuard)
 export class PostsController {
   constructor(
     private postsService: PostsService,
