@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/users.entity';
 import { CreateUserDto } from '../dto/create-user.dto';
 import bcrypt from 'bcrypt';
+import {randomUUID} from "crypto"
 import { NotFoundException } from '@nestjs/common';
 
 export class UsersService {
@@ -19,6 +20,7 @@ export class UsersService {
       email: dto.email,
       login: dto.login,
       password: passwordHash,
+
     });
 
     await this.usersRepository.save(user);

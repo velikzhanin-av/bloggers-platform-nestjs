@@ -9,6 +9,7 @@ import { AuthLoginDto } from '../dto/auth-login.dto';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { BcryptService } from './bcrypt.service';
 import { randomUUID } from 'crypto';
+import {add} from "date-fns"
 import { JwtService } from './jwt.service';
 import { AuthRepository } from '../infrastructure/auth.repository';
 import {
@@ -17,6 +18,11 @@ import {
   SessionModelType,
 } from '../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
+import {CreateUserDto} from "../dto/create-user.dto";
+import bcrypt from "bcrypt";
+import {UsersService} from "./users.service";
+import {NodemailerAdapter} from "../infrastructure/adapters/nodemailer.adapter";
+import {NodemailerService} from "./nodemailer.service";
 
 @Injectable()
 export class AuthService {
@@ -24,9 +30,11 @@ export class AuthService {
     @InjectModel(Session.name)
     private SessionModel: SessionModelType,
     private bcryptService: BcryptService,
+    private usersService: UsersService,
     private jwtService: JwtService,
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
+    private nodemailerService: NodemailerService,
   ) {}
 
   async login(dto: AuthLoginDto): Promise<{
@@ -102,5 +110,18 @@ export class AuthService {
 
     if (!tokenData) return null;
     return { accessToken, refreshToken, tokenData };
+  }
+
+  async registerUser(dto: CreateUserDto): Promise<void> {
+    await this.usersRepository.doesExistByLoginOrEmail(dto.login, dto.email);
+
+    const userId: string =  await this.usersService.createUser(dto);
+    const confirmationCode = randomUUID();
+
+    const user: UserDocument | null = await this.usersRepository.findOrNotFoundFail(userId);
+    user!.setConfirmationCode(confirmationCode);
+    await this.usersRepository.save(user!);
+
+    await this.nodemailerService.sendEmail(dto.login, dto.email, confirmationCode);
   }
 }

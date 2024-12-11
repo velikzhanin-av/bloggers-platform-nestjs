@@ -49,7 +49,9 @@ export function pipesSetup(app: INestApplication) {
       exceptionFactory: (errors) => {
         const formattedErrors = errorFormatter(errors);
 
-        throw new BadRequestException(formattedErrors);
+        throw new BadRequestException({
+          errorsMessages: formattedErrors,
+        });
       },
     }),
   );

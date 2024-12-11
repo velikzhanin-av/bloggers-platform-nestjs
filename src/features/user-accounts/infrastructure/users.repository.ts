@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import {BadRequestException, Injectable, UnauthorizedException} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/users.entity';
 import { UpdateWriteOpResult } from 'mongoose';
@@ -43,5 +43,21 @@ export class UsersRepository {
       { $set: { refreshToken: token } },
     );
     return res.modifiedCount;
+  }
+
+  // TODO спросить правильно ли так делать
+  async doesExistByLoginOrEmail(login: string, email: string): Promise<void> {
+    if (await this.UserModel.findOne({login})) {
+      throw new BadRequestException({
+        "message": "string",
+        "field": "string"
+      });
+    }
+    if (await this.UserModel.findOne({email})) {
+      throw new BadRequestException({
+        "message": "string",
+        "field": "string"
+      });
+    }
   }
 }

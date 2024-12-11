@@ -8,6 +8,7 @@ import {ExtractUserFromRequest} from "../../../core/decorators/extract-user-from
 import {UserContext} from "../../../core/dto/user-context";
 import {AuthQueryRepository} from "../infrastructure/query/auth.query-repository";
 import {UserMeViewDto} from "./output-dto/users.view-dto";
+import {CreateUserDto} from "../dto/create-user.dto";
 
 @Controller('/auth')
 export class AuthController {
@@ -15,8 +16,10 @@ export class AuthController {
               private authQueryRepository: AuthQueryRepository) {
   }
 
-  @Post()
-  async registration(@Body() body: AuthRegistrationInputDto) {
+  @Post('/registration')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registration(@Body() body: CreateUserDto) {
+    return this.authService.registerUser(body);
   }
 
   @Post('/login')

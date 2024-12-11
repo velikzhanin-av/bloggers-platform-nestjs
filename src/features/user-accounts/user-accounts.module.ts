@@ -13,6 +13,8 @@ import { BcryptService } from './application/bcrypt.service';
 import { JwtService } from './application/jwt.service';
 import { JwtStrategy } from "../../core/guards/jwt.strategy";
 import { AuthQueryRepository } from "./infrastructure/query/auth.query-repository";
+import {NodemailerService} from "./application/nodemailer.service";
+import {NodemailerAdapter} from "./infrastructure/adapters/nodemailer.adapter";
 
 @Module({
   imports: [
@@ -28,6 +30,8 @@ import { AuthQueryRepository } from "./infrastructure/query/auth.query-repositor
     AuthRepository,
     AuthQueryRepository,
     BcryptService,
+    NodemailerService,
+    NodemailerAdapter,
     JwtService,
     JwtStrategy
   ],
