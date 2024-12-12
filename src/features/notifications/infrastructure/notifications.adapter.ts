@@ -1,16 +1,16 @@
 import nodemailer from "nodemailer";
 import {Injectable} from "@nestjs/common";
-import {Config} from "../../../../config/config";
+import {Config} from "../../../config/config";
 
 @Injectable()
-export class NodemailerAdapter {
+export class NotificationsAdapter {
 
   async sendEmail(login: string, email: string, confirmationCode: string) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {
         user: "backendincubator@gmail.com",
-        pass: "ihhv smpw phwu fehl",
+        pass: Config.GMAIL_PASS,
       },
     })
     try {
@@ -36,7 +36,7 @@ export class NodemailerAdapter {
       service: 'gmail',
       auth: {
         user: "backendincubator@gmail.com",
-        pass: "ihhv smpw phwu fehl"
+        pass: Config.GMAIL_PASS,
       },
     })
     try {

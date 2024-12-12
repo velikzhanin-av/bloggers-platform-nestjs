@@ -10,7 +10,6 @@ import {AuthLoginDto} from '../dto/auth-login.dto';
 import {UsersRepository} from '../infrastructure/users.repository';
 import {BcryptService} from './bcrypt.service';
 import {randomUUID} from 'crypto';
-import {add} from "date-fns"
 import {JwtService} from './jwt.service';
 import {AuthRepository} from '../infrastructure/auth.repository';
 import {
@@ -20,12 +19,10 @@ import {
 } from '../domain/sessions.entity';
 import {InjectModel} from '@nestjs/mongoose';
 import {CreateUserDto} from "../dto/create-user.dto";
-import bcrypt from "bcrypt";
 import {UsersService} from "./users.service";
-import {NodemailerAdapter} from "../infrastructure/adapters/nodemailer.adapter";
-import {NodemailerService} from "./nodemailer.service";
 import {AuthConfirmationCodeDto} from "../api/input-dto/auth-confirmation-code.dto";
 import {AuthRegistrationEmailResendingDtp} from "../api/input-dto/auth-registration-email-resending.dtp";
+import {NotificationsService} from "../../notifications/application/notifications.service";
 
 @Injectable()
 export class AuthService {
@@ -37,7 +34,7 @@ export class AuthService {
     private jwtService: JwtService,
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
-    private nodemailerService: NodemailerService,
+    private notificationsService: NotificationsService,
   ) {
   }
 
@@ -126,7 +123,7 @@ export class AuthService {
     user!.setConfirmationCode(confirmationCode);
     await this.usersRepository.save(user!);
 
-    await this.nodemailerService.sendEmail(dto.login, dto.email, confirmationCode);
+    await this.notificationsService.sendEmail(dto.login, dto.email, confirmationCode);
   }
 
   async registrationConfirmation(dto: AuthConfirmationCodeDto): Promise<void> {
@@ -164,6 +161,6 @@ export class AuthService {
     user.setConfirmationCode(newConfirmationCode);
     await this.usersRepository.save(user);
 
-    await this.nodemailerService.sendEmail(user.login, user.email, newConfirmationCode);
+    await this.notificationsService.sendEmail(user.login, user.email, newConfirmationCode);
   }
 }

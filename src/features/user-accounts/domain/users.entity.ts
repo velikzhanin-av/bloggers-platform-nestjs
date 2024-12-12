@@ -1,7 +1,7 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
-import {add} from "date-fns";
+import { add } from "date-fns";
 
 export enum DeletionStatus {
   NotDeleted = 'not-deleted',
@@ -72,8 +72,6 @@ export class User {
   confirmEmail(): void {
     this.emailConfirmation.isConfirmed = true
   }
-
-
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);
