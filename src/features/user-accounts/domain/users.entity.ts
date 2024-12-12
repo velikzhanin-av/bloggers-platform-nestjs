@@ -16,7 +16,7 @@ export class EmailConfirmationType {
   @Prop({ type: String, required: false, default: '' })
   expirationDate: string;
 
-  @Prop({ type: String, required: true, default: false })
+  @Prop({ type: Boolean, required: true, default: false })
   isConfirmed: boolean;
 }
 
@@ -68,6 +68,12 @@ export class User {
       minutes: 30,
     }).toString()
   }
+
+  confirmEmail(): void {
+    this.emailConfirmation.isConfirmed = true
+  }
+
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

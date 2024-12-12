@@ -9,6 +9,8 @@ import {UserContext} from "../../../core/dto/user-context";
 import {AuthQueryRepository} from "../infrastructure/query/auth.query-repository";
 import {UserMeViewDto} from "./output-dto/users.view-dto";
 import {CreateUserDto} from "../dto/create-user.dto";
+import {AuthConfirmationCodeDto} from "./input-dto/auth-confirmation-code.dto";
+import {AuthRegistrationEmailResendingDtp} from "./input-dto/auth-registration-email-resending.dtp";
 
 @Controller('/auth')
 export class AuthController {
@@ -48,5 +50,19 @@ export class AuthController {
     return this.authQueryRepository.getUserInfo(user.userId)
 
   }
+
+  @Post('/registration-confirmation')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registrationConfirmation(@Body() body: AuthConfirmationCodeDto) {
+    return this.authService.registrationConfirmation(body);
+  }
+
+  @Post('/registration-email-resending')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async registrationEmailResending(@Body() body: AuthRegistrationEmailResendingDtp) {
+    return this.authService.registrationEmailResending(body);
+  }
+
+
 }
 

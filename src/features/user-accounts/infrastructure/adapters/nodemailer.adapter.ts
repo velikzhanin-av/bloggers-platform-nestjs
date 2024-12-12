@@ -10,11 +10,11 @@ export class NodemailerAdapter {
       service: 'gmail',
       auth: {
         user: "backendincubator@gmail.com",
-        pass: Config.GMAIL_PASS,
+        pass: "ihhv smpw phwu fehl",
       },
     })
     try {
-      const result = await transporter.sendMail({
+      const result = transporter.sendMail({
         from: '"backend incubator" <backendincubator@gmail.com>', // sender address
         to: email,
         subject: `Hi ${login}!`,
@@ -36,11 +36,11 @@ export class NodemailerAdapter {
       service: 'gmail',
       auth: {
         user: "backendincubator@gmail.com",
-        pass: Config.GMAIL_PASS,
+        pass: "ihhv smpw phwu fehl"
       },
     })
     try {
-      const result = await transporter.sendMail({
+      const result = transporter.sendMail({
         from: '"backend incubator" <backendincubator@gmail.com>', // sender address
         to: email,
         subject: `Hi ${login}!`,
