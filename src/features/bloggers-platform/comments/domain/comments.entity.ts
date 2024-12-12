@@ -1,41 +1,38 @@
-import {Prop, Schema} from "@nestjs/mongoose";
+import { Prop, Schema } from '@nestjs/mongoose';
 
-@Schema({_id: false})
+@Schema({ _id: false })
 export class CommentatorInfo {
   @Prop({ type: String, required: true })
-  userId: string
+  userId: string;
 
   @Prop({ type: String, required: true })
-  userLogin: string
+  userLogin: string;
 }
 
-@Schema({_id: false})
+@Schema({ _id: false })
 export class LikesInfo {
   @Prop({ type: Number, required: true })
-  likesCount: number
+  likesCount: number;
 
   @Prop({ type: Number, required: true })
-  dislikesCount: number
+  dislikesCount: number;
 }
 
-
-@Schema({timestamps: true})
+@Schema({ timestamps: true })
 export class Comment {
   @Prop({ type: String, required: true })
-  content: string
+  content: string;
 
   @Prop({ type: CommentatorInfo, required: true })
-  commentatorInfo: CommentatorInfo
+  commentatorInfo: CommentatorInfo;
 
   @Prop({ type: Date, required: true })
-  createdAt: Date
+  createdAt: Date;
 
   @Prop({ type: String, required: true })
-  postId: string
-
+  postId: string;
   @Prop({ type: LikesInfo, required: true })
-  likesInfo: LikesInfo
+  likesInfo: LikesInfo;
 
   static createInstance(comment: Comment) {}
 }
-

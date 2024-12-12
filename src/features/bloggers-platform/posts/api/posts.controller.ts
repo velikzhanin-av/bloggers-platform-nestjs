@@ -1,12 +1,17 @@
 import {
   Body,
-  Controller, Delete,
-  Get, HttpCode, HttpStatus,
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
   InternalServerErrorException,
   NotFoundException,
   Param,
-  Post, Put,
-  Query, UseGuards,
+  Post,
+  Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { PostViewDto } from './output-dto/posts.view-dto';
 import { PostsQueryRepository } from '../infrastructure/query/posts.query-repository';
@@ -16,7 +21,7 @@ import { PostsService } from '../application/posts.service';
 import { BlogsQueryRepository } from '../../blogs/infrastructure/query/blogs.query-repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { GetPostsQueryParams } from './input-dto/get-posts-query-params.input-dto';
-import {JwtAuthGuard} from "../../../../core/guards/jwt-auth.guard";
+import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -43,8 +48,10 @@ export class PostsController {
 
   @Put(':postId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async putPostById(@Param('postId') postId: string,
-                    @Body() body: CreatePostInputDto): Promise<void> {
+  async putPostById(
+    @Param('postId') postId: string,
+    @Body() body: CreatePostInputDto,
+  ): Promise<void> {
     await this.postsService.updatePost(postId, body);
     return;
   }

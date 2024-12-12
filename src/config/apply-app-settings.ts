@@ -1,5 +1,5 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
-import {pipesSetup} from "./pipes.setup";
+import { pipesSetup } from './pipes.setup';
 
 export const applyAppSettings = (app: INestApplication) => {
   app.enableCors();

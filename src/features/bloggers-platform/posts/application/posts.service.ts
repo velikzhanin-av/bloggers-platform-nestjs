@@ -3,9 +3,9 @@ import { CreatePostDto } from '../dto/create-post.dto';
 import { InjectModel } from '@nestjs/mongoose';
 
 import { PostsRepository } from '../infrastructure/posts.repository';
-import {CreateBlogInputDto} from "../../blogs/api/input-dto/blogs.input-dto";
-import {NotFoundException} from "@nestjs/common";
-import {CreatePostInputDto} from "../api/input-dto/posts.input-dto";
+import { CreateBlogInputDto } from '../../blogs/api/input-dto/blogs.input-dto';
+import { NotFoundException } from '@nestjs/common';
+import { CreatePostInputDto } from '../api/input-dto/posts.input-dto';
 
 export class PostsService {
   constructor(

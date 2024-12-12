@@ -3,5 +3,4 @@ export class UserContext {
   deviceId: string;
   iat: number;
   exp: number;
-
 }

@@ -1,7 +1,7 @@
 import * as process from 'node:process';
-import {config} from "dotenv"
+import { config } from 'dotenv';
 
-config()
+config();
 
 export const Config = {
   DB_NAME: process.env.DB_NAME || 'bloggers-platform',

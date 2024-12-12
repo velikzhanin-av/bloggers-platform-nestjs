@@ -14,10 +14,12 @@ export class PostsQueryRepository {
 
   async findAllPosts(
     @Query() query: GetPostsQueryParams,
-    blogId: string | null =null
+    blogId: string | null = null,
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     let filter: FilterQuery<Post> = {};
-    if (blogId) { filter = { blogId } }
+    if (blogId) {
+      filter = { blogId };
+    }
 
     const posts: PostDocument[] | null = await this.PostModel.find({
       ...filter,

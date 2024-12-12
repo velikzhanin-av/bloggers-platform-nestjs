@@ -1,6 +1,5 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
-import {UserContext} from "../dto/user-context";
-
+import { UserContext } from '../dto/user-context';
 
 export const ExtractUserFromRequest = createParamDecorator(
   (data: unknown, context: ExecutionContext): UserContext => {
