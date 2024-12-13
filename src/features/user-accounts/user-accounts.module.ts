@@ -33,6 +33,6 @@ import { NotificationsModule } from '../notifications/notifications.module';
     JwtService,
     JwtStrategy,
   ],
-  exports: [UsersService, MongooseModule],
+  exports: [UsersService, MongooseModule, UsersRepository],
 })
 export class UserAccountsModule {}
