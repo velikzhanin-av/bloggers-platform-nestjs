@@ -14,12 +14,15 @@ import { JwtService } from './application/jwt.service';
 import { JwtStrategy } from '../../core/guards/jwt.strategy';
 import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 import { NotificationsModule } from '../notifications/notifications.module';
+import { CreateUserUseCase } from './application/create-user.usecase';
+import { CqrsModule } from '@nestjs/cqrs';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }]),
     NotificationsModule,
+    CqrsModule,
   ],
   controllers: [UsersController, AuthController],
   providers: [
@@ -32,6 +35,7 @@ import { NotificationsModule } from '../notifications/notifications.module';
     BcryptService,
     JwtService,
     JwtStrategy,
+    CreateUserUseCase,
   ],
   exports: [UsersService, MongooseModule, UsersRepository],
 })

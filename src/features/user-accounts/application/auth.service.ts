@@ -113,21 +113,21 @@ export class AuthService {
   }
 
   async registerUser(dto: CreateUserDto): Promise<void> {
-    await this.usersRepository.doesExistByLoginOrEmail(dto.login, dto.email);
-
-    const userId: string = await this.usersService.createUser(dto);
-    const confirmationCode = randomUUID();
-
-    const user: UserDocument | null =
-      await this.usersRepository.findOrNotFoundFail(userId);
-    user!.setConfirmationCode(confirmationCode);
-    await this.usersRepository.save(user!);
-
-    await this.notificationsService.sendEmail(
-      dto.login,
-      dto.email,
-      confirmationCode,
-    );
+    // await this.usersRepository.doesExistByLoginOrEmail(dto.login, dto.email);
+    //
+    // const userId: string = await this.usersService.createUser(dto);
+    // const confirmationCode = randomUUID();
+    //
+    // const user: UserDocument | null =
+    //   await this.usersRepository.findOrNotFoundFail(userId);
+    // user!.setConfirmationCode(confirmationCode);
+    // await this.usersRepository.save(user!);
+    //
+    // await this.notificationsService.sendEmail(
+    //   dto.login,
+    //   dto.email,
+    //   confirmationCode,
+    // );
   }
 
   async registrationConfirmation(dto: AuthConfirmationCodeDto): Promise<void> {

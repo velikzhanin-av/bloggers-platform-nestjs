@@ -13,19 +13,9 @@ export class UsersService {
     private usersRepository: UsersRepository,
   ) {}
 
-  async createUser(dto: CreateUserDto): Promise<string> {
-    const passwordHash: string = await bcrypt.hash(dto.password, 10);
-
-    const user: UserDocument = this.UserModel.createInstance({
-      email: dto.email,
-      login: dto.login,
-      password: passwordHash,
-    });
-
-    await this.usersRepository.save(user);
-
-    return user._id.toString();
-  }
+  // async createUser(dto: CreateUserDto): Promise<string> {
+  //
+  // }
 
   async deleteUser(userId: string): Promise<void> {
     const user: UserDocument | null =

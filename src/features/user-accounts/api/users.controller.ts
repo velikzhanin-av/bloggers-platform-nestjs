@@ -17,6 +17,8 @@ import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dt
 import { UserViewDto } from './output-dto/users.view-dto';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
 import { BasicAuthGuard } from '../../../core/guards/basic-auth.guard';
+import { CommandBus } from '@nestjs/cqrs';
+import { CreateUserCommand } from '../application/create-user.usecase';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
@@ -24,6 +26,7 @@ export class UsersController {
   constructor(
     private usersService: UsersService,
     private usersQueryRepository: UsersQueryRepository,
+    private commandBus: CommandBus,
   ) {}
 
   @Get()
@@ -35,7 +38,10 @@ export class UsersController {
 
   @Post()
   async postUser(@Body() body: CreateUserDto): Promise<UserViewDto | null> {
-    const userId: string = await this.usersService.createUser(body);
+    const userId: string = await this.commandBus.execute<
+      CreateUserCommand,
+      string
+    >(new CreateUserCommand(body));
 
     return await this.usersQueryRepository.getByIdOrNotFoundFail(userId);
   }
