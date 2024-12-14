@@ -6,7 +6,7 @@ import {
   HttpStatus,
 } from '@nestjs/common';
 import { Request, Response } from 'express';
-import { OutputErrorsType } from 'src/core/types/output-errors.types';
+import { OutputErrorsType } from '../types/output-errors.types';
 
 @Catch(HttpException)
 export class HttpExceptionFilter implements ExceptionFilter<HttpException> {
