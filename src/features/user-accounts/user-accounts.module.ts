@@ -11,15 +11,15 @@ import { AuthRepository } from './infrastructure/auth.repository';
 import { AuthService } from './application/auth.service';
 import { BcryptService } from './application/bcrypt.service';
 import { JwtService } from './application/jwt.service';
-import { JwtStrategy } from "../../core/guards/jwt.strategy";
-import { AuthQueryRepository } from "./infrastructure/query/auth.query-repository";
-import {NodemailerService} from "./application/nodemailer.service";
-import {NodemailerAdapter} from "./infrastructure/adapters/nodemailer.adapter";
+import { JwtStrategy } from '../../core/guards/jwt.strategy';
+import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
+import { NotificationsModule } from '../notifications/notifications.module';
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
     MongooseModule.forFeature([{ name: Session.name, schema: SessionSchema }]),
+    NotificationsModule,
   ],
   controllers: [UsersController, AuthController],
   providers: [
@@ -30,11 +30,9 @@ import {NodemailerAdapter} from "./infrastructure/adapters/nodemailer.adapter";
     AuthRepository,
     AuthQueryRepository,
     BcryptService,
-    NodemailerService,
-    NodemailerAdapter,
     JwtService,
-    JwtStrategy
+    JwtStrategy,
   ],
-  exports: [UsersService, MongooseModule],
+  exports: [UsersService, MongooseModule, UsersRepository],
 })
 export class UserAccountsModule {}

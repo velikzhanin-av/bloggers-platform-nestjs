@@ -1,14 +1,14 @@
 import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
-import {add} from "date-fns";
+import { add } from 'date-fns';
 
 export enum DeletionStatus {
   NotDeleted = 'not-deleted',
   PermanentDeleted = 'permanent-deleted',
 }
 
-@Schema({_id: false})
+@Schema({ _id: false })
 export class EmailConfirmationType {
   @Prop({ type: String, required: false, default: '' })
   confirmationCode: string;
@@ -51,7 +51,7 @@ export class User {
     user.emailConfirmation = {
       confirmationCode: '',
       expirationDate: '',
-      isConfirmed: false
+      isConfirmed: false,
     };
 
     return user as UserDocument;
@@ -66,14 +66,12 @@ export class User {
     this.emailConfirmation.expirationDate = add(new Date(), {
       hours: 1,
       minutes: 30,
-    }).toString()
+    }).toString();
   }
 
   confirmEmail(): void {
-    this.emailConfirmation.isConfirmed = true
+    this.emailConfirmation.isConfirmed = true;
   }
-
-
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

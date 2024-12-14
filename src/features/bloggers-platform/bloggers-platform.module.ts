@@ -10,14 +10,22 @@ import { Post, PostSchema } from './posts/domain/posts.entity';
 import { PostsService } from './posts/application/posts.service';
 import { PostsRepository } from './posts/infrastructure/posts.repository';
 import { PostsQueryRepository } from './posts/infrastructure/query/posts.query-repository';
+import { CommentsService } from './comments/application/comments.service';
+import { CommentsController } from './comments/api/comments.controller';
+import { Comment, CommentSchema } from './comments/domain/comments.entity';
+import { UsersRepository } from '../user-accounts/infrastructure/users.repository';
+import { UserAccountsModule } from '../user-accounts/user-accounts.module';
+import { CommentsRepository } from './comments/infrastructure/comments.repository';
 
 //тут регистрируем провайдеры всех сущностей блоггерской платформы (blogs, posts, comments, etc...)
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
+    MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+    UserAccountsModule,
   ],
-  controllers: [BlogsController, PostsController],
+  controllers: [BlogsController, PostsController, CommentsController],
   providers: [
     BlogsService,
     BlogsRepository,
@@ -25,6 +33,8 @@ import { PostsQueryRepository } from './posts/infrastructure/query/posts.query-r
     PostsService,
     PostsRepository,
     PostsQueryRepository,
+    CommentsService,
+    CommentsRepository,
   ],
   exports: [MongooseModule],
 })

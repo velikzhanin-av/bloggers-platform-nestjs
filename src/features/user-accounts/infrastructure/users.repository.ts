@@ -1,4 +1,9 @@
-import {BadRequestException, Injectable, NotFoundException, UnauthorizedException} from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { User, UserDocument, UserModelType } from '../domain/users.entity';
 import { UpdateWriteOpResult } from 'mongoose';
@@ -47,43 +52,49 @@ export class UsersRepository {
 
   // TODO спросить правильно ли так делать
   async doesExistByLoginOrEmail(login: string, email: string): Promise<void> {
-    if (await this.UserModel.findOne({login})) {
-      throw new BadRequestException({ errorsMessages: [{
-        "message": "string",
-        "field": "login"}]
+    if (await this.UserModel.findOne({ login })) {
+      throw new BadRequestException({
+        errorsMessages: {
+          message: 'string',
+          field: 'login',
+        },
       });
     }
-    if (await this.UserModel.findOne({email})) {
-      throw new BadRequestException({ errorsMessages: [{
-          "message": "string",
-          "field": "email"}]
+    if (await this.UserModel.findOne({ email })) {
+      throw new BadRequestException({
+        errorsMessages: {
+          message: 'string',
+          field: 'email',
+        },
       });
     }
   }
 
   async findUserByConfirmationCode(code: string) {
-    const user: UserDocument | null = await this.UserModel.findOne({'emailConfirmation.confirmationCode': code})
-    if (!user) throw new BadRequestException({
-      "errorsMessages": [
-        {
-          "message": "string",
-          "field": "code"
-        }
-      ]
+    const user: UserDocument | null = await this.UserModel.findOne({
+      'emailConfirmation.confirmationCode': code,
     });
+    if (!user)
+      throw new BadRequestException({
+        errorsMessages: {
+          message: 'string',
+          field: 'code',
+        },
+      });
     return user;
   }
 
   async findUserByEmail(email: string) {
-    const user: UserDocument | null = await this.UserModel.findOne({email})
-    if (!user) throw new BadRequestException({
-      "errorsMessages": [
-        {
-          "message": "string",
-          "field": "email"
-        }
-      ]
-    });
+    const user: UserDocument | null = await this.UserModel.findOne({ email });
+    if (!user)
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: 'string',
+            field: 'email',
+          },
+        ],
+      });
     return user;
   }
 }

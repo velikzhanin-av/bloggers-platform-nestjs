@@ -7,7 +7,8 @@ import {
   HttpStatus,
   Param,
   Post,
-  Query, UseGuards,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
 import { CreateUserDto } from '../dto/create-user.dto';
@@ -15,7 +16,7 @@ import { UsersService } from '../application/users.service';
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { UserViewDto } from './output-dto/users.view-dto';
 import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
-import {BasicAuthGuard} from "../../../core/guards/basic-auth.guard";
+import { BasicAuthGuard } from '../../../core/guards/basic-auth.guard';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)

@@ -1,5 +1,5 @@
 import { UserDocument } from '../../domain/users.entity';
-import {OmitType} from "@nestjs/mapped-types";
+import { OmitType } from '@nestjs/mapped-types';
 
 export class UserViewDto {
   id: string;
@@ -27,9 +27,8 @@ export class UserMeViewDto extends OmitType(UserViewDto, ['createdAt']) {
 
     dto.email = user.email;
     dto.login = user.login;
-    dto.userId = user.id
+    dto.userId = user.id;
 
     return dto;
-
   }
 }

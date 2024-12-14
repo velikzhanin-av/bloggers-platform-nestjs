@@ -1,7 +1,11 @@
-import {BadRequestException, INestApplication, ValidationPipe} from '@nestjs/common';
+import {
+  BadRequestException,
+  INestApplication,
+  ValidationPipe,
+} from '@nestjs/common';
 
 import { ValidationError } from '@nestjs/common';
-import { ObjectIdValidationPipe } from "../core/pipes/object-id-validation.pipes";
+import { ObjectIdValidationPipe } from '../core/pipes/object-id-validation.pipes';
 
 type ErrorResponse = { message: string; field: string };
 

@@ -5,27 +5,24 @@ import {
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
-import {UserDocument} from '../domain/users.entity';
-import {AuthLoginDto} from '../dto/auth-login.dto';
-import {UsersRepository} from '../infrastructure/users.repository';
-import {BcryptService} from './bcrypt.service';
-import {randomUUID} from 'crypto';
-import {add} from "date-fns"
-import {JwtService} from './jwt.service';
-import {AuthRepository} from '../infrastructure/auth.repository';
+import { UserDocument } from '../domain/users.entity';
+import { AuthLoginDto } from '../dto/auth-login.dto';
+import { UsersRepository } from '../infrastructure/users.repository';
+import { BcryptService } from './bcrypt.service';
+import { randomUUID } from 'crypto';
+import { JwtService } from './jwt.service';
+import { AuthRepository } from '../infrastructure/auth.repository';
 import {
   Session,
   SessionDocument,
   SessionModelType,
 } from '../domain/sessions.entity';
-import {InjectModel} from '@nestjs/mongoose';
-import {CreateUserDto} from "../dto/create-user.dto";
-import bcrypt from "bcrypt";
-import {UsersService} from "./users.service";
-import {NodemailerAdapter} from "../infrastructure/adapters/nodemailer.adapter";
-import {NodemailerService} from "./nodemailer.service";
-import {AuthConfirmationCodeDto} from "../api/input-dto/auth-confirmation-code.dto";
-import {AuthRegistrationEmailResendingDtp} from "../api/input-dto/auth-registration-email-resending.dtp";
+import { InjectModel } from '@nestjs/mongoose';
+import { CreateUserDto } from '../dto/create-user.dto';
+import { UsersService } from './users.service';
+import { AuthConfirmationCodeDto } from '../api/input-dto/auth-confirmation-code.dto';
+import { AuthRegistrationEmailResendingDtp } from '../api/input-dto/auth-registration-email-resending.dtp';
+import { NotificationsService } from '../../notifications/application/notifications.service';
 
 @Injectable()
 export class AuthService {
@@ -37,9 +34,8 @@ export class AuthService {
     private jwtService: JwtService,
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
-    private nodemailerService: NodemailerService,
-  ) {
-  }
+    private notificationsService: NotificationsService,
+  ) {}
 
   async login(dto: AuthLoginDto): Promise<{
     sessionId: string;
@@ -113,7 +109,7 @@ export class AuthService {
     } | null = await this.jwtService.getDataFromJwtToken(refreshToken);
 
     if (!tokenData) return null;
-    return {accessToken, refreshToken, tokenData};
+    return { accessToken, refreshToken, tokenData };
   }
 
   async registerUser(dto: CreateUserDto): Promise<void> {
@@ -122,41 +118,47 @@ export class AuthService {
     const userId: string = await this.usersService.createUser(dto);
     const confirmationCode = randomUUID();
 
-    const user: UserDocument | null = await this.usersRepository.findOrNotFoundFail(userId);
+    const user: UserDocument | null =
+      await this.usersRepository.findOrNotFoundFail(userId);
     user!.setConfirmationCode(confirmationCode);
     await this.usersRepository.save(user!);
 
-    await this.nodemailerService.sendEmail(dto.login, dto.email, confirmationCode);
+    await this.notificationsService.sendEmail(
+      dto.login,
+      dto.email,
+      confirmationCode,
+    );
   }
 
   async registrationConfirmation(dto: AuthConfirmationCodeDto): Promise<void> {
-    const user: UserDocument = await this.usersRepository.findUserByConfirmationCode(dto.code);
+    const user: UserDocument =
+      await this.usersRepository.findUserByConfirmationCode(dto.code);
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
-        "errorsMessages": [
-          {
-            "message": "string",
-            "field": "code"
-          }
-        ]
+        errorsMessages: {
+          message: 'string',
+          field: 'code',
+        },
       });
     }
 
     user.confirmEmail();
     await this.usersRepository.save(user);
-    return
+    return;
   }
 
-  async registrationEmailResending(dto: AuthRegistrationEmailResendingDtp): Promise<void> {
-    const user: UserDocument = await this.usersRepository.findUserByEmail(dto.email);
+  async registrationEmailResending(
+    dto: AuthRegistrationEmailResendingDtp,
+  ): Promise<void> {
+    const user: UserDocument = await this.usersRepository.findUserByEmail(
+      dto.email,
+    );
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
-        "errorsMessages": [
-          {
-            "message": "string",
-            "field": "email"
-          }
-        ]
+        errorsMessages: {
+          message: 'string',
+          field: 'email',
+        },
       });
     }
 
@@ -164,6 +166,10 @@ export class AuthService {
     user.setConfirmationCode(newConfirmationCode);
     await this.usersRepository.save(user);
 
-    await this.nodemailerService.sendEmail(user.login, user.email, newConfirmationCode);
+    await this.notificationsService.sendEmail(
+      user.login,
+      user.email,
+      newConfirmationCode,
+    );
   }
 }

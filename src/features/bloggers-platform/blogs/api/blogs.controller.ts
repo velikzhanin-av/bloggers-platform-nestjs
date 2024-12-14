@@ -8,8 +8,10 @@ import {
   InternalServerErrorException,
   NotFoundException,
   Param,
-  Post, Put,
-  Query, UseGuards,
+  Post,
+  Put,
+  Query,
+  UseGuards,
 } from '@nestjs/common';
 import { BlogsService } from '../application/blogs.service';
 import { CreateBlogInputDto } from './input-dto/blogs.input-dto';
@@ -27,8 +29,8 @@ import { GetUsersQueryParams } from '../../../user-accounts/api/input-dto/get-us
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { UserViewDto } from '../../../user-accounts/api/output-dto/users.view-dto';
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
-import {GetPostsQueryParams} from "../../posts/api/input-dto/get-posts-query-params.input-dto";
-import {JwtAuthGuard} from "../../../../core/guards/jwt-auth.guard";
+import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
+import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {
@@ -65,8 +67,10 @@ export class BlogsController {
 
   @Put(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
-  async putBlogById(@Param('blogId') blogId: string,
-    @Body() body: CreateBlogInputDto): Promise<void> {
+  async putBlogById(
+    @Param('blogId') blogId: string,
+    @Body() body: CreateBlogInputDto,
+  ): Promise<void> {
     await this.blogsService.updateBlog(blogId, body);
     return;
   }
@@ -95,7 +99,8 @@ export class BlogsController {
   @Get(':blogId/posts')
   async getPostsByBlogId(
     @Param('blogId') blogId: string,
-    @Query() query: GetPostsQueryParams,): Promise<PaginatedViewDto<PostViewDto[]>> {
+    @Query() query: GetPostsQueryParams,
+  ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const blog: BlogViewDto | null =
       await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
 
