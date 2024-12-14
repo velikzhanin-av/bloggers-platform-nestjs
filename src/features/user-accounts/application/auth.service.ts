@@ -135,12 +135,10 @@ export class AuthService {
       await this.usersRepository.findUserByConfirmationCode(dto.code);
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'string',
-            field: 'code',
-          },
-        ],
+        errorsMessages: {
+          message: 'string',
+          field: 'code',
+        },
       });
     }
 
@@ -157,12 +155,10 @@ export class AuthService {
     );
     if (user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'string',
-            field: 'email',
-          },
-        ],
+        errorsMessages: {
+          message: 'string',
+          field: 'email',
+        },
       });
     }
 

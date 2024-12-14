@@ -1,7 +1,7 @@
-import {Prop, Schema, SchemaFactory} from '@nestjs/mongoose';
-import {HydratedDocument, Model} from "mongoose";
-import {Post} from "../../posts/domain/posts.entity";
-import {CreateCommentDto} from "../dto/create-comment.dto";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { HydratedDocument, Model } from 'mongoose';
+import { Post } from '../../posts/domain/posts.entity';
+import { CreateCommentDto } from '../dto/create-comment.dto';
 
 @Schema({ _id: false })
 export class CommentatorInfo {
@@ -39,14 +39,14 @@ export class Comment {
   likesInfo: LikesInfo;
 
   static createInstance(dto: CreateCommentDto): CommentDocument {
-    const comment = new this()
-    comment.content = dto.content
-    comment.postId = dto.postId
+    const comment = new this();
+    comment.content = dto.content;
+    comment.postId = dto.postId;
     comment.commentatorInfo = {
       userId: dto.commentatorInfo.userId,
       userLogin: dto.commentatorInfo.userLogin,
-    }
-    comment.likesInfo = {likesCount: 0, dislikesCount: 0};
+    };
+    comment.likesInfo = { likesCount: 0, dislikesCount: 0 };
 
     return comment as CommentDocument;
   }

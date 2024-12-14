@@ -54,22 +54,18 @@ export class UsersRepository {
   async doesExistByLoginOrEmail(login: string, email: string): Promise<void> {
     if (await this.UserModel.findOne({ login })) {
       throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'string',
-            field: 'login',
-          },
-        ],
+        errorsMessages: {
+          message: 'string',
+          field: 'login',
+        },
       });
     }
     if (await this.UserModel.findOne({ email })) {
       throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'string',
-            field: 'email',
-          },
-        ],
+        errorsMessages: {
+          message: 'string',
+          field: 'email',
+        },
       });
     }
   }
@@ -80,12 +76,10 @@ export class UsersRepository {
     });
     if (!user)
       throw new BadRequestException({
-        errorsMessages: [
-          {
-            message: 'string',
-            field: 'code',
-          },
-        ],
+        errorsMessages: {
+          message: 'string',
+          field: 'code',
+        },
       });
     return user;
   }
