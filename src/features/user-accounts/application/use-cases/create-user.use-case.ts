@@ -1,8 +1,8 @@
-import { CreateUserDto } from '../dto/create-user.dto';
+import { CreateUserDto } from '../../dto/create-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../domain/users.entity';
-import { UsersRepository } from '../infrastructure/users.repository';
+import { User, UserDocument, UserModelType } from '../../domain/users.entity';
+import { UsersRepository } from '../../infrastructure/users.repository';
 import bcrypt from 'bcrypt';
 
 export class CreateUserCommand {

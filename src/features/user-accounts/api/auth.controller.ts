@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthLoginInputDto } from './input-dto/auth-login.input-dto';
-import { AuthRegistrationInputDto } from './input-dto/auth-registration.input-dto';
 import { AuthService } from '../application/auth.service';
 import { Response, Request } from 'express';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
@@ -21,18 +20,21 @@ import { UserMeViewDto } from './output-dto/users.view-dto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthConfirmationCodeDto } from './input-dto/auth-confirmation-code.dto';
 import { AuthRegistrationEmailResendingDtp } from './input-dto/auth-registration-email-resending.dtp';
+import { CommandBus } from '@nestjs/cqrs';
+import { RegisterUserCommand } from '../application/use-cases/register-user.use-case';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     private authService: AuthService,
     private authQueryRepository: AuthQueryRepository,
+    private readonly commandBus: CommandBus,
   ) {}
 
   @Post('/registration')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registration(@Body() body: CreateUserDto) {
-    return this.authService.registerUser(body);
+    return this.commandBus.execute(new RegisterUserCommand(body));
   }
 
   @Post('/login')

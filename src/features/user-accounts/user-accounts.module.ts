@@ -14,8 +14,9 @@ import { JwtService } from './application/jwt.service';
 import { JwtStrategy } from '../../core/guards/jwt.strategy';
 import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { CreateUserUseCase } from './application/create-user.usecase';
+import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
+import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { CqrsModule } from '@nestjs/cqrs';
     JwtService,
     JwtStrategy,
     CreateUserUseCase,
+    RegisterUserUseCase,
   ],
   exports: [UsersService, MongooseModule, UsersRepository],
 })
