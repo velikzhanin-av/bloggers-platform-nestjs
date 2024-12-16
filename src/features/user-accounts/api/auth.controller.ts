@@ -22,12 +22,14 @@ import { AuthConfirmationCodeDto } from './input-dto/auth-confirmation-code.dto'
 import { AuthRegistrationEmailResendingDtp } from './input-dto/auth-registration-email-resending.dtp';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/use-cases/register-user.use-case';
+import {LoginUserCommand} from "../application/use-cases/login-user.use-case";
+import {RegistrationConfirmationCommand} from "../application/use-cases/registration-confirmation.use-case";
 
 @Controller('/auth')
 export class AuthController {
   constructor(
-    private authService: AuthService,
-    private authQueryRepository: AuthQueryRepository,
+    private readonly authService: AuthService,
+    private readonly authQueryRepository: AuthQueryRepository,
     private readonly commandBus: CommandBus,
   ) {}
 
@@ -51,10 +53,10 @@ export class AuthController {
       ip: req.ip || '',
     };
     // TODO поправить тип
-    const result = await this.authService.login(dto);
+    const result = await this.commandBus.execute(new LoginUserCommand(dto));
     res.json({ accessToken: result.accessToken });
   }
-
+s
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getUserInfo(
@@ -66,7 +68,7 @@ export class AuthController {
   @Post('/registration-confirmation')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationConfirmation(@Body() body: AuthConfirmationCodeDto) {
-    return this.authService.registrationConfirmation(body);
+    return this.commandBus.execute(new RegistrationConfirmationCommand(body));
   }
 
   @Post('/registration-email-resending')

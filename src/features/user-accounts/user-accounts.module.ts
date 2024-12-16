@@ -3,7 +3,6 @@ import { UsersController } from './api/users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './domain/users.entity';
 import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
-import { UsersService } from './application/users.service';
 import { UsersRepository } from './infrastructure/users.repository';
 import { Session, SessionSchema } from './domain/sessions.entity';
 import { AuthController } from './api/auth.controller';
@@ -17,6 +16,15 @@ import { NotificationsModule } from '../notifications/notifications.module';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
 import { RegisterUserUseCase } from './application/use-cases/register-user.use-case';
+import {DeleteUserUseCase} from "./application/use-cases/delete-user.use-case";
+import {LoginUserUseCase} from "./application/use-cases/login-user.use-case";
+import {RegistrationConfirmationUseCase} from "./application/use-cases/registration-confirmation.use-case";
+
+const useCases: Array<any> = [    CreateUserUseCase,
+  RegisterUserUseCase,
+  DeleteUserUseCase,
+  LoginUserUseCase,
+  RegistrationConfirmationUseCase]
 
 @Module({
   imports: [
@@ -27,7 +35,6 @@ import { RegisterUserUseCase } from './application/use-cases/register-user.use-c
   ],
   controllers: [UsersController, AuthController],
   providers: [
-    UsersService,
     UsersRepository,
     UsersQueryRepository,
     AuthService,
@@ -36,9 +43,9 @@ import { RegisterUserUseCase } from './application/use-cases/register-user.use-c
     BcryptService,
     JwtService,
     JwtStrategy,
-    CreateUserUseCase,
-    RegisterUserUseCase,
+    ...useCases
+
   ],
-  exports: [UsersService, MongooseModule, UsersRepository],
+  exports: [MongooseModule, UsersRepository],
 })
 export class UserAccountsModule {}

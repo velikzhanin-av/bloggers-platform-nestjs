@@ -18,8 +18,6 @@ import {
   SessionModelType,
 } from '../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { UsersService } from './users.service';
 import { AuthConfirmationCodeDto } from '../api/input-dto/auth-confirmation-code.dto';
 import { AuthRegistrationEmailResendingDtp } from '../api/input-dto/auth-registration-email-resending.dtp';
 import { NotificationsService } from '../../notifications/application/notifications.service';
@@ -30,67 +28,11 @@ export class AuthService {
     @InjectModel(Session.name)
     private SessionModel: SessionModelType,
     private bcryptService: BcryptService,
-    private usersService: UsersService,
     private jwtService: JwtService,
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
     private notificationsService: NotificationsService,
   ) {}
-
-  async login(dto: AuthLoginDto): Promise<{
-    sessionId: string;
-    accessToken: string;
-    deviceId: string;
-    refreshToken: string;
-  }> {
-    const user: UserDocument | null =
-      await this.usersRepository.findByLoginOrEmail(dto.loginOrEmail);
-    if (!user)
-      throw new UnauthorizedException('login/email or password is wrong');
-
-    if (
-      !(await this.bcryptService.checkPassword(dto.password, user.passwordHash))
-    )
-      throw new UnauthorizedException('login/email or password is wrong');
-
-    const userId: string = user._id.toString();
-    const deviceId: string = randomUUID();
-
-    const tokens: {
-      accessToken: string;
-      refreshToken: string;
-      tokenData: { iat: Date; exp: Date; deviceId: string };
-    } | null = await this.createAccessAndRefreshTokens(userId, deviceId);
-    if (!tokens)
-      throw new ForbiddenException('login/email or password is wrong');
-    const iat: Date = tokens.tokenData.iat;
-    const exp: Date = tokens.tokenData.exp;
-    const resultAccessToken: number = await this.usersRepository.addJwtToken(
-      userId,
-      tokens.accessToken,
-    );
-    const resultRefreshToken: number =
-      await this.usersRepository.addRefreshToken(userId, tokens.refreshToken);
-    if (!resultAccessToken || !resultRefreshToken)
-      throw new InternalServerErrorException('internal server error');
-
-    const session: SessionDocument = this.SessionModel.createInstance({
-      userId,
-      deviceId,
-      iat,
-      exp,
-      ip: dto.ip,
-      deviceName: dto.userAgent,
-    });
-    await session.save();
-
-    return {
-      accessToken: tokens.accessToken,
-      refreshToken: tokens.refreshToken,
-      sessionId: session._id.toString(),
-      deviceId,
-    };
-  }
 
   async createAccessAndRefreshTokens(userId: string, deviceId: string) {
     const accessToken: string = await this.jwtService.createJwt(

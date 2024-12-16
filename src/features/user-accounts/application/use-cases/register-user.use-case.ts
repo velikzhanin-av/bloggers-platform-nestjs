@@ -44,19 +44,5 @@ export class RegisterUserUseCase
       dto.email,
       confirmationCode,
     );
-
-    // const createdUserId = await this.commandBus.execute<
-    //   CreateUserCommand,
-    //   string
-    // >(new CreateUserCommand(dto));
-    //
-    // const confirmCode = 'uuid';
-    //
-    // const user = await this.usersRepository.findOrNotFoundFail(createdUserId);
-    //
-    // user.setConfirmationCode(confirmCode);
-    // await this.usersRepository.save(user);
-    //
-    // this.eventBus.publish(new UserRegisteredEvent(user.email, confirmCode));
   }
 }
