@@ -25,8 +25,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
               private readonly SessionModel: SessionModelType,
               private readonly usersRepository: UsersRepository,
               private readonly bcryptService: BcryptService,
-              private readonly authService: AuthService,) {
-  }
+              private readonly authService: AuthService,) {}
 
   async execute({dto}: LoginUserCommand): Promise<any> {
     const { loginOrEmail, password, userAgent, ip } = dto;
@@ -52,8 +51,6 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       throw new ForbiddenException('login/email or password is wrong');
 
     const { iat, exp } = tokens.tokenData;
-    // const iat: Date = tokens.tokenData.iat;
-    // const exp: Date = tokens.tokenData.exp;
     const resultAccessToken: number = await this.usersRepository.addJwtToken(
       userId,
       tokens.accessToken,

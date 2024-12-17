@@ -19,11 +19,14 @@ import { AuthQueryRepository } from '../infrastructure/query/auth.query-reposito
 import { UserMeViewDto } from './output-dto/users.view-dto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthConfirmationCodeDto } from './input-dto/auth-confirmation-code.dto';
-import { AuthRegistrationEmailResendingDtp } from './input-dto/auth-registration-email-resending.dtp';
+import {
+  AuthRegistrationEmailResendingDto
+} from './input-dto/auth-registration-email-resending.dtp';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/use-cases/register-user.use-case';
 import {LoginUserCommand} from "../application/use-cases/login-user.use-case";
 import {RegistrationConfirmationCommand} from "../application/use-cases/registration-confirmation.use-case";
+import {RegistrationEmailResendingCommand} from "../application/use-cases/registration-email-resending.use-case";
 
 @Controller('/auth')
 export class AuthController {
@@ -54,7 +57,12 @@ export class AuthController {
     };
     // TODO поправить тип
     const result = await this.commandBus.execute(new LoginUserCommand(dto));
-    res.json({ accessToken: result.accessToken });
+    res
+      .cookie('refreshToken', result.refreshToken, {
+      httpOnly: true,
+      secure: true,
+    })
+      .json({ accessToken: result.accessToken });
   }
 s
   @Get('/me')
@@ -74,8 +82,8 @@ s
   @Post('/registration-email-resending')
   @HttpCode(HttpStatus.NO_CONTENT)
   async registrationEmailResending(
-    @Body() body: AuthRegistrationEmailResendingDtp,
+    @Body() body: AuthRegistrationEmailResendingDto,
   ) {
-    return this.authService.registrationEmailResending(body);
+    return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
   }
 }

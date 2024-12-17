@@ -22,10 +22,11 @@ import { BlogsQueryRepository } from '../../blogs/infrastructure/query/blogs.que
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
 import { GetPostsQueryParams } from './input-dto/get-posts-query-params.input-dto';
 import { CreateCommentInputDto } from '../../comments/api/input-dto/create-comment.dto';
-import { CommentsService } from '../../comments/application/comments.service';
 import { ExtractUserFromRequest } from '../../../../core/decorators/extract-user-from-request';
 import { UserContext } from '../../../../core/dto/user-context';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
+import {CommandBus} from "@nestjs/cqrs";
+import {CreateCommentByPostIdCommand} from "../../comments/application/use-cases/create-comment-by-post-id.use-case";
 
 @Controller('posts')
 export class PostsController {
@@ -33,7 +34,7 @@ export class PostsController {
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
     private blogsQueryRepository: BlogsQueryRepository,
-    private commentsService: CommentsService,
+    private readonly commandBus: CommandBus
   ) {}
 
   @Get()
@@ -91,18 +92,7 @@ export class PostsController {
     @ExtractUserFromRequest() user: UserContext,
   ): Promise<void> {
     const dto = { ...body, postId, userId: user.userId };
-    await this.commentsService.createCommentByPostId(dto);
+    await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
   }
 }
 
-// async postCommentsByPostId(req: RequestWithUser, res: Response) {
-//   const result = await this.commentsServices.createComment(req.params.postId, req.body.content, req.user)
-//   if (!result) {
-//     res.sendStatus(404)
-//     return
-//   }
-//   res
-//     .status(201)
-//     .json(result)
-//   return
-// }

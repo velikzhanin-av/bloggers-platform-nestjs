@@ -2,6 +2,7 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { Post } from '../../posts/domain/posts.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
+import {DeletionStatus} from "../../../../core/utils/status-enam";
 
 @Schema({ _id: false })
 export class CommentatorInfo {
@@ -38,6 +39,9 @@ export class Comment {
   @Prop({ type: LikesInfo, required: true })
   likesInfo: LikesInfo;
 
+  @Prop({ enum: DeletionStatus, default: DeletionStatus.NotDeleted })
+  deletionStatus: DeletionStatus;
+
   static createInstance(dto: CreateCommentDto): CommentDocument {
     const comment = new this();
     comment.content = dto.content;
@@ -49,6 +53,14 @@ export class Comment {
     comment.likesInfo = { likesCount: 0, dislikesCount: 0 };
 
     return comment as CommentDocument;
+  }
+
+  makeDeleted() {
+    this.deletionStatus = DeletionStatus.PermanentDeleted;
+  }
+
+  updateContent(content: string) {
+    this.content = content
   }
 }
 

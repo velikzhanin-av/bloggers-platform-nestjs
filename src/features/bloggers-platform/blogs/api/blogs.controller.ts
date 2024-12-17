@@ -31,6 +31,7 @@ import { UserViewDto } from '../../../user-accounts/api/output-dto/users.view-dt
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
+import {BasicAuthGuard} from "../../../../core/guards/basic-auth.guard";
 
 @Controller('blogs')
 export class BlogsController {
@@ -49,6 +50,7 @@ export class BlogsController {
   }
 
   @Post()
+  @UseGuards(BasicAuthGuard)
   async postBlogs(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId: string = await this.blogsService.createBlog(body);
     const blog: BlogViewDto | null =
@@ -67,6 +69,7 @@ export class BlogsController {
 
   @Put(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async putBlogById(
     @Param('blogId') blogId: string,
     @Body() body: CreateBlogInputDto,
@@ -77,6 +80,7 @@ export class BlogsController {
 
   @Delete(':blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
+  @UseGuards(BasicAuthGuard)
   async deleteBlogById(@Param('blogId') blogId: string): Promise<void> {
     await this.blogsService.deleteBlog(blogId);
     return;

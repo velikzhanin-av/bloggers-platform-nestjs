@@ -1,6 +1,5 @@
 import { Injectable, NotFoundException, Query } from '@nestjs/common';
 import {
-  DeletionStatus,
   User,
   UserDocument,
   UserModelType,
@@ -10,6 +9,7 @@ import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.
 import { UserViewDto } from '../../api/output-dto/users.view-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import {DeletionStatus} from "../../../../core/utils/status-enam";
 
 @Injectable()
 export class UsersQueryRepository {

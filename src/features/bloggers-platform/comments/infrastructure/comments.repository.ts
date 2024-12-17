@@ -4,7 +4,7 @@ import {
   CommentDocument,
   CommentModelType,
 } from '../domain/comments.entity';
-import { Injectable } from '@nestjs/common';
+import {Injectable, NotFoundException} from '@nestjs/common';
 
 @Injectable()
 export class CommentsRepository {
@@ -16,4 +16,11 @@ export class CommentsRepository {
   async save(comment: CommentDocument): Promise<void> {
     await comment.save();
   }
+
+  async findCommentById(commentId: string): Promise<CommentDocument> {
+    const comment: CommentDocument | null =  await this.CommentModel.findOne({_id: commentId})
+    if (!comment) throw new NotFoundException(`Comment with id ${commentId} not found`)
+    return comment
+  }
+
 }
