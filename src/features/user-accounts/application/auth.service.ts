@@ -3,7 +3,7 @@ import {
 } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { BcryptService } from './bcrypt.service';
-import { JwtService } from './jwt.service';
+import { CustomJwtService } from './jwt.service';
 import { AuthRepository } from '../infrastructure/auth.repository';
 import {
   Session,
@@ -18,18 +18,18 @@ export class AuthService {
     @InjectModel(Session.name)
     private SessionModel: SessionModelType,
     private bcryptService: BcryptService,
-    private jwtService: JwtService,
+    private customJwtService: CustomJwtService,
     private usersRepository: UsersRepository,
     private authRepository: AuthRepository,
     private notificationsService: NotificationsService,
   ) {}
 
   async createAccessAndRefreshTokens(userId: string, deviceId: string) {
-    const accessToken: string = await this.jwtService.createJwt(
+    const accessToken: string = await this.customJwtService.createJwt(
       userId,
       deviceId,
     );
-    const refreshToken: string = await this.jwtService.createRefreshToken(
+    const refreshToken: string = await this.customJwtService.createRefreshToken(
       userId,
       deviceId,
     );
@@ -38,7 +38,7 @@ export class AuthService {
       iat: Date;
       exp: Date;
       deviceId: string;
-    } | null = await this.jwtService.getDataFromJwtToken(refreshToken);
+    } | null = await this.customJwtService.getDataFromJwtToken(refreshToken);
 
     if (!tokenData) return null;
     return { accessToken, refreshToken, tokenData };

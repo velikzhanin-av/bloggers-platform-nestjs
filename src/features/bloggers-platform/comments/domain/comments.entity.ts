@@ -1,6 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
-import { Post } from '../../posts/domain/posts.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import {DeletionStatus} from "../../../../core/utils/status-enam";
 
@@ -61,6 +60,30 @@ export class Comment {
 
   updateContent(content: string) {
     this.content = content
+  }
+
+  increaseLike() {
+    this.likesInfo.likesCount++
+  }
+
+  increaseDislike() {
+    this.likesInfo.dislikesCount++
+  }
+
+  decreaseLike() {
+    this.likesInfo.likesCount--
+  }
+
+  decreaseDislike() {
+    this.likesInfo.dislikesCount--
+  }
+
+  clearLikesCount() {
+    this.likesInfo.likesCount = 0
+  }
+
+  clearDislikesCount() {
+    this.likesInfo.dislikesCount = 0
   }
 }
 

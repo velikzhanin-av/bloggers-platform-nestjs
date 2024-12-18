@@ -9,7 +9,7 @@ import {AuthController} from './api/auth.controller';
 import {AuthRepository} from './infrastructure/auth.repository';
 import {AuthService} from './application/auth.service';
 import {BcryptService} from './application/bcrypt.service';
-import {JwtService} from './application/jwt.service';
+import {CustomJwtService} from './application/jwt.service';
 import {JwtStrategy} from '../../core/guards/jwt.strategy';
 import {AuthQueryRepository} from './infrastructure/query/auth.query-repository';
 import {NotificationsModule} from '../notifications/notifications.module';
@@ -20,6 +20,7 @@ import {DeleteUserUseCase} from "./application/use-cases/delete-user.use-case";
 import {LoginUserUseCase} from "./application/use-cases/login-user.use-case";
 import {RegistrationConfirmationUseCase} from "./application/use-cases/registration-confirmation.use-case";
 import {RegistrationEmailResendingUseCase} from "./application/use-cases/registration-email-resending.use-case";
+import {JwtService} from "@nestjs/jwt";
 
 const useCases: Array<any> = [CreateUserUseCase,
   RegisterUserUseCase,
@@ -30,8 +31,9 @@ const useCases: Array<any> = [CreateUserUseCase,
 
 const services: Array<any> = [
   BcryptService,
-  JwtService,
-  AuthService
+  CustomJwtService,
+  AuthService,
+  JwtService
 ]
 
 @Module({
@@ -48,12 +50,14 @@ const services: Array<any> = [
     AuthRepository,
     AuthQueryRepository,
     JwtStrategy,
+    // JwtService,
     ...useCases,
     ...services,
 
   ],
   exports: [MongooseModule,
-    UsersRepository],
+    UsersRepository,
+    JwtService],
 })
 export class UserAccountsModule {
 }

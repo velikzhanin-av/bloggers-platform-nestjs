@@ -1,94 +1,94 @@
-import {LikeStatus} from "../../../../../core/utils/status-enam";
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
-import {UpdateLikeStatusDto} from "../../dto/update-like-status.dto";
 import {CommentsRepository} from "../../infrastructure/comments.repository";
 import {CommentDocument} from "../../domain/comments.entity";
+import {LikesRepository} from "../../../likes/infrastructure/likes.repository";
+import {Like, LikeDocument, LikeModelType} from "../../../likes/domain/likes.entity";
+import {LikeStatus} from "../../../../../core/utils/status-enam";
+import {CreateLikeDto} from "../../../likes/dto/create.like.dto";
+import {UserDocument} from "../../../../user-accounts/domain/users.entity";
+import {UsersRepository} from "../../../../user-accounts/infrastructure/users.repository";
+import {InjectModel} from "@nestjs/mongoose";
 
 export class UpdateLikeStatusCommand {
-  constructor(public dto: UpdateLikeStatusDto) {}
+  constructor(public dto: { commentId: string, userId: string, likeStatus: LikeStatus}) {}
 }
 
 @CommandHandler(UpdateLikeStatusCommand)
 export class UpdateLikeStatusUseCase implements ICommandHandler {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(private readonly commentsRepository: CommentsRepository,
+              private readonly likesRepository: LikesRepository,
+              private readonly usersRepository: UsersRepository,
+              @InjectModel(Like.name)
+              private readonly LikeModel: LikeModelType,
+              ) {}
 
-  async execute({ dto }: UpdateLikeStatusCommand) {
-    const { commentId, userId, likeStatus } = dto;
-    const comment: CommentDocument | undefined = await this.commentsRepository.findCommentById(commentId)
+  async execute({ dto }: UpdateLikeStatusCommand): Promise<void> {
+    const {commentId, userId, likeStatus} = dto;
+    const comment: CommentDocument = await this.commentsRepository.findCommentById(commentId)
+    const user: UserDocument | null = await this.usersRepository.findOrNotFoundFail(userId)
 
-
-    // TODO Здесь остановился, нужно понять как реализовывать. Через репу или через entity
-    const findLike: LikesDbType | undefined | null = await this.commentsRepository.findLikeByCommentAndUser(user._id!.toString(), commentId)
+    const findLike: LikeDocument | null = await this.likesRepository.findLikeByCommentAndUser(userId, commentId)
     if (!findLike) {
-      if (status === likeStatus.Like) comment.likesInfo.likesCount++
-      else if (status === likeStatus.Dislike) comment.likesInfo.dislikesCount++
+      if (likeStatus === LikeStatus.Like) comment.increaseLike()
+      else if (likeStatus === LikeStatus.Dislike) comment.increaseDislike()
+      await this.commentsRepository.save(comment)
 
-      const newLike: LikesDbType = {
-        createdAt: new Date().toISOString(),
+      const newLike: CreateLikeDto = {
         commentId,
-        userId: user._id!.toString(),
-        userLogin: user.login,
-        status
+        userId,
+        userLogin: user!.login,
+        status: likeStatus
       }
+      const createLike: LikeDocument = this.LikeModel.createInstance(newLike);
+      await this.likesRepository.save(createLike);
 
-      const createLike = await this.commentsRepository.createLike(newLike)
+      } else {
+        if (findLike.status !== likeStatus) {
+          switch (findLike.status) {
 
-      let updateComment = await this.commentsRepository.updateLikesCountComment(commentId,
-        comment.likesInfo.likesCount,
-        comment.likesInfo.dislikesCount)
-    } else {
-      if (findLike.status !== status) {
-        switch (findLike.status) {
+            case LikeStatus.Like:
+              switch (likeStatus) {
+                case LikeStatus.Dislike:
+                  comment.decreaseLike()
+                  comment.decreaseDislike()
+                  break
+                case LikeStatus.None:
+                  comment.clearLikesCount()
+                  comment.clearDislikesCount()
+                  break
+              }
+              break
 
-          case likeStatus.Like:
-            switch (status) {
-              case likeStatus.Dislike:
-                comment.likesInfo.likesCount--
-                comment.likesInfo.dislikesCount++
-                break
-              case likeStatus.None:
-                comment.likesInfo.likesCount = 0
-                comment.likesInfo.dislikesCount = 0
-                break
-            }
-            break
+            case LikeStatus.Dislike:
+              switch (likeStatus) {
+                case LikeStatus.Like:
+                  comment.decreaseDislike()
+                  comment.increaseLike()
+                  break
+                case LikeStatus.None:
+                  comment.clearLikesCount()
+                  comment.clearDislikesCount()
+                  break
+              }
+              break
 
-          case likeStatus.Dislike:
-            switch (status) {
-              case likeStatus.Like:
-                comment.likesInfo.dislikesCount--
-                comment.likesInfo.likesCount++
-                break
-              case likeStatus.None:
-                comment.likesInfo.likesCount = 0
-                comment.likesInfo.dislikesCount = 0
-                break
-            }
-            break
+            case LikeStatus.None:
+              switch (likeStatus) {
+                case LikeStatus.Like:
+                  comment.increaseLike()
+                  break
+                case LikeStatus.Dislike:
+                  comment.increaseDislike()
+                  break
+              }
+              break
+          }
 
-          case likeStatus.None:
-            switch (status) {
-              case likeStatus.Like:
-                comment.likesInfo.likesCount++
-                break
-              case likeStatus.Dislike:
-                comment.likesInfo.dislikesCount++
-                break
-            }
-            break
+          await this.commentsRepository.save(comment)
+
+          findLike.updateLikeStatus(likeStatus)
+          await this.likesRepository.save(findLike)
         }
-        findLike.status = status
-        const updateLike = await this.commentsRepository.updateLike(findLike._id!, status)
-        const updateComment = await this.commentsRepository.updateLikesCountComment(commentId,
-          comment.likesInfo.likesCount,
-          comment.likesInfo.dislikesCount)
       }
-
-    }
-
-    return {
-      statusCode: StatusCodeHttp.NoContent,
-      data: null
-    }
   }
 }

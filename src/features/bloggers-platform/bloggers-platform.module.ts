@@ -18,19 +18,25 @@ import {CreateCommentByPostIdUseCase} from "./comments/application/use-cases/cre
 import {DeleteCommentByPostIdUseCase} from "./comments/application/use-cases/delete-comment-by-id.use-case";
 import {CqrsModule} from "@nestjs/cqrs";
 import {UpdateCommentByPostIdUseCase} from "./comments/application/use-cases/update-comment-by-id.use-case";
+import {UpdateLikeStatusUseCase} from "./comments/application/use-cases/update-like-status.use-case";
+import {LikesRepository} from "./likes/infrastructure/likes.repository";
+import {Like, LikeSchema} from "./likes/domain/likes.entity";
+import {GetCommentByIdUserCase} from "./comments/application/use-cases/get-comment-by-id.use-case";
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
   DeleteCommentByPostIdUseCase,
   UpdateCommentByPostIdUseCase,
+  UpdateLikeStatusUseCase,
+  GetCommentByIdUserCase,
 ]
-
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
+    MongooseModule.forFeature([{ name: Like.name, schema: LikeSchema }]),
     UserAccountsModule,
     CqrsModule
   ],
@@ -43,6 +49,7 @@ const useCases: Array<any> = [
     PostsRepository,
     PostsQueryRepository,
     CommentsRepository,
+    LikesRepository,
     ...useCases
   ],
   exports: [MongooseModule],
