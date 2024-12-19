@@ -1,12 +1,12 @@
 import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
 import {LikeStatus} from "../../../../core/utils/status-enam";
-import {CreateLikeDto} from "../dto/create.like.dto";
 import {HydratedDocument, Model} from "mongoose";
+import {CreateLikeDto} from "../dto/create-like.dto";
 
 @Schema({ timestamps: true })
-export class Like {
+export class PostLike {
   @Prop({ type: String, required: true })
-  commentId: string;
+  postId: string;
 
   @Prop({ type: String, required: true })
   userId: string;
@@ -20,14 +20,14 @@ export class Like {
   @Prop({ type: Date })
   createdAt: Date;
 
-  static createInstance(dto: CreateLikeDto): LikeDocument {
+  static createInstance(dto: CreateLikeDto): PostLikeDocument {
     const like = new this();
-    like.commentId = dto.commentId;
+    like.postId = dto.postId;
     like.userId = dto.userId;
     like.userLogin = dto.userLogin;
     like.status = dto.status;
 
-    return like as LikeDocument;
+    return like as PostLikeDocument;
   }
 
   updateLikeStatus(status: LikeStatus) {
@@ -35,10 +35,10 @@ export class Like {
   }
 }
 
-export const LikeSchema = SchemaFactory.createForClass(Like);
+export const PostLikeSchema = SchemaFactory.createForClass(PostLike);
 
-LikeSchema.loadClass(Like);
+PostLikeSchema.loadClass(PostLike);
 
-export type LikeDocument = HydratedDocument<Like>;
+export type PostLikeDocument = HydratedDocument<PostLike>;
 
-export type LikeModelType = Model<LikeDocument> & typeof Like;
+export type PostLikeModelType = Model<PostLikeDocument> & typeof PostLike;

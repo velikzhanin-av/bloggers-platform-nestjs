@@ -6,6 +6,8 @@ import {UsersRepository} from "../../../../user-accounts/infrastructure/users.re
 import {CommentsRepository} from "../../infrastructure/comments.repository";
 import {InjectModel} from "@nestjs/mongoose";
 import {CreateCommentDto} from "../../dto/create-comment.dto";
+import {CommentsService} from "../comments-service";
+import {GetCommentByIdViewDto} from "../../api/output-dto/get-comment-by-id.view-dto";
 
 export class CreateCommentByPostIdCommand {
   constructor(public dto: CreateCommentServiceDto) {
@@ -16,11 +18,12 @@ export class CreateCommentByPostIdCommand {
 export class CreateCommentByPostIdUseCase implements ICommandHandler {
   constructor(private readonly usersRepository: UsersRepository,
               private readonly commentsRepository: CommentsRepository,
+              private readonly commentsService:CommentsService,
               @InjectModel(Comment.name)
               private CommentModel: CommentModelType,) {
   }
 
-  async execute({ dto }: CreateCommentByPostIdCommand) {
+  async execute({ dto }: CreateCommentByPostIdCommand): Promise<GetCommentByIdViewDto> {
     const user: UserDocument | null =
       await this.usersRepository.findOrNotFoundFail(dto.userId);
     const CreateCommentDto: CreateCommentDto = {
@@ -35,5 +38,7 @@ export class CreateCommentByPostIdUseCase implements ICommandHandler {
     const comment: CommentDocument =
       this.CommentModel.createInstance(CreateCommentDto);
     await this.commentsRepository.save(comment);
+
+    return this.commentsService.getCommentById({commentId: comment._id.toString(), userId: dto.userId});
   }
 }

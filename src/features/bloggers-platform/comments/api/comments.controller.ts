@@ -8,14 +8,16 @@ import {CreateCommentInputDto} from "./input-dto/create-comment.dto";
 import {UpdateCommentByIdCommand} from "../application/use-cases/update-comment-by-id.use-case";
 import {UpdateLikeStatusCommentDto} from "./input-dto/update-like-status-comment.dto";
 import {UpdateLikeStatusCommand} from "../application/use-cases/update-like-status.use-case";
-import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import {GetUser} from "../../../../core/decorators/get-user";
-import {getCommentByIdCommand, GetCommentByIdUserCase} from "../application/use-cases/get-comment-by-id.use-case";
+import {CommentsService} from "../application/comments-service";
 import {OptionalJwtAuthGuard} from "../../../../core/guards/optional-jwt-auth.guard";
+import {CommentsRepository} from "../infrastructure/comments.repository";
+import {GetCommentByIdViewDto} from "./output-dto/get-comment-by-id.view-dto";
 
 @Controller('/comments')
 export class CommentsController {
-  constructor(private readonly commandBus: CommandBus,) {
+  constructor(private readonly commandBus: CommandBus,
+              private readonly commentsService: CommentsService,) {
   }
 
   @Delete(':commentId')
@@ -53,9 +55,9 @@ export class CommentsController {
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
   async getCommentById(@GetUser() user: UserContext,
-    @Param('id') commentId: string): Promise<void> {
+    @Param('id') commentId: string): Promise<GetCommentByIdViewDto> {
     const userId: string | null = user ? user.userId : null;
-    return await this.commandBus.execute(new getCommentByIdCommand({ commentId, userId }));
+    return await this.commentsService.getCommentById({ commentId, userId })
     };
 
 }

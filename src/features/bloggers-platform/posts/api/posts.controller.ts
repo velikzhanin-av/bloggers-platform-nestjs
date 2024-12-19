@@ -27,6 +27,10 @@ import { UserContext } from '../../../../core/dto/user-context';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 import {CommandBus} from "@nestjs/cqrs";
 import {CreateCommentByPostIdCommand} from "../../comments/application/use-cases/create-comment-by-post-id.use-case";
+import {GetCommentByIdViewDto} from "../../comments/api/output-dto/get-comment-by-id.view-dto";
+import {UpdateLikeStatusCommentDto} from "../../comments/api/input-dto/update-like-status-comment.dto";
+import {UpdateLikeStatusCommand} from "../../comments/application/use-cases/update-like-status.use-case";
+import {UpdatePostLikeStatusCommand} from "../application/use-cases/update-post-like-status";
 
 @Controller('posts')
 export class PostsController {
@@ -90,9 +94,21 @@ export class PostsController {
     @Param('postId') postId: string,
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContext,
-  ): Promise<void> {
+  ): Promise<GetCommentByIdViewDto> {
     const dto = { ...body, postId, userId: user.userId };
-    await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
-  }
-}
+    return await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
+  };
 
+  @Put(':postId/like-status')
+  @UseGuards(JwtAuthGuard)
+  async putLikeStatusPostById(@ExtractUserFromRequest() user: UserContext,
+                                 @Param('postId') postId: string,
+                                 @Body() body: UpdateLikeStatusCommentDto) {
+    return await this.commandBus.execute(new UpdatePostLikeStatusCommand({
+      postId,
+      userId: user.userId,
+      likeStatus: body.likeStatus
+    }));
+  };
+
+}

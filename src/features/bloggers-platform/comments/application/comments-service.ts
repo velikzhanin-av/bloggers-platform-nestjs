@@ -1,22 +1,18 @@
-import {GetCommentById} from "../../dto/get-comment-by-id";
-import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
-import {CommentsRepository} from "../../infrastructure/comments.repository";
-import {CommentDocument} from "../../domain/comments.entity";
-import {LikeStatus} from "../../../../../core/utils/status-enam";
-import {GetCommentByIdViewDto} from "../../api/output-dto/get-comment-by-id.view-dto";
-import {LikesRepository} from "../../../likes/infrastructure/likes.repository";
-import {LikeDocument} from "../../../likes/domain/likes.entity";
+import {GetCommentById} from "../dto/get-comment-by-id";
+import {CommentsRepository} from "../infrastructure/comments.repository";
+import {CommentDocument} from "../domain/comments.entity";
+import {LikeStatus} from "../../../../core/utils/status-enam";
+import {GetCommentByIdViewDto} from "../api/output-dto/get-comment-by-id.view-dto";
+import {Injectable} from "@nestjs/common";
+import {LikesRepository} from "../../comments-likes/infrastructure/likes.repository";
+import {CommentLikeDocument} from "../../comments-likes/domain/comment-like.entity";
 
-export class getCommentByIdCommand {
-  constructor(public dto: GetCommentById) {}
-}
-
-@CommandHandler(getCommentByIdCommand)
-export class GetCommentByIdUserCase implements ICommandHandler {
+@Injectable()
+export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository,
               private readonly likesRepository: LikesRepository,) {}
 
-  async execute({ dto }: getCommentByIdCommand ): Promise<GetCommentByIdViewDto> {
+  async getCommentById(dto: GetCommentById ): Promise<GetCommentByIdViewDto> {
     const { commentId, userId } = dto;
     const comment: CommentDocument = await this.commentsRepository.findCommentById(commentId)
 
@@ -24,7 +20,7 @@ export class GetCommentByIdUserCase implements ICommandHandler {
 
     if (!userId) return result
 
-    const like: LikeDocument | null = await this.likesRepository.findLikeByCommentAndUser(commentId, userId)
+    const like: CommentLikeDocument | null = await this.likesRepository.findLikeByCommentAndUser(userId, commentId)
     if (!like) return result
 
     result = this.mapToUserViewComment(comment, like.status)

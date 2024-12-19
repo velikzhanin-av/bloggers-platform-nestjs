@@ -1,13 +1,18 @@
 import {CommandHandler, ICommandHandler} from "@nestjs/cqrs";
 import {CommentsRepository} from "../../infrastructure/comments.repository";
 import {CommentDocument} from "../../domain/comments.entity";
-import {LikesRepository} from "../../../likes/infrastructure/likes.repository";
-import {Like, LikeDocument, LikeModelType} from "../../../likes/domain/likes.entity";
+
 import {LikeStatus} from "../../../../../core/utils/status-enam";
-import {CreateLikeDto} from "../../../likes/dto/create.like.dto";
 import {UserDocument} from "../../../../user-accounts/domain/users.entity";
 import {UsersRepository} from "../../../../user-accounts/infrastructure/users.repository";
 import {InjectModel} from "@nestjs/mongoose";
+import {LikesRepository} from "../../../comments-likes/infrastructure/likes.repository";
+import {
+  CommentLike,
+  CommentLikeDocument,
+  CommentLikeModelType
+} from "../../../comments-likes/domain/comment-like.entity";
+import {CreateLikeDto} from "../../../comments-likes/dto/create.like.dto";
 
 export class UpdateLikeStatusCommand {
   constructor(public dto: { commentId: string, userId: string, likeStatus: LikeStatus}) {}
@@ -18,8 +23,8 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
   constructor(private readonly commentsRepository: CommentsRepository,
               private readonly likesRepository: LikesRepository,
               private readonly usersRepository: UsersRepository,
-              @InjectModel(Like.name)
-              private readonly LikeModel: LikeModelType,
+              @InjectModel(CommentLike.name)
+              private readonly LikeModel: CommentLikeModelType,
               ) {}
 
   async execute({ dto }: UpdateLikeStatusCommand): Promise<void> {
@@ -27,7 +32,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
     const comment: CommentDocument = await this.commentsRepository.findCommentById(commentId)
     const user: UserDocument | null = await this.usersRepository.findOrNotFoundFail(userId)
 
-    const findLike: LikeDocument | null = await this.likesRepository.findLikeByCommentAndUser(userId, commentId)
+    const findLike: CommentLikeDocument | null = await this.likesRepository.findLikeByCommentAndUser(userId, commentId)
     if (!findLike) {
       if (likeStatus === LikeStatus.Like) comment.increaseLike()
       else if (likeStatus === LikeStatus.Dislike) comment.increaseDislike()
@@ -39,7 +44,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
         userLogin: user!.login,
         status: likeStatus
       }
-      const createLike: LikeDocument = this.LikeModel.createInstance(newLike);
+      const createLike: CommentLikeDocument = this.LikeModel.createInstance(newLike);
       await this.likesRepository.save(createLike);
 
       } else {
@@ -50,7 +55,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
               switch (likeStatus) {
                 case LikeStatus.Dislike:
                   comment.decreaseLike()
-                  comment.decreaseDislike()
+                  comment.increaseDislike()
                   break
                 case LikeStatus.None:
                   comment.clearLikesCount()

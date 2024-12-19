@@ -19,16 +19,19 @@ import {DeleteCommentByPostIdUseCase} from "./comments/application/use-cases/del
 import {CqrsModule} from "@nestjs/cqrs";
 import {UpdateCommentByPostIdUseCase} from "./comments/application/use-cases/update-comment-by-id.use-case";
 import {UpdateLikeStatusUseCase} from "./comments/application/use-cases/update-like-status.use-case";
-import {LikesRepository} from "./likes/infrastructure/likes.repository";
-import {Like, LikeSchema} from "./likes/domain/likes.entity";
-import {GetCommentByIdUserCase} from "./comments/application/use-cases/get-comment-by-id.use-case";
+import {LikesRepository} from "./comments-likes/infrastructure/likes.repository";
+import {CommentsService} from "./comments/application/comments-service";
+import {CommentLike, CommentLikeSchema} from "./comments-likes/domain/comment-like.entity";
+import {PostLike, PostLikeSchema} from "./posts-likes/domain/post-like.entity";
+import {UpdatePostLikeStatusUseCase} from "./posts/application/use-cases/update-post-like-status";
+import {PostsLikesRepository} from "./posts-likes/infrastructure/posts-likes.repository";
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
   DeleteCommentByPostIdUseCase,
   UpdateCommentByPostIdUseCase,
   UpdateLikeStatusUseCase,
-  GetCommentByIdUserCase,
+  UpdatePostLikeStatusUseCase
 ]
 
 @Module({
@@ -36,7 +39,8 @@ const useCases: Array<any> = [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
-    MongooseModule.forFeature([{ name: Like.name, schema: LikeSchema }]),
+    MongooseModule.forFeature([{ name: CommentLike.name, schema: CommentLikeSchema }]),
+    MongooseModule.forFeature([{ name: PostLike.name, schema: PostLikeSchema }]),
     UserAccountsModule,
     CqrsModule
   ],
@@ -48,8 +52,10 @@ const useCases: Array<any> = [
     PostsService,
     PostsRepository,
     PostsQueryRepository,
+    CommentsService,
     CommentsRepository,
     LikesRepository,
+    PostsLikesRepository,
     ...useCases
   ],
   exports: [MongooseModule],
