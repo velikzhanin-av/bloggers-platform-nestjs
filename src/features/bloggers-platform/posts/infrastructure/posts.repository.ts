@@ -44,4 +44,5 @@ export class PostsRepository {
     if (!post) throw new NotFoundException(`Post with id ${postId} not found`)
     return post
   }
+
 }

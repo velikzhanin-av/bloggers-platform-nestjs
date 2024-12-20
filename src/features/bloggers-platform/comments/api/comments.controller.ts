@@ -1,4 +1,4 @@
-import {Body, Controller, Delete, Get, Injectable, Param, Put, UseGuards} from '@nestjs/common';
+import {Body, Controller, Delete, Get, HttpCode, HttpStatus, Injectable, Param, Put, UseGuards} from '@nestjs/common';
 import {CommandBus} from "@nestjs/cqrs";
 import {DeleteCommentByIdCommand} from "../application/use-cases/delete-comment-by-id.use-case";
 import {ExtractUserFromRequest} from "../../../../core/decorators/extract-user-from-request";
@@ -11,7 +11,6 @@ import {UpdateLikeStatusCommand} from "../application/use-cases/update-like-stat
 import {GetUser} from "../../../../core/decorators/get-user";
 import {CommentsService} from "../application/comments-service";
 import {OptionalJwtAuthGuard} from "../../../../core/guards/optional-jwt-auth.guard";
-import {CommentsRepository} from "../infrastructure/comments.repository";
 import {GetCommentByIdViewDto} from "./output-dto/get-comment-by-id.view-dto";
 
 @Controller('/comments')
@@ -29,6 +28,7 @@ export class CommentsController {
 
   @Put(':commentId')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async putCommentById(@ExtractUserFromRequest() user: UserContext,
                        @Param('commentId') commentId: string,
                        @Body() body: CreateCommentInputDto): Promise<void> {
@@ -42,6 +42,7 @@ export class CommentsController {
 
   @Put(':commentId/like-status')
   @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
   async putLikeStatusCommentById(@ExtractUserFromRequest() user: UserContext,
                                  @Param('commentId') commentId: string,
                                  @Body() body: UpdateLikeStatusCommentDto) {

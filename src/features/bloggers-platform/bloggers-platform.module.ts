@@ -25,6 +25,7 @@ import {CommentLike, CommentLikeSchema} from "./comments-likes/domain/comment-li
 import {PostLike, PostLikeSchema} from "./posts-likes/domain/post-like.entity";
 import {UpdatePostLikeStatusUseCase} from "./posts/application/use-cases/update-post-like-status";
 import {PostsLikesRepository} from "./posts-likes/infrastructure/posts-likes.repository";
+import {PostsLikesQueryRepository} from "./posts-likes/infrastructure/posts-likes-query.repository";
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
@@ -56,6 +57,7 @@ const useCases: Array<any> = [
     CommentsRepository,
     LikesRepository,
     PostsLikesRepository,
+    PostsLikesQueryRepository,
     ...useCases
   ],
   exports: [MongooseModule],
