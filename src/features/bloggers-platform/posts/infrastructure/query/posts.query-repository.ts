@@ -29,7 +29,7 @@ export class PostsQueryRepository {
       .limit(query.pageSize);
 
     const totalCount: number = await this.PostModel.countDocuments(filter);
-
+    
     const items: PostViewDto[] = posts.map(PostViewDto.newPostMapToView);
 
     return PaginatedViewDto.mapToView({
