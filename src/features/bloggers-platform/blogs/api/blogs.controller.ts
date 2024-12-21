@@ -87,6 +87,7 @@ export class BlogsController {
   }
 
   @Post(':blogId/posts')
+  @UseGuards(BasicAuthGuard)
   async createPostByBlogId(
     @Param('blogId') blogId: string,
     @Body() body: CreatePostByBlogIdInputDto,

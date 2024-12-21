@@ -1,6 +1,6 @@
-import {PostDocument} from '../../domain/posts.entity';
-import {NewestLikesDto} from "../../dto/newest-likes.dto";
-import {LikeStatus} from "../../../../../core/utils/status-enam";
+import { PostDocument } from '../../domain/posts.entity';
+import { NewestLikesDto } from '../../dto/newest-likes.dto';
+import { LikeStatus } from '../../../../../core/utils/status-enam';
 
 export class PostViewDto {
   id: string;
@@ -17,7 +17,10 @@ export class PostViewDto {
     newestLikes: Array<NewestLikesDto>;
   };
 
-  static newPostMapToView(post: PostDocument, likeStatus: LikeStatus): PostViewDto {
+  static newPostMapToView(
+    post: PostDocument,
+    likeStatus: LikeStatus,
+  ): PostViewDto {
     const dto = new PostViewDto();
 
     dto.id = post._id.toString();
@@ -36,5 +39,4 @@ export class PostViewDto {
 
     return dto;
   }
-
 }
