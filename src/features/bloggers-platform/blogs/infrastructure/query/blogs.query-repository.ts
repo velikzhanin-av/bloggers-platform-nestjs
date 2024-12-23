@@ -1,15 +1,16 @@
 import { BlogViewDto } from '../../api/output-dto/blogs.view-dto';
 import { Blog, BlogDocument, BlogModelType } from '../../domain/blogs.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { Query } from '@nestjs/common';
+import {Injectable, Query} from '@nestjs/common';
 import { PaginatedViewDto } from '../../../../../core/dto/base.paginated.view-dto';
 import { FilterQuery } from 'mongoose';
 import { GetBlogsQueryParams } from '../../api/input-dto/get-blogs-query-params.input-dto';
 
+@Injectable()
 export class BlogsQueryRepository {
   constructor(
     @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
+    private readonly BlogModel: BlogModelType,
   ) {}
 
   async findAllBlogs(

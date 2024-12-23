@@ -26,6 +26,7 @@ import {PostLike, PostLikeSchema} from "./posts-likes/domain/post-like.entity";
 import {UpdatePostLikeStatusUseCase} from "./posts/application/use-cases/update-post-like-status";
 import {PostsLikesRepository} from "./posts-likes/infrastructure/posts-likes.repository";
 import {PostsLikesQueryRepository} from "./posts-likes/infrastructure/posts-likes-query.repository";
+import {BlogIsExistConstraint} from "../../core/decorators/blog-is-exist";
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
@@ -58,8 +59,9 @@ const useCases: Array<any> = [
     LikesRepository,
     PostsLikesRepository,
     PostsLikesQueryRepository,
+    BlogIsExistConstraint,
     ...useCases
   ],
-  exports: [MongooseModule],
+  exports: [MongooseModule, BlogIsExistConstraint, BlogsQueryRepository],
 })
 export class BloggersPlatformModule {}

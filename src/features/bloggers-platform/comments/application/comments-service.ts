@@ -35,7 +35,7 @@ export class CommentsService {
         userId: comment.commentatorInfo.userId,
         userLogin: comment.commentatorInfo.userLogin
       },
-      createdAt: comment.createdAt.toString(),
+      createdAt: comment.createdAt,
       likesInfo: {
         likesCount: comment.likesInfo.likesCount,
         dislikesCount: comment.likesInfo.dislikesCount,

@@ -17,9 +17,10 @@ export class PostViewDto {
     newestLikes: Array<NewestLikesDto>;
   };
 
-  static newPostMapToView(
+  static postMapToView(
     post: PostDocument,
     likeStatus: LikeStatus,
+    newestLikes: NewestLikesDto[],
   ): PostViewDto {
     const dto = new PostViewDto();
 
@@ -34,7 +35,7 @@ export class PostViewDto {
       likesCount: post.extendedLikesInfo.likesCount,
       dislikesCount: post.extendedLikesInfo.dislikesCount,
       myStatus: likeStatus,
-      newestLikes: [],
+      newestLikes
     };
 
     return dto;

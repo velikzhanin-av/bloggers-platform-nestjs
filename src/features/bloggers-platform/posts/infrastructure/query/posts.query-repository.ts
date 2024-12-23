@@ -8,12 +8,15 @@ import { GetPostsQueryParams } from '../../api/input-dto/get-posts-query-params.
 import { LikeStatus } from '../../../../../core/utils/status-enam';
 import { PostLikeDocument } from '../../../posts-likes/domain/post-like.entity';
 import { PostsLikesRepository } from '../../../posts-likes/infrastructure/posts-likes.repository';
+import {NewestLikesDto} from "../../dto/newest-likes.dto";
+import {PostsLikesQueryRepository} from "../../../posts-likes/infrastructure/posts-likes-query.repository";
 
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
     private PostModel: PostModelType,
     private readonly postsLikesRepository: PostsLikesRepository,
+    private readonly postsLikesQueryRepository: PostsLikesQueryRepository,
   ) {}
 
   async findAllPosts(
@@ -35,16 +38,19 @@ export class PostsQueryRepository {
 
     const totalCount: number = await this.PostModel.countDocuments(filter);
 
+
+
     const items: PostViewDto[] = await Promise.all(
       posts.map(async (post: PostDocument) => {
-        if (!userId) return PostViewDto.newPostMapToView(post, LikeStatus.None);
+        const newestLikes: NewestLikesDto[] | undefined = await this.postsLikesQueryRepository.findNewestLikes(post._id!.toString())
+        if (!userId) return PostViewDto.postMapToView(post, LikeStatus.None, newestLikes);
         const like: PostLikeDocument | null =
           await this.postsLikesRepository.findLikeByPostAndUser(
             post._id.toString(),
             userId,
           );
-        if (!like) return PostViewDto.newPostMapToView(post, LikeStatus.None);
-        return PostViewDto.newPostMapToView(post, like.status);
+        if (!like) return PostViewDto.postMapToView(post, LikeStatus.None, newestLikes);
+        return PostViewDto.postMapToView(post, like.status, newestLikes);
       }),
     );
     // const items: PostViewDto[] = posts.map(PostViewDto.newPostMapToView);
@@ -65,6 +71,6 @@ export class PostsQueryRepository {
       _id: postId,
     });
     if (!post) return null;
-    return PostViewDto.newPostMapToView(post, LikeStatus.None);
+    return PostViewDto.postMapToView(post, LikeStatus.None, []);
   }
 }
