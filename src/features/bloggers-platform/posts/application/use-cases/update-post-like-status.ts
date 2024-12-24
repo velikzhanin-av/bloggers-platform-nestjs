@@ -29,7 +29,7 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler {
     const post: PostDocument = await this.postsRepository.findPostById(postId)
     const user: UserDocument | null = await this.usersRepository.findOrNotFoundFail(userId)
 
-    const findLike: PostLikeDocument | null = await this.postsLikesRepository.findLikeByPostAndUser(userId, postId)
+    const findLike: PostLikeDocument | null = await this.postsLikesRepository.findLikeByPostAndUser(postId, userId)
     if (!findLike) {
       if (likeStatus === LikeStatus.Like) post.increaseLike()
       else if (likeStatus === LikeStatus.Dislike) post.increaseDislike()

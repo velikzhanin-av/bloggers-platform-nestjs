@@ -21,7 +21,7 @@ export class PostsLikesQueryRepository {
 
   mapToOutputNewestLikes(like: PostLikeDocument): NewestLikesDto {
     return {
-      addedAt: like.createdAt.toString(),
+      createdAt: like.createdAt.toString(),
       userId: like.userId,
       login: like.userLogin,
     }

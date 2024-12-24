@@ -6,8 +6,8 @@ import {UsersRepository} from "../../../../user-accounts/infrastructure/users.re
 import {CommentsRepository} from "../../infrastructure/comments.repository";
 import {InjectModel} from "@nestjs/mongoose";
 import {CreateCommentDto} from "../../dto/create-comment.dto";
-import {CommentsService} from "../comments-service";
-import {GetCommentByIdViewDto} from "../../api/output-dto/get-comment-by-id.view-dto";
+import {CommentsService} from "../comments.service";
+import {CommentViewDto} from "../../api/output-dto/comment.view-dto";
 
 export class CreateCommentByPostIdCommand {
   constructor(public dto: CreateCommentServiceDto) {
@@ -23,7 +23,7 @@ export class CreateCommentByPostIdUseCase implements ICommandHandler {
               private CommentModel: CommentModelType,) {
   }
 
-  async execute({ dto }: CreateCommentByPostIdCommand): Promise<GetCommentByIdViewDto> {
+  async execute({ dto }: CreateCommentByPostIdCommand): Promise<CommentViewDto> {
     const user: UserDocument | null =
       await this.usersRepository.findOrNotFoundFail(dto.userId);
     const CreateCommentDto: CreateCommentDto = {

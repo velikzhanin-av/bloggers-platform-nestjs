@@ -32,6 +32,9 @@ export class Comment {
   @Prop({ type: Date })
   createdAt: Date;
 
+  @Prop({ type: Date })
+  updatedAt: Date;
+
   @Prop({ type: String, required: true })
   postId: string;
 

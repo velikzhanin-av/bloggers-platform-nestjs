@@ -27,20 +27,25 @@ import { UserContext } from '../../../../core/dto/user-context';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentByPostIdCommand } from '../../comments/application/use-cases/create-comment-by-post-id.use-case';
-import { GetCommentByIdViewDto } from '../../comments/api/output-dto/get-comment-by-id.view-dto';
+import { CommentViewDto } from '../../comments/api/output-dto/comment.view-dto';
 import { UpdateLikeStatusCommentDto } from '../../comments/api/input-dto/update-like-status-comment.dto';
 import { UpdatePostLikeStatusCommand } from '../application/use-cases/update-post-like-status';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { GetUser } from '../../../../core/decorators/get-user';
 import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
+import {CommentsService} from "../../comments/application/comments.service";
+import {CommentDocument} from "../../comments/domain/comments.entity";
+import {CommentsQueryRepository} from "../../comments/infrastructure/comments-query.repository";
 
 @Controller('posts')
 export class PostsController {
   constructor(
     private postsService: PostsService,
+    private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
     private blogsQueryRepository: BlogsQueryRepository,
     private readonly commandBus: CommandBus,
+    private readonly commentsQueryRepository: CommentsQueryRepository
   ) {}
 
   @Get()
@@ -109,16 +114,27 @@ export class PostsController {
     @Param('postId') postId: string,
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContext,
-  ): Promise<GetCommentByIdViewDto> {
+  ): Promise<CommentViewDto> {
     const dto = { ...body, postId, userId: user.userId };
     return await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
+  }
+
+  @Get(':postId/comments')
+  @UseGuards(OptionalJwtAuthGuard)
+  async getCommentById(
+    @Query() query: GetPostsQueryParams,
+    @Param('postId') postId: string,
+    @GetUser() user: UserContext,
+  ): Promise<PaginatedViewDto<CommentViewDto[]>> {
+    const userId: string | null = user ? user.userId : null;
+    return await this.commentsQueryRepository.getCommentsByPostId(query, postId, userId)
   }
 
   @Put(':postId/like-status')
   @UseGuards(JwtAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async putLikeStatusPostById(
-    @ExtractUserFromRequest() user: UserContext,
+    @GetUser() user: UserContext,
     @Param('postId') postId: string,
     @Body() body: UpdateLikeStatusCommentDto,
   ) {

@@ -8,6 +8,7 @@ import {PostsLikesQueryRepository} from "../../posts-likes/infrastructure/posts-
 import {PostLikeDocument} from "../../posts-likes/domain/post-like.entity";
 import {NewestLikesDto} from "../dto/newest-likes.dto";
 import {LikeStatus} from "../../../../core/utils/status-enam";
+import {GetPostsQueryParams} from "../api/input-dto/get-posts-query-params.input-dto";
 
 export class PostsService {
   constructor(
@@ -54,7 +55,7 @@ export class PostsService {
     return this.mapToOutputPostsFromBd(post, like.status, newestLikes)
   }
 
-  mapToOutputPostsFromBd(post: any, likeStatus: string, newestLikes: Array<any> | undefined) {
+   mapToOutputPostsFromBd(post: any, likeStatus: string, newestLikes: Array<any> | undefined) {
     return {
       id: post.id,
       title: post.title,

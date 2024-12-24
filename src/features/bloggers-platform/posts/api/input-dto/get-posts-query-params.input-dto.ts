@@ -4,4 +4,5 @@ export class GetPostsQueryParams extends BaseSortablePaginationParams<
   string | null
 > {
   sortBy: string = 'createdAt';
+  searchNameTerm: string | null = null;
 }

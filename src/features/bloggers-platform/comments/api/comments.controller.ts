@@ -5,7 +5,6 @@ import {
   Get,
   HttpCode,
   HttpStatus,
-  Injectable,
   Param,
   Put,
   UseGuards,
@@ -20,9 +19,9 @@ import { UpdateCommentByIdCommand } from '../application/use-cases/update-commen
 import { UpdateLikeStatusCommentDto } from './input-dto/update-like-status-comment.dto';
 import { UpdateLikeStatusCommand } from '../application/use-cases/update-like-status.use-case';
 import { GetUser } from '../../../../core/decorators/get-user';
-import { CommentsService } from '../application/comments-service';
+import { CommentsService } from '../application/comments.service';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
-import { GetCommentByIdViewDto } from './output-dto/get-comment-by-id.view-dto';
+import { CommentViewDto } from './output-dto/comment.view-dto';
 
 @Controller('/comments')
 export class CommentsController {
@@ -79,11 +78,12 @@ export class CommentsController {
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  async getCommentById(
+  async getCommentsByPostId(
     @GetUser() user: UserContext,
     @Param('id') commentId: string,
-  ): Promise<GetCommentByIdViewDto> {
+  ): Promise<CommentViewDto> {
     const userId: string | null = user ? user.userId : null;
     return await this.commentsService.getCommentById({ commentId, userId });
   }
+
 }

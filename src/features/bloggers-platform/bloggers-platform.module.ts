@@ -20,13 +20,14 @@ import {CqrsModule} from "@nestjs/cqrs";
 import {UpdateCommentByPostIdUseCase} from "./comments/application/use-cases/update-comment-by-id.use-case";
 import {UpdateLikeStatusUseCase} from "./comments/application/use-cases/update-like-status.use-case";
 import {LikesRepository} from "./comments-likes/infrastructure/likes.repository";
-import {CommentsService} from "./comments/application/comments-service";
+import {CommentsService} from "./comments/application/comments.service";
 import {CommentLike, CommentLikeSchema} from "./comments-likes/domain/comment-like.entity";
 import {PostLike, PostLikeSchema} from "./posts-likes/domain/post-like.entity";
 import {UpdatePostLikeStatusUseCase} from "./posts/application/use-cases/update-post-like-status";
 import {PostsLikesRepository} from "./posts-likes/infrastructure/posts-likes.repository";
 import {PostsLikesQueryRepository} from "./posts-likes/infrastructure/posts-likes-query.repository";
 import {BlogIsExistConstraint} from "../../core/decorators/blog-is-exist";
+import {CommentsQueryRepository} from "./comments/infrastructure/comments-query.repository";
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
@@ -60,6 +61,7 @@ const useCases: Array<any> = [
     PostsLikesRepository,
     PostsLikesQueryRepository,
     BlogIsExistConstraint,
+    CommentsQueryRepository,
     ...useCases
   ],
   exports: [MongooseModule, BlogIsExistConstraint, BlogsQueryRepository],

@@ -1,22 +1,26 @@
 import {GetCommentById} from "../dto/get-comment-by-id";
 import {CommentsRepository} from "../infrastructure/comments.repository";
-import {CommentDocument} from "../domain/comments.entity";
+import {Comment, CommentDocument} from "../domain/comments.entity";
 import {LikeStatus} from "../../../../core/utils/status-enam";
-import {GetCommentByIdViewDto} from "../api/output-dto/get-comment-by-id.view-dto";
-import {Injectable} from "@nestjs/common";
+import {CommentViewDto} from "../api/output-dto/comment.view-dto";
+import {Injectable, Query} from "@nestjs/common";
 import {LikesRepository} from "../../comments-likes/infrastructure/likes.repository";
 import {CommentLikeDocument} from "../../comments-likes/domain/comment-like.entity";
+import {GetPostsQueryParams} from "../../posts/api/input-dto/get-posts-query-params.input-dto";
+import {FilterQuery} from "mongoose";
+import {Post} from "../../posts/domain/posts.entity";
 
 @Injectable()
 export class CommentsService {
   constructor(private readonly commentsRepository: CommentsRepository,
-              private readonly likesRepository: LikesRepository,) {}
+              private readonly likesRepository: LikesRepository,) {
+  }
 
-  async getCommentById(dto: GetCommentById ): Promise<GetCommentByIdViewDto> {
-    const { commentId, userId } = dto;
+  async getCommentById(dto: GetCommentById): Promise<CommentViewDto> {
+    const {commentId, userId} = dto;
     const comment: CommentDocument = await this.commentsRepository.findCommentById(commentId)
 
-    let result: GetCommentByIdViewDto = this.mapToUserViewComment(comment, LikeStatus.None)
+    let result: CommentViewDto = this.mapToUserViewComment(comment, LikeStatus.None)
 
     if (!userId) return result
 
@@ -27,7 +31,7 @@ export class CommentsService {
     return result
   }
 
-  mapToUserViewComment(comment: CommentDocument, likeStatus: LikeStatus ): GetCommentByIdViewDto { //
+  mapToUserViewComment(comment: CommentDocument, likeStatus: LikeStatus): CommentViewDto { //
     return {
       id: comment._id?.toString(),
       content: comment.content,
@@ -43,5 +47,4 @@ export class CommentsService {
       }
     }
   }
-
 }

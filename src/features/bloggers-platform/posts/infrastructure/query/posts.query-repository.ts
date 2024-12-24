@@ -14,7 +14,7 @@ import {PostsLikesQueryRepository} from "../../../posts-likes/infrastructure/pos
 export class PostsQueryRepository {
   constructor(
     @InjectModel(Post.name)
-    private PostModel: PostModelType,
+    private readonly PostModel: PostModelType,
     private readonly postsLikesRepository: PostsLikesRepository,
     private readonly postsLikesQueryRepository: PostsLikesQueryRepository,
   ) {}
@@ -37,8 +37,6 @@ export class PostsQueryRepository {
       .limit(query.pageSize);
 
     const totalCount: number = await this.PostModel.countDocuments(filter);
-
-
 
     const items: PostViewDto[] = await Promise.all(
       posts.map(async (post: PostDocument) => {

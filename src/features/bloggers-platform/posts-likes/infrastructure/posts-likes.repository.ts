@@ -13,7 +13,7 @@ export class PostsLikesRepository {
     await like.save();
   }
 
-  async findLikeByPostAndUser(userId: string, postId: string): Promise<PostLikeDocument | null> {
+  async findLikeByPostAndUser(postId: string, userId: string): Promise<PostLikeDocument | null> {
     return this.PostLikeModel.findOne({userId, postId});
   }
 

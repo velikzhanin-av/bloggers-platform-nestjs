@@ -20,6 +20,9 @@ export class CommentLike {
   @Prop({ type: Date })
   createdAt: Date;
 
+  @Prop({ type: Date })
+  updatedAt: Date;
+
   static createInstance(dto: CreateLikeDto): CommentLikeDocument {
     const like = new this();
     like.commentId = dto.commentId;

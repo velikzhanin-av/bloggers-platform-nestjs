@@ -1,5 +1,5 @@
 export class NewestLikesDto {
-  addedAt: string;
+  createdAt: string;
   userId: string;
   login: string;
 }
