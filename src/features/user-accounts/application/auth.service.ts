@@ -1,14 +1,9 @@
-import {
-  Injectable,
-} from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { UsersRepository } from '../infrastructure/users.repository';
 import { BcryptService } from './bcrypt.service';
 import { CustomJwtService } from './jwt.service';
 import { AuthRepository } from '../infrastructure/auth.repository';
-import {
-  Session,
-  SessionModelType,
-} from '../domain/sessions.entity';
+import { Session, SessionModelType } from '../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { NotificationsService } from '../../notifications/application/notifications.service';
 
@@ -43,5 +38,4 @@ export class AuthService {
     if (!tokenData) return null;
     return { accessToken, refreshToken, tokenData };
   }
-
 }

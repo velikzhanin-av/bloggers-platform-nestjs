@@ -33,9 +33,9 @@ import { UpdatePostLikeStatusCommand } from '../application/use-cases/update-pos
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { GetUser } from '../../../../core/decorators/get-user';
 import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
-import {CommentsService} from "../../comments/application/comments.service";
-import {CommentDocument} from "../../comments/domain/comments.entity";
-import {CommentsQueryRepository} from "../../comments/infrastructure/comments-query.repository";
+import { CommentsService } from '../../comments/application/comments.service';
+import { CommentDocument } from '../../comments/domain/comments.entity';
+import { CommentsQueryRepository } from '../../comments/infrastructure/comments-query.repository';
 
 @Controller('posts')
 export class PostsController {
@@ -45,7 +45,7 @@ export class PostsController {
     private postsQueryRepository: PostsQueryRepository,
     private blogsQueryRepository: BlogsQueryRepository,
     private readonly commandBus: CommandBus,
-    private readonly commentsQueryRepository: CommentsQueryRepository
+    private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
   @Get()
@@ -127,7 +127,11 @@ export class PostsController {
     @GetUser() user: UserContext,
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
     const userId: string | null = user ? user.userId : null;
-    return await this.commentsQueryRepository.getCommentsByPostId(query, postId, userId)
+    return await this.commentsQueryRepository.getCommentsByPostId(
+      query,
+      postId,
+      userId,
+    );
   }
 
   @Put(':postId/like-status')

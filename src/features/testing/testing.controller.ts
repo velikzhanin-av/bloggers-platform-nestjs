@@ -17,8 +17,14 @@ import {
   Comment,
   CommentModelType,
 } from '../bloggers-platform/comments/domain/comments.entity';
-import {CommentLike, CommentLikeModelType} from "../bloggers-platform/comments-likes/domain/comment-like.entity";
-import {PostLike, PostLikeModelType} from "../bloggers-platform/posts-likes/domain/post-like.entity";
+import {
+  CommentLike,
+  CommentLikeModelType,
+} from '../bloggers-platform/comments-likes/domain/comment-like.entity';
+import {
+  PostLike,
+  PostLikeModelType,
+} from '../bloggers-platform/posts-likes/domain/post-like.entity';
 
 @Controller('testing')
 export class TestingController {

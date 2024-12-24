@@ -1,7 +1,7 @@
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {LikeStatus} from "../../../../core/utils/status-enam";
-import {CreateLikeDto} from "../dto/create.like.dto";
-import {HydratedDocument, Model} from "mongoose";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { LikeStatus } from '../../../../core/utils/status-enam';
+import { CreateLikeDto } from '../dto/create.like.dto';
+import { HydratedDocument, Model } from 'mongoose';
 
 @Schema({ timestamps: true })
 export class CommentLike {
@@ -14,7 +14,12 @@ export class CommentLike {
   @Prop({ type: String, required: true })
   userLogin: string;
 
-  @Prop({ type: String, enum: Object.values(LikeStatus), required: true, default: LikeStatus.None })
+  @Prop({
+    type: String,
+    enum: Object.values(LikeStatus),
+    required: true,
+    default: LikeStatus.None,
+  })
   status: LikeStatus;
 
   @Prop({ type: Date })
@@ -34,7 +39,7 @@ export class CommentLike {
   }
 
   updateLikeStatus(status: LikeStatus) {
-    this.status = status
+    this.status = status;
   }
 }
 
@@ -44,4 +49,5 @@ CommentLikeSchema.loadClass(CommentLike);
 
 export type CommentLikeDocument = HydratedDocument<CommentLike>;
 
-export type CommentLikeModelType = Model<CommentLikeDocument> & typeof CommentLike;
+export type CommentLikeModelType = Model<CommentLikeDocument> &
+  typeof CommentLike;

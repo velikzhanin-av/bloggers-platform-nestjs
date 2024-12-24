@@ -1,6 +1,6 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { pipesSetup } from './pipes.setup';
-import cookieParser from 'cookie-parser'
+import cookieParser from 'cookie-parser';
 
 export const applyAppSettings = (app: INestApplication) => {
   app.enableCors();

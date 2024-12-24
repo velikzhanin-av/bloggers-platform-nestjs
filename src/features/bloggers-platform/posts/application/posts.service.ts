@@ -1,14 +1,14 @@
-import {Post, PostDocument, PostModelType} from '../domain/posts.entity';
-import {CreatePostDto} from '../dto/create-post.dto';
-import {InjectModel} from '@nestjs/mongoose';
-import {PostsRepository} from '../infrastructure/posts.repository';
-import {NotFoundException} from '@nestjs/common';
-import {CreatePostInputDto} from '../api/input-dto/posts.input-dto';
-import {PostsLikesQueryRepository} from "../../posts-likes/infrastructure/posts-likes-query.repository";
-import {PostLikeDocument} from "../../posts-likes/domain/post-like.entity";
-import {NewestLikesDto} from "../dto/newest-likes.dto";
-import {LikeStatus} from "../../../../core/utils/status-enam";
-import {GetPostsQueryParams} from "../api/input-dto/get-posts-query-params.input-dto";
+import { Post, PostDocument, PostModelType } from '../domain/posts.entity';
+import { CreatePostDto } from '../dto/create-post.dto';
+import { InjectModel } from '@nestjs/mongoose';
+import { PostsRepository } from '../infrastructure/posts.repository';
+import { NotFoundException } from '@nestjs/common';
+import { CreatePostInputDto } from '../api/input-dto/posts.input-dto';
+import { PostsLikesQueryRepository } from '../../posts-likes/infrastructure/posts-likes-query.repository';
+import { PostLikeDocument } from '../../posts-likes/domain/post-like.entity';
+import { NewestLikesDto } from '../dto/newest-likes.dto';
+import { LikeStatus } from '../../../../core/utils/status-enam';
+import { GetPostsQueryParams } from '../api/input-dto/get-posts-query-params.input-dto';
 
 export class PostsService {
   constructor(
@@ -16,8 +16,7 @@ export class PostsService {
     private PostModel: PostModelType,
     private postsRepository: PostsRepository,
     private readonly postsLikesQueryRepository: PostsLikesQueryRepository,
-  ) {
-  }
+  ) {}
 
   async createPost(dto: CreatePostDto): Promise<string> {
     const post: PostDocument = this.PostModel.createInstance(dto);
@@ -41,21 +40,34 @@ export class PostsService {
   }
 
   async findPostById(postId: string, userId: string | null): Promise<any> {
-    const post: PostDocument = await this.postsRepository.findPostById(postId)
+    const post: PostDocument = await this.postsRepository.findPostById(postId);
 
-    const newestLikes: Array<NewestLikesDto> | null = await this.postsLikesQueryRepository.findNewestLikes(postId)
+    const newestLikes: Array<NewestLikesDto> | null =
+      await this.postsLikesQueryRepository.findNewestLikes(postId);
     // TODO поправить any
-    let postOut: any = this.mapToOutputPostsFromBd(post, LikeStatus.None, newestLikes)
+    const postOut: any = this.mapToOutputPostsFromBd(
+      post,
+      LikeStatus.None,
+      newestLikes,
+    );
 
-    if (!userId) return postOut
+    if (!userId) return postOut;
 
-    const like: PostLikeDocument | null = await this.postsLikesQueryRepository.findLikeByCommentAndUser(postId, userId)
-    if (!like) return postOut
+    const like: PostLikeDocument | null =
+      await this.postsLikesQueryRepository.findLikeByCommentAndUser(
+        postId,
+        userId,
+      );
+    if (!like) return postOut;
 
-    return this.mapToOutputPostsFromBd(post, like.status, newestLikes)
+    return this.mapToOutputPostsFromBd(post, like.status, newestLikes);
   }
 
-   mapToOutputPostsFromBd(post: any, likeStatus: string, newestLikes: Array<any> | undefined) {
+  mapToOutputPostsFromBd(
+    post: any,
+    likeStatus: string,
+    newestLikes: Array<any> | undefined,
+  ) {
     return {
       id: post.id,
       title: post.title,
@@ -68,9 +80,8 @@ export class PostsService {
         dislikesCount: post.extendedLikesInfo.dislikesCount,
         likesCount: post.extendedLikesInfo.likesCount,
         myStatus: likeStatus,
-        newestLikes
+        newestLikes,
       },
-    }
+    };
   }
-
 }

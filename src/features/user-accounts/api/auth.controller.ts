@@ -19,14 +19,12 @@ import { AuthQueryRepository } from '../infrastructure/query/auth.query-reposito
 import { UserMeViewDto } from './output-dto/users.view-dto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthConfirmationCodeDto } from './input-dto/auth-confirmation-code.dto';
-import {
-  AuthRegistrationEmailResendingDto
-} from './input-dto/auth-registration-email-resending.dtp';
+import { AuthRegistrationEmailResendingDto } from './input-dto/auth-registration-email-resending.dtp';
 import { CommandBus } from '@nestjs/cqrs';
 import { RegisterUserCommand } from '../application/use-cases/register-user.use-case';
-import {LoginUserCommand} from "../application/use-cases/login-user.use-case";
-import {RegistrationConfirmationCommand} from "../application/use-cases/registration-confirmation.use-case";
-import {RegistrationEmailResendingCommand} from "../application/use-cases/registration-email-resending.use-case";
+import { LoginUserCommand } from '../application/use-cases/login-user.use-case';
+import { RegistrationConfirmationCommand } from '../application/use-cases/registration-confirmation.use-case';
+import { RegistrationEmailResendingCommand } from '../application/use-cases/registration-email-resending.use-case';
 
 @Controller('/auth')
 export class AuthController {
@@ -59,12 +57,12 @@ export class AuthController {
     const result = await this.commandBus.execute(new LoginUserCommand(dto));
     res
       .cookie('refreshToken', result.refreshToken, {
-      httpOnly: true,
-      secure: true,
-    })
+        httpOnly: true,
+        secure: true,
+      })
       .json({ accessToken: result.accessToken });
   }
-s
+  s;
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getUserInfo(

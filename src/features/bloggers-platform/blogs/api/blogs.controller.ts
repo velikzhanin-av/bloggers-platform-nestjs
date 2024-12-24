@@ -31,7 +31,7 @@ import { UserViewDto } from '../../../user-accounts/api/output-dto/users.view-dt
 import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dto';
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
-import {BasicAuthGuard} from "../../../../core/guards/basic-auth.guard";
+import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
 
 @Controller('blogs')
 export class BlogsController {

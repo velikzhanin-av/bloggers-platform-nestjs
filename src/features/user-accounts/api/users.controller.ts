@@ -18,7 +18,7 @@ import { PaginatedViewDto } from '../../../core/dto/base.paginated.view-dto';
 import { BasicAuthGuard } from '../../../core/guards/basic-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/use-cases/create-user.use-case';
-import {DeleteUserCommand} from "../application/use-cases/delete-user.use-case";
+import { DeleteUserCommand } from '../application/use-cases/delete-user.use-case';
 
 @Controller('users')
 @UseGuards(BasicAuthGuard)
@@ -49,6 +49,5 @@ export class UsersController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteUserById(@Param('id') id: string): Promise<void> {
     return await this.commandBus.execute(new DeleteUserCommand(id));
-
   }
 }

@@ -1,7 +1,7 @@
-import {Prop, Schema, SchemaFactory} from "@nestjs/mongoose";
-import {LikeStatus} from "../../../../core/utils/status-enam";
-import {HydratedDocument, Model} from "mongoose";
-import {CreateLikeDto} from "../dto/create-like.dto";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { LikeStatus } from '../../../../core/utils/status-enam';
+import { HydratedDocument, Model } from 'mongoose';
+import { CreateLikeDto } from '../dto/create-like.dto';
 
 @Schema({ timestamps: true })
 export class PostLike {
@@ -14,11 +14,19 @@ export class PostLike {
   @Prop({ type: String, required: true })
   userLogin: string;
 
-  @Prop({ type: String, enum: Object.values(LikeStatus), required: true, default: LikeStatus.None })
+  @Prop({
+    type: String,
+    enum: Object.values(LikeStatus),
+    required: true,
+    default: LikeStatus.None,
+  })
   status: LikeStatus;
 
   @Prop({ type: Date })
   createdAt: Date;
+
+  @Prop({ type: Date })
+  updatedAt: Date;
 
   static createInstance(dto: CreateLikeDto): PostLikeDocument {
     const like = new this();
@@ -31,7 +39,7 @@ export class PostLike {
   }
 
   updateLikeStatus(status: LikeStatus) {
-    this.status = status
+    this.status = status;
   }
 }
 

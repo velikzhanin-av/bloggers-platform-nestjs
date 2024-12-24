@@ -14,38 +14,48 @@ import { CommentsController } from './comments/api/comments.controller';
 import { Comment, CommentSchema } from './comments/domain/comments.entity';
 import { UserAccountsModule } from '../user-accounts/user-accounts.module';
 import { CommentsRepository } from './comments/infrastructure/comments.repository';
-import {CreateCommentByPostIdUseCase} from "./comments/application/use-cases/create-comment-by-post-id.use-case";
-import {DeleteCommentByPostIdUseCase} from "./comments/application/use-cases/delete-comment-by-id.use-case";
-import {CqrsModule} from "@nestjs/cqrs";
-import {UpdateCommentByPostIdUseCase} from "./comments/application/use-cases/update-comment-by-id.use-case";
-import {UpdateLikeStatusUseCase} from "./comments/application/use-cases/update-like-status.use-case";
-import {LikesRepository} from "./comments-likes/infrastructure/likes.repository";
-import {CommentsService} from "./comments/application/comments.service";
-import {CommentLike, CommentLikeSchema} from "./comments-likes/domain/comment-like.entity";
-import {PostLike, PostLikeSchema} from "./posts-likes/domain/post-like.entity";
-import {UpdatePostLikeStatusUseCase} from "./posts/application/use-cases/update-post-like-status";
-import {PostsLikesRepository} from "./posts-likes/infrastructure/posts-likes.repository";
-import {PostsLikesQueryRepository} from "./posts-likes/infrastructure/posts-likes-query.repository";
-import {BlogIsExistConstraint} from "../../core/decorators/blog-is-exist";
-import {CommentsQueryRepository} from "./comments/infrastructure/comments-query.repository";
+import { CreateCommentByPostIdUseCase } from './comments/application/use-cases/create-comment-by-post-id.use-case';
+import { DeleteCommentByPostIdUseCase } from './comments/application/use-cases/delete-comment-by-id.use-case';
+import { CqrsModule } from '@nestjs/cqrs';
+import { UpdateCommentByPostIdUseCase } from './comments/application/use-cases/update-comment-by-id.use-case';
+import { UpdateLikeStatusUseCase } from './comments/application/use-cases/update-like-status.use-case';
+import { LikesRepository } from './comments-likes/infrastructure/likes.repository';
+import { CommentsService } from './comments/application/comments.service';
+import {
+  CommentLike,
+  CommentLikeSchema,
+} from './comments-likes/domain/comment-like.entity';
+import {
+  PostLike,
+  PostLikeSchema,
+} from './posts-likes/domain/post-like.entity';
+import { UpdatePostLikeStatusUseCase } from './posts/application/use-cases/update-post-like-status';
+import { PostsLikesRepository } from './posts-likes/infrastructure/posts-likes.repository';
+import { PostsLikesQueryRepository } from './posts-likes/infrastructure/posts-likes-query.repository';
+import { BlogIsExistConstraint } from '../../core/decorators/blog-is-exist';
+import { CommentsQueryRepository } from './comments/infrastructure/comments-query.repository';
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
   DeleteCommentByPostIdUseCase,
   UpdateCommentByPostIdUseCase,
   UpdateLikeStatusUseCase,
-  UpdatePostLikeStatusUseCase
-]
+  UpdatePostLikeStatusUseCase,
+];
 
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: Blog.name, schema: BlogSchema }]),
     MongooseModule.forFeature([{ name: Post.name, schema: PostSchema }]),
     MongooseModule.forFeature([{ name: Comment.name, schema: CommentSchema }]),
-    MongooseModule.forFeature([{ name: CommentLike.name, schema: CommentLikeSchema }]),
-    MongooseModule.forFeature([{ name: PostLike.name, schema: PostLikeSchema }]),
+    MongooseModule.forFeature([
+      { name: CommentLike.name, schema: CommentLikeSchema },
+    ]),
+    MongooseModule.forFeature([
+      { name: PostLike.name, schema: PostLikeSchema },
+    ]),
     UserAccountsModule,
-    CqrsModule
+    CqrsModule,
   ],
   controllers: [BlogsController, PostsController, CommentsController],
   providers: [
@@ -62,7 +72,7 @@ const useCases: Array<any> = [
     PostsLikesQueryRepository,
     BlogIsExistConstraint,
     CommentsQueryRepository,
-    ...useCases
+    ...useCases,
   ],
   exports: [MongooseModule, BlogIsExistConstraint, BlogsQueryRepository],
 })

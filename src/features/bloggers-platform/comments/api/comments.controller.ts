@@ -85,5 +85,4 @@ export class CommentsController {
     const userId: string | null = user ? user.userId : null;
     return await this.commentsService.getCommentById({ commentId, userId });
   }
-
 }

@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDto } from '../dto/create-comment.dto';
-import {DeletionStatus} from "../../../../core/utils/status-enam";
+import { DeletionStatus } from '../../../../core/utils/status-enam';
 
 @Schema({ _id: false })
 export class CommentatorInfo {
@@ -62,31 +62,31 @@ export class Comment {
   }
 
   updateContent(content: string) {
-    this.content = content
+    this.content = content;
   }
 
   increaseLike() {
-    this.likesInfo.likesCount++
+    this.likesInfo.likesCount++;
   }
 
   increaseDislike() {
-    this.likesInfo.dislikesCount++
+    this.likesInfo.dislikesCount++;
   }
 
   decreaseLike() {
-    this.likesInfo.likesCount--
+    this.likesInfo.likesCount--;
   }
 
   decreaseDislike() {
-    this.likesInfo.dislikesCount--
+    this.likesInfo.dislikesCount--;
   }
 
   clearLikesCount() {
-    this.likesInfo.likesCount = 0
+    this.likesInfo.likesCount = 0;
   }
 
   clearDislikesCount() {
-    this.likesInfo.dislikesCount = 0
+    this.likesInfo.dislikesCount = 0;
   }
 }
 

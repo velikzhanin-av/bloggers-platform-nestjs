@@ -1,15 +1,11 @@
 import { Injectable, NotFoundException, Query } from '@nestjs/common';
-import {
-  User,
-  UserDocument,
-  UserModelType,
-} from '../../domain/users.entity';
+import { User, UserDocument, UserModelType } from '../../domain/users.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.input-dto';
 import { UserViewDto } from '../../api/output-dto/users.view-dto';
 import { FilterQuery } from 'mongoose';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
-import {DeletionStatus} from "../../../../core/utils/status-enam";
+import { DeletionStatus } from '../../../../core/utils/status-enam';
 
 @Injectable()
 export class UsersQueryRepository {

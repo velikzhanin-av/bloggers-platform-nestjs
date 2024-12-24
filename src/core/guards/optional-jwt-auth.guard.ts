@@ -1,6 +1,6 @@
-import {CanActivate, ExecutionContext, Injectable} from '@nestjs/common';
-import {JwtService} from '@nestjs/jwt';
-import {Config} from "../../config/config";
+import { CanActivate, ExecutionContext, Injectable } from '@nestjs/common';
+import { JwtService } from '@nestjs/jwt';
+import { Config } from '../../config/config';
 
 @Injectable()
 export class OptionalJwtAuthGuard implements CanActivate {
@@ -13,11 +13,13 @@ export class OptionalJwtAuthGuard implements CanActivate {
     if (!token) return true;
 
     try {
-      request.user = this.jwtService.verify(token, {secret: Config.TOKEN_SECRET_KEY});
+      request.user = this.jwtService.verify(token, {
+        secret: Config.TOKEN_SECRET_KEY,
+      });
     } catch (e) {
       request.user = null;
     }
-    return true
+    return true;
   }
 
   private extractToken(request: any): string | null {
