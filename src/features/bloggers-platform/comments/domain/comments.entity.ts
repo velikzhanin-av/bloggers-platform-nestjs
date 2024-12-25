@@ -2,8 +2,6 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 import { DeletionStatus } from '../../../../core/utils/status-enam';
-import { Post } from '../../posts/domain/posts.entity';
-import { CreateCommentDto } from '../dto/create-comment.dto';
 
 @Schema({ _id: false })
 export class CommentatorInfo {

@@ -37,10 +37,6 @@ import { CommentsService } from '../../comments/application/comments.service';
 import { CommentDocument } from '../../comments/domain/comments.entity';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments-query.repository';
 import {PostDocument} from "../domain/posts.entity";
-import { CommentsService } from '../../comments/application/comments.service';
-import { ExtractUserFromRequest } from '../../../../core/decorators/extract-user-from-request';
-import { UserContext } from '../../../../core/dto/user-context';
-import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -51,7 +47,6 @@ export class PostsController {
     private blogsQueryRepository: BlogsQueryRepository,
     private readonly commandBus: CommandBus,
     private readonly commentsQueryRepository: CommentsQueryRepository,
-    private commentsService: CommentsService,
   ) {}
 
   @Get()
@@ -137,7 +132,7 @@ export class PostsController {
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
     const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
     if (!post) throw new NotFoundException('post not found');
-      
+
     const userId: string | null = user ? user.userId : null;
     return await this.commentsQueryRepository.getCommentsByPostId(
       query,
@@ -145,8 +140,6 @@ export class PostsController {
       userId,
     );
   }
-
-
 
   @Put(':postId/like-status')
   @UseGuards(JwtAuthGuard)
