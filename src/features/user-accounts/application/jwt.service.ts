@@ -4,7 +4,7 @@ import { UsersRepository } from '../infrastructure/users.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class JwtService {
+export class CustomJwtService {
   constructor(private usersRepository: UsersRepository) {}
 
   async createJwt(userId: string, deviceId: string) {

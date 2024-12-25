@@ -2,11 +2,7 @@ import { Schema, Prop, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { add } from 'date-fns';
-
-export enum DeletionStatus {
-  NotDeleted = 'not-deleted',
-  PermanentDeleted = 'permanent-deleted',
-}
+import { DeletionStatus } from '../../../core/utils/status-enam';
 
 @Schema({ _id: false })
 export class EmailConfirmationType {

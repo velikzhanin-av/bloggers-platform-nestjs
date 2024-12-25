@@ -1,3 +1,3 @@
-export class AuthRegistrationEmailResendingDtp {
+export class AuthRegistrationEmailResendingDto {
   email: string;
 }

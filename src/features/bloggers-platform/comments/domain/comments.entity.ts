@@ -1,5 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { HydratedDocument, Model } from 'mongoose';
+import { CreateCommentDto } from '../dto/create-comment.dto';
+import { DeletionStatus } from '../../../../core/utils/status-enam';
 import { Post } from '../../posts/domain/posts.entity';
 import { CreateCommentDto } from '../dto/create-comment.dto';
 
@@ -32,11 +34,17 @@ export class Comment {
   @Prop({ type: Date })
   createdAt: Date;
 
+  @Prop({ type: Date })
+  updatedAt: Date;
+
   @Prop({ type: String, required: true })
   postId: string;
 
   @Prop({ type: LikesInfo, required: true })
   likesInfo: LikesInfo;
+
+  @Prop({ enum: DeletionStatus, default: DeletionStatus.NotDeleted })
+  deletionStatus: DeletionStatus;
 
   static createInstance(dto: CreateCommentDto): CommentDocument {
     const comment = new this();
@@ -49,6 +57,38 @@ export class Comment {
     comment.likesInfo = { likesCount: 0, dislikesCount: 0 };
 
     return comment as CommentDocument;
+  }
+
+  makeDeleted() {
+    this.deletionStatus = DeletionStatus.PermanentDeleted;
+  }
+
+  updateContent(content: string) {
+    this.content = content;
+  }
+
+  increaseLike() {
+    this.likesInfo.likesCount++;
+  }
+
+  increaseDislike() {
+    this.likesInfo.dislikesCount++;
+  }
+
+  decreaseLike() {
+    this.likesInfo.likesCount--;
+  }
+
+  decreaseDislike() {
+    this.likesInfo.dislikesCount--;
+  }
+
+  clearLikesCount() {
+    this.likesInfo.likesCount = 0;
+  }
+
+  clearDislikesCount() {
+    this.likesInfo.dislikesCount = 0;
   }
 }
 

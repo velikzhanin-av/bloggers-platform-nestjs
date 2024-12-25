@@ -1,6 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { CreatePostDto } from '../dto/create-post.dto';
 import { HydratedDocument, Model } from 'mongoose';
+import { DeletionStatus } from '../../../../core/utils/status-enam';
 
 @Schema({ _id: false })
 export class extendedLikesInfo {
@@ -34,6 +35,9 @@ export class Post {
   @Prop({ type: extendedLikesInfo, require: true })
   extendedLikesInfo: extendedLikesInfo;
 
+  @Prop({ enum: DeletionStatus, default: DeletionStatus.NotDeleted })
+  deletionStatus: DeletionStatus;
+
   static createInstance(dto: CreatePostDto): PostDocument {
     const post = new this();
     post.title = dto.title;
@@ -44,6 +48,38 @@ export class Post {
     post.extendedLikesInfo = { likesCount: 0, dislikesCount: 0 };
 
     return post as PostDocument;
+  }
+
+  makeDeleted() {
+    this.deletionStatus = DeletionStatus.PermanentDeleted;
+  }
+
+  updateContent(content: string) {
+    this.content = content;
+  }
+
+  increaseLike() {
+    this.extendedLikesInfo.likesCount++;
+  }
+
+  increaseDislike() {
+    this.extendedLikesInfo.dislikesCount++;
+  }
+
+  decreaseLike() {
+    this.extendedLikesInfo.likesCount--;
+  }
+
+  decreaseDislike() {
+    this.extendedLikesInfo.dislikesCount--;
+  }
+
+  clearLikesCount() {
+    this.extendedLikesInfo.likesCount = 0;
+  }
+
+  clearDislikesCount() {
+    this.extendedLikesInfo.dislikesCount = 0;
   }
 }
 

@@ -1,9 +1,15 @@
 import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { pipesSetup } from './pipes.setup';
+import cookieParser from 'cookie-parser';
+import {validationConstraintSetup} from "./validation-constraint.setup";
 import { HttpExceptionFilter } from '../core/exception-filters/exception-filters';
+
 
 export const applyAppSettings = (app: INestApplication) => {
   app.enableCors();
+  // useContainer(app, { fallback: true });
+  validationConstraintSetup(app)
+  app.use(cookieParser());
   pipesSetup(app);
   app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
