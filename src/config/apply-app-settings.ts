@@ -2,8 +2,6 @@ import { INestApplication, ValidationPipe } from '@nestjs/common';
 import { pipesSetup } from './pipes.setup';
 import cookieParser from 'cookie-parser';
 import {validationConstraintSetup} from "./validation-constraint.setup";
-import { HttpExceptionFilter } from '../core/exception-filters/exception-filters';
-
 
 export const applyAppSettings = (app: INestApplication) => {
   app.enableCors();
@@ -11,7 +9,6 @@ export const applyAppSettings = (app: INestApplication) => {
   validationConstraintSetup(app)
   app.use(cookieParser());
   pipesSetup(app);
-  app.useGlobalFilters(new HttpExceptionFilter());
   app.useGlobalPipes(
     new ValidationPipe({
       //class-transformer создает экземпляр dto

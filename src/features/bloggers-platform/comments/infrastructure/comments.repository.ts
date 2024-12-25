@@ -11,15 +11,12 @@ import { PostViewDto } from '../../posts/api/output-dto/posts.view-dto';
 import { PostDocument } from '../../posts/domain/posts.entity';
 import { NewestLikesDto } from '../../posts/dto/newest-likes.dto';
 import { PostLikeDocument } from '../../posts-likes/domain/post-like.entity';
-import { PostDocument } from '../../posts/domain/posts.entity';
-import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CommentsRepository {
   constructor(
     @InjectModel(Comment.name)
     private readonly CommentModel: CommentModelType,
-    private CommentModel: CommentModelType,
   ) {}
 
   async save(comment: CommentDocument): Promise<void> {
