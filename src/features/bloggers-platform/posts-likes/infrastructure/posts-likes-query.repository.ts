@@ -19,8 +19,9 @@ export class PostsLikesQueryRepository {
       postId,
       status: 'Like',
     })
-      .sort({ addedAt: -1 })
+      .sort({ updatedAt: -1 })
       .limit(3);
+    console.log(result);
     return result.map((like: PostLikeDocument): NewestLikesDto => {
       return this.mapToOutputNewestLikes(like);
     });
@@ -28,7 +29,7 @@ export class PostsLikesQueryRepository {
 
   mapToOutputNewestLikes(like: PostLikeDocument): NewestLikesDto {
     return {
-      createdAt: like.updatedAt.toString(),
+      addedAt: like.updatedAt.toString(),
       userId: like.userId,
       login: like.userLogin,
     };

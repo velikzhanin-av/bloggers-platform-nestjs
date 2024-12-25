@@ -29,9 +29,7 @@ export class PostsQueryRepository {
       filter = { blogId };
     }
 
-    const posts: PostDocument[] | null = await this.PostModel.find({
-      ...filter,
-    })
+    const posts: PostDocument[] | null = await this.PostModel.find(filter)
       .sort({ [query.sortBy]: query.sortDirection })
       .skip(query.calculateSkip())
       .limit(query.pageSize);

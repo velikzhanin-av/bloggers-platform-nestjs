@@ -8,6 +8,9 @@ import {
 import { BlogsQueryRepository } from '../../features/bloggers-platform/blogs/infrastructure/query/blogs.query-repository';
 import { BlogViewDto } from '../../features/bloggers-platform/blogs/api/output-dto/blogs.view-dto';
 import { Injectable } from '@nestjs/common';
+import {
+  CommentsQueryRepository
+} from "../../features/bloggers-platform/comments/infrastructure/comments-query.repository";
 
 @ValidatorConstraint({ name: 'BlogIsExist', async: true })
 @Injectable()

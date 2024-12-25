@@ -61,6 +61,7 @@ const useCases: Array<any> = [
   providers: [
     BlogsService,
     BlogsRepository,
+    BlogIsExistConstraint,
     BlogsQueryRepository,
     PostsService,
     PostsRepository,
@@ -70,10 +71,9 @@ const useCases: Array<any> = [
     LikesRepository,
     PostsLikesRepository,
     PostsLikesQueryRepository,
-    BlogIsExistConstraint,
     CommentsQueryRepository,
     ...useCases,
   ],
-  exports: [MongooseModule, BlogIsExistConstraint, BlogsQueryRepository],
+  exports: [MongooseModule, BlogsQueryRepository],
 })
 export class BloggersPlatformModule {}

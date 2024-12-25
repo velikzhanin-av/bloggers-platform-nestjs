@@ -32,6 +32,9 @@ import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dt
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
+import {OptionalJwtAuthGuard} from "../../../../core/guards/optional-jwt-auth.guard";
+import {GetUser} from "../../../../core/decorators/get-user";
+import {UserContext} from "../../../../core/dto/user-context";
 
 @Controller('blogs')
 export class BlogsController {
@@ -102,15 +105,18 @@ export class BlogsController {
   }
 
   @Get(':blogId/posts')
+  @UseGuards(OptionalJwtAuthGuard)
   async getPostsByBlogId(
+    @GetUser() user: UserContext,
     @Param('blogId') blogId: string,
     @Query() query: GetPostsQueryParams,
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
+    const userId: string | null = user ? user.userId : null;
     const blog: BlogViewDto | null =
       await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
 
     if (!blog) throw new NotFoundException('blog not found');
 
-    return this.postsQueryRepository.findAllPosts(query, blogId);
+    return this.postsQueryRepository.findAllPosts(query, userId, blogId);
   }
 }

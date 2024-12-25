@@ -39,6 +39,6 @@ export class CreatePostInputDto {
   @IsString()
   @Transform(({ value }) => value?.trim())
   @IsNotEmpty()
-  // @BlogIsExist()
+  @BlogIsExist()
   blogId: string;
 }

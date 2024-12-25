@@ -36,6 +36,7 @@ import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
 import { CommentsService } from '../../comments/application/comments.service';
 import { CommentDocument } from '../../comments/domain/comments.entity';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments-query.repository';
+import {PostDocument} from "../domain/posts.entity";
 
 @Controller('posts')
 export class PostsController {
@@ -115,6 +116,9 @@ export class PostsController {
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContext,
   ): Promise<CommentViewDto> {
+    const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
+    if (!post) throw new NotFoundException('post not found');
+
     const dto = { ...body, postId, userId: user.userId };
     return await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
   }
@@ -126,6 +130,9 @@ export class PostsController {
     @Param('postId') postId: string,
     @GetUser() user: UserContext,
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
+    const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
+    if (!post) throw new NotFoundException('post not found');
+
     const userId: string | null = user ? user.userId : null;
     return await this.commentsQueryRepository.getCommentsByPostId(
       query,
