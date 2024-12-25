@@ -9,12 +9,28 @@ import { CommentLikeDocument } from '../../comments-likes/domain/comment-like.en
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { FilterQuery } from 'mongoose';
 import { Post } from '../../posts/domain/posts.entity';
+import { Injectable } from '@nestjs/common';
+import { CreateCommentServiceDto } from '../dto/create-comment-service.dto';
+import { UserDocument } from '../../../user-accounts/domain/users.entity';
+import { UsersRepository } from '../../../user-accounts/infrastructure/users.repository';
+import {
+  Comment,
+  CommentDocument,
+  CommentModelType,
+} from '../domain/comments.entity';
+import { CreateCommentDto } from '../dto/create-comment.dto';
+import { CommentsRepository } from '../infrastructure/comments.repository';
+import { InjectModel } from '@nestjs/mongoose';
 
 @Injectable()
 export class CommentsService {
   constructor(
     private readonly commentsRepository: CommentsRepository,
     private readonly likesRepository: LikesRepository,
+    private readonly usersRepository: UsersRepository,
+    private readonly commentsRepository: CommentsRepository,
+    @InjectModel(Comment.name)
+    private CommentModel: CommentModelType,
   ) {}
 
   async getCommentById(dto: GetCommentById): Promise<CommentViewDto> {
@@ -56,5 +72,23 @@ export class CommentsService {
         myStatus: likeStatus,
       },
     };
+
+  ) {}
+
+  async createCommentByPostId(dto: CreateCommentServiceDto) {
+    const user: UserDocument | null =
+      await this.usersRepository.findOrNotFoundFail(dto.userId);
+    const CreateCommentDto: CreateCommentDto = {
+      content: dto.content,
+      postId: dto.postId,
+      commentatorInfo: {
+        userId: dto.userId,
+        userLogin: user!.login,
+      },
+    };
+
+    const comment: CommentDocument =
+      this.CommentModel.createInstance(CreateCommentDto);
+    await this.commentsRepository.save(comment);
   }
 }

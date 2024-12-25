@@ -34,6 +34,12 @@ import { PostsLikesRepository } from './posts-likes/infrastructure/posts-likes.r
 import { PostsLikesQueryRepository } from './posts-likes/infrastructure/posts-likes-query.repository';
 import { BlogIsExistConstraint } from '../../core/decorators/blog-is-exist';
 import { CommentsQueryRepository } from './comments/infrastructure/comments-query.repository';
+import { CommentsService } from './comments/application/comments.service';
+import { CommentsController } from './comments/api/comments.controller';
+import { Comment, CommentSchema } from './comments/domain/comments.entity';
+import { UsersRepository } from '../user-accounts/infrastructure/users.repository';
+import { UserAccountsModule } from '../user-accounts/user-accounts.module';
+import { CommentsRepository } from './comments/infrastructure/comments.repository';
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,

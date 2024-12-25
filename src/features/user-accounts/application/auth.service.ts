@@ -38,4 +38,65 @@ export class AuthService {
     if (!tokenData) return null;
     return { accessToken, refreshToken, tokenData };
   }
+
+  async registerUser(dto: CreateUserDto): Promise<void> {
+    await this.usersRepository.doesExistByLoginOrEmail(dto.login, dto.email);
+
+    const userId: string = await this.usersService.createUser(dto);
+    const confirmationCode = randomUUID();
+
+    const user: UserDocument | null =
+      await this.usersRepository.findOrNotFoundFail(userId);
+    user!.setConfirmationCode(confirmationCode);
+    await this.usersRepository.save(user!);
+
+    await this.notificationsService.sendEmail(
+      dto.login,
+      dto.email,
+      confirmationCode,
+    );
+  }
+
+  async registrationConfirmation(dto: AuthConfirmationCodeDto): Promise<void> {
+    const user: UserDocument =
+      await this.usersRepository.findUserByConfirmationCode(dto.code);
+    if (user.emailConfirmation.isConfirmed) {
+      throw new BadRequestException({
+        errorsMessages: {
+          message: 'string',
+          field: 'code',
+        },
+      });
+    }
+
+    user.confirmEmail();
+    await this.usersRepository.save(user);
+    return;
+  }
+
+  async registrationEmailResending(
+    dto: AuthRegistrationEmailResendingDtp,
+  ): Promise<void> {
+    const user: UserDocument = await this.usersRepository.findUserByEmail(
+      dto.email,
+    );
+    if (user.emailConfirmation.isConfirmed) {
+      throw new BadRequestException({
+        errorsMessages: {
+          message: 'string',
+          field: 'email',
+        },
+      });
+    }
+
+    const newConfirmationCode = randomUUID();
+    user.setConfirmationCode(newConfirmationCode);
+    await this.usersRepository.save(user);
+
+    await this.notificationsService.sendEmail(
+      user.login,
+      user.email,
+      newConfirmationCode,
+    );
+  }
 }
