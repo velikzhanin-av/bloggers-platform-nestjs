@@ -10,7 +10,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { AuthLoginInputDto } from './input-dto/auth-login.input-dto';
-import { AuthService } from '../application/auth.service';
 import { Response, Request } from 'express';
 import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
@@ -29,7 +28,6 @@ import { RegistrationEmailResendingCommand } from '../application/use-cases/regi
 @Controller('/auth')
 export class AuthController {
   constructor(
-    private readonly authService: AuthService,
     private readonly authQueryRepository: AuthQueryRepository,
     private readonly commandBus: CommandBus,
   ) {}
@@ -84,4 +82,11 @@ export class AuthController {
   ) {
     return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
   }
+
+  // @Post('/refresh-token')
+  // async refreshToken(
+  //   @Body() body: RefreshTokenInputDto,
+  // ) {
+  //   return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
+  // }
 }

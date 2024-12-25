@@ -1,22 +1,13 @@
 import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../infrastructure/users.repository';
-import { BcryptService } from './bcrypt.service';
 import { CustomJwtService } from './jwt.service';
-import { AuthRepository } from '../infrastructure/auth.repository';
-import { Session, SessionModelType } from '../domain/sessions.entity';
+import { Session } from '../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { NotificationsService } from '../../notifications/application/notifications.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     @InjectModel(Session.name)
-    private SessionModel: SessionModelType,
-    private bcryptService: BcryptService,
     private customJwtService: CustomJwtService,
-    private usersRepository: UsersRepository,
-    private authRepository: AuthRepository,
-    private notificationsService: NotificationsService,
   ) {}
 
   async createAccessAndRefreshTokens(userId: string, deviceId: string) {
@@ -38,4 +29,6 @@ export class AuthService {
     if (!tokenData) return null;
     return { accessToken, refreshToken, tokenData };
   }
+
+
 }
