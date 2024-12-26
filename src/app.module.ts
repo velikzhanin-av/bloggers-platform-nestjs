@@ -4,15 +4,26 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { BloggersPlatformModule } from './features/bloggers-platform/bloggers-platform.module';
 import { TestingModule } from './features/testing/testing.module';
 import { UserAccountsModule } from './features/user-accounts/user-accounts.module';
-import { Config } from './config/config';
+import {CoreConfig} from "./core/core.config";
+import {CoreModule} from "./core/core.module";
 
 @Module({
   imports: [
-    configModule,
     BloggersPlatformModule,
-    MongooseModule.forRoot(Config.DB_URI),
+    MongooseModule.forRootAsync({
+      useFactory: (coreConfig: CoreConfig) => {
+        const uri: string = coreConfig.dbURI
+        console.log(uri);
+        return {
+          uri: uri
+        }
+      },
+      inject: [CoreConfig],
+    }),
+    CoreModule,
     TestingModule,
     UserAccountsModule,
+    configModule,
   ],
   controllers: [],
   providers: [],

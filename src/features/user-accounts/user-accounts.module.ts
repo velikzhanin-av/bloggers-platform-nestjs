@@ -21,6 +21,11 @@ import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
 import { RegistrationConfirmationUseCase } from './application/use-cases/registration-confirmation.use-case';
 import { RegistrationEmailResendingUseCase } from './application/use-cases/registration-email-resending.use-case';
 import { JwtService } from '@nestjs/jwt';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN
+} from "./constants/auth-tokens.inject-constants";
+import {CoreConfig} from "../../core/core.config";
 
 const useCases: Array<any> = [
   CreateUserUseCase,
@@ -52,9 +57,33 @@ const services: Array<any> = [
     AuthRepository,
     AuthQueryRepository,
     JwtStrategy,
-    // JwtService,
+    CustomJwtService,
     ...useCases,
     ...services,
+    {
+      provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (
+        coreConfig: CoreConfig,
+      ): JwtService => {
+        return new JwtService({
+          secret: coreConfig.accessTokenSecret,
+          signOptions: { expiresIn: coreConfig.accessTokenExpiresIn },
+        });
+      },
+      inject: [CoreConfig],
+    },
+    {
+      provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (
+        coreConfig: CoreConfig,
+      ): JwtService => {
+        return new JwtService({
+          secret: coreConfig.refreshTokenSecret,
+          signOptions: { expiresIn: coreConfig.refreshTokenExpiresIn },
+        });
+      },
+      inject: [CoreConfig],
+    },
   ],
   exports: [MongooseModule, UsersRepository, JwtService],
 })

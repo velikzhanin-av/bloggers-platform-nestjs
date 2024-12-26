@@ -60,7 +60,7 @@ export class AuthController {
       })
       .json({ accessToken: result.accessToken });
   }
-  s;
+
   @Get('/me')
   @UseGuards(JwtAuthGuard)
   async getUserInfo(
