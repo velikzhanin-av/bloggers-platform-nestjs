@@ -65,6 +65,7 @@ const services: Array<any> = [
       useFactory: (
         coreConfig: CoreConfig,
       ): JwtService => {
+        console.log('Access Token Secret:', coreConfig.accessTokenSecret);
         return new JwtService({
           secret: coreConfig.accessTokenSecret,
           signOptions: { expiresIn: coreConfig.accessTokenExpiresIn },
@@ -85,6 +86,6 @@ const services: Array<any> = [
       inject: [CoreConfig],
     },
   ],
-  exports: [MongooseModule, UsersRepository, JwtService],
+  exports: [MongooseModule, UsersRepository, ACCESS_TOKEN_STRATEGY_INJECT_TOKEN],
 })
 export class UserAccountsModule {}

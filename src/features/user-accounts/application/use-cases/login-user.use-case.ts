@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserDocument } from '../../domain/users.entity';
 import {
-  ForbiddenException, Inject,
+  ForbiddenException,
   InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
@@ -15,11 +15,6 @@ import { UsersRepository } from '../../infrastructure/users.repository';
 import { BcryptService } from '../bcrypt.service';
 import { AuthService } from '../auth.service';
 import { InjectModel } from '@nestjs/mongoose';
-import {
-  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN
-} from "../../constants/auth-tokens.inject-constants";
-import {JwtService} from "@nestjs/jwt";
 
 export class LoginUserCommand {
   constructor(

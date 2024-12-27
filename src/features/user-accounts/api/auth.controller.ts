@@ -24,6 +24,8 @@ import { RegisterUserCommand } from '../application/use-cases/register-user.use-
 import { LoginUserCommand } from '../application/use-cases/login-user.use-case';
 import { RegistrationConfirmationCommand } from '../application/use-cases/registration-confirmation.use-case';
 import { RegistrationEmailResendingCommand } from '../application/use-cases/registration-email-resending.use-case';
+import {BearerAuthGuard} from "../../../core/guards/custom/bearer-auth.guard";
+import {RefreshTokenInputDto} from "./input-dto/refresh-token.input-dto";
 
 @Controller('/auth')
 export class AuthController {
@@ -62,7 +64,7 @@ export class AuthController {
   }
 
   @Get('/me')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerAuthGuard)
   async getUserInfo(
     @ExtractUserFromRequest() user: UserContext,
   ): Promise<UserMeViewDto> {
@@ -83,10 +85,10 @@ export class AuthController {
     return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
   }
 
-  // @Post('/refresh-token')
-  // async refreshToken(
-  //   @Body() body: RefreshTokenInputDto,
-  // ) {
-  //   return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
-  // }
+  @Post('/refresh-token')
+  async refreshToken(
+    @Body() body: RefreshTokenInputDto,
+  ) {
+    return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
+  }
 }

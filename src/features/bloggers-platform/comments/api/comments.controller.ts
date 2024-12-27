@@ -22,6 +22,7 @@ import { GetUser } from '../../../../core/decorators/get-user';
 import { CommentsService } from '../application/comments.service';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { CommentViewDto } from './output-dto/comment.view-dto';
+import {BearerAuthGuard} from "../../../../core/guards/custom/bearer-auth.guard";
 
 @Controller('/comments')
 export class CommentsController {
@@ -31,7 +32,7 @@ export class CommentsController {
   ) {}
 
   @Delete(':commentId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteCommentById(
     @ExtractUserFromRequest() user: UserContext,
@@ -43,7 +44,7 @@ export class CommentsController {
   }
 
   @Put(':commentId')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async putCommentById(
     @ExtractUserFromRequest() user: UserContext,
@@ -60,7 +61,7 @@ export class CommentsController {
   }
 
   @Put(':commentId/like-status')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async putLikeStatusCommentById(
     @ExtractUserFromRequest() user: UserContext,
