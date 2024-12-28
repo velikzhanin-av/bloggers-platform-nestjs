@@ -14,4 +14,8 @@ export class AuthRepository {
   async save(session: SessionDocument): Promise<void> {
     await session.save();
   }
+
+  async findSessionByIatAndDeviceId(iat: number, deviceId: string) {
+    return this.SessionModel.findOne({iat: new Date(iat * 1000), deviceId});
+  }
 }

@@ -33,6 +33,10 @@ export class Session {
 
     return session as SessionDocument;
   }
+
+  updateIat(iat: Date): void {
+    this.iat = iat;
+  }
 }
 
 export const SessionSchema = SchemaFactory.createForClass(Session);

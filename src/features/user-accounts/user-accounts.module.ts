@@ -26,6 +26,7 @@ import {
   REFRESH_TOKEN_STRATEGY_INJECT_TOKEN
 } from "./constants/auth-tokens.inject-constants";
 import {CoreConfig} from "../../core/core.config";
+import {CreateNewTokensUseCase} from "./application/use-cases/create-new-tokens.use-case";
 
 const useCases: Array<any> = [
   CreateUserUseCase,
@@ -34,6 +35,7 @@ const useCases: Array<any> = [
   LoginUserUseCase,
   RegistrationConfirmationUseCase,
   RegistrationEmailResendingUseCase,
+  CreateNewTokensUseCase,
 ];
 
 const services: Array<any> = [
@@ -65,7 +67,6 @@ const services: Array<any> = [
       useFactory: (
         coreConfig: CoreConfig,
       ): JwtService => {
-        console.log('Access Token Secret:', coreConfig.accessTokenSecret);
         return new JwtService({
           secret: coreConfig.accessTokenSecret,
           signOptions: { expiresIn: coreConfig.accessTokenExpiresIn },

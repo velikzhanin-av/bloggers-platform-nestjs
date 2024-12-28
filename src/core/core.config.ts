@@ -1,6 +1,6 @@
 import {Injectable} from "@nestjs/common";
 import {ConfigService} from "@nestjs/config";
-import {IsEnum, IsNotEmpty} from "class-validator";
+import {IsEnum, IsNotEmpty, IsNumber} from "class-validator";
 import {configValidationUtility} from "../setup/config-validation.utility";
 
 export enum Environments {
@@ -14,6 +14,7 @@ export enum Environments {
 export class CoreConfig {
   constructor(private configService: ConfigService<any, true>) {
     configValidationUtility.validateConfig(this);
+    console.log(`ENVIRONMENT: ${this.env}`)
   }
 
   @IsEnum(Environments, {
@@ -22,6 +23,14 @@ export class CoreConfig {
       configValidationUtility.getEnumValues(Environments).join(', '),
   })
   env: string = this.configService.get('NODE_ENV');
+
+  @IsNumber(
+    {},
+    {
+      message: 'Set Env variable PORT, example: 3000',
+    },
+  )
+  port: number = Number(this.configService.get('PORT'));
 
   @IsNotEmpty({
     message:

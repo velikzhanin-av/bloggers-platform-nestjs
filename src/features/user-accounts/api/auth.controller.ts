@@ -9,30 +9,32 @@ import {
   HttpStatus,
   UseGuards,
 } from '@nestjs/common';
-import { AuthLoginInputDto } from './input-dto/auth-login.input-dto';
-import { Response, Request } from 'express';
-import { JwtAuthGuard } from '../../../core/guards/jwt-auth.guard';
-import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
-import { UserContext } from '../../../core/dto/user-context';
-import { AuthQueryRepository } from '../infrastructure/query/auth.query-repository';
-import { UserMeViewDto } from './output-dto/users.view-dto';
-import { CreateUserDto } from '../dto/create-user.dto';
-import { AuthConfirmationCodeDto } from './input-dto/auth-confirmation-code.dto';
-import { AuthRegistrationEmailResendingDto } from './input-dto/auth-registration-email-resending.dtp';
-import { CommandBus } from '@nestjs/cqrs';
-import { RegisterUserCommand } from '../application/use-cases/register-user.use-case';
-import { LoginUserCommand } from '../application/use-cases/login-user.use-case';
-import { RegistrationConfirmationCommand } from '../application/use-cases/registration-confirmation.use-case';
-import { RegistrationEmailResendingCommand } from '../application/use-cases/registration-email-resending.use-case';
+import {AuthLoginInputDto} from './input-dto/auth-login.input-dto';
+import {Response, Request} from 'express';
+import {ExtractUserFromRequest} from '../../../core/decorators/extract-user-from-request';
+import {UserContext} from '../../../core/dto/user-context';
+import {AuthQueryRepository} from '../infrastructure/query/auth.query-repository';
+import {UserMeViewDto} from './output-dto/users.view-dto';
+import {CreateUserDto} from '../dto/create-user.dto';
+import {AuthConfirmationCodeDto} from './input-dto/auth-confirmation-code.dto';
+import {AuthRegistrationEmailResendingDto} from './input-dto/auth-registration-email-resending.dtp';
+import {CommandBus} from '@nestjs/cqrs';
+import {RegisterUserCommand} from '../application/use-cases/register-user.use-case';
+import {LoginUserCommand} from '../application/use-cases/login-user.use-case';
+import {RegistrationConfirmationCommand} from '../application/use-cases/registration-confirmation.use-case';
+import {RegistrationEmailResendingCommand} from '../application/use-cases/registration-email-resending.use-case';
 import {BearerAuthGuard} from "../../../core/guards/custom/bearer-auth.guard";
 import {RefreshTokenInputDto} from "./input-dto/refresh-token.input-dto";
+import {CreateNewTokensCommand} from "../application/use-cases/create-new-tokens.use-case";
+import {RefreshTokenAuthGuard} from "../../../core/guards/custom/refresh-token-auth.guard";
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     private readonly authQueryRepository: AuthQueryRepository,
     private readonly commandBus: CommandBus,
-  ) {}
+  ) {
+  }
 
   @Post('/registration')
   @HttpCode(HttpStatus.NO_CONTENT)
@@ -60,7 +62,7 @@ export class AuthController {
         httpOnly: true,
         secure: true,
       })
-      .json({ accessToken: result.accessToken });
+      .json({accessToken: result.accessToken});
   }
 
   @Get('/me')
@@ -86,9 +88,27 @@ export class AuthController {
   }
 
   @Post('/refresh-token')
+  @UseGuards(RefreshTokenAuthGuard)
   async refreshToken(
     @Body() body: RefreshTokenInputDto,
-  ) {
-    return this.commandBus.execute(new RegistrationEmailResendingCommand(body));
+    @Req() req: Request,
+    @Res() res: Response,
+    @ExtractUserFromRequest() user: UserContext,
+  ): Promise<void> {
+    const dto = {user}
+
+    const result: {
+      accessToken: string;
+      refreshToken: string;
+      tokenData: { iat: Date; exp: Date; deviceId: string }
+    } = await this.commandBus.execute(new CreateNewTokensCommand(dto));
+    res
+      .cookie('refreshToken', result.refreshToken, {
+        httpOnly: true,
+        secure: true,
+      })
+      .json({accessToken: result.accessToken});
+
   }
+
 }
