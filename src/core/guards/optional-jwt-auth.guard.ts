@@ -1,12 +1,14 @@
-import {Inject, Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import {ACCESS_TOKEN_STRATEGY_INJECT_TOKEN} from "../../features/user-accounts/constants/auth-tokens.inject-constants";
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../../features/user-accounts/constants/auth-tokens.inject-constants';
 
 @Injectable()
 export class OptionalJwtAuthGuard implements CanActivate {
-  constructor(@Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
-              private readonly accessTokenContext: JwtService) {}
+  constructor(
+    @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
+    private readonly accessTokenContext: JwtService,
+  ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();

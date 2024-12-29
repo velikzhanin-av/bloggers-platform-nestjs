@@ -1,12 +1,12 @@
-import {Inject, Injectable} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { CustomJwtService } from './jwt.service';
 import { Session } from '../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import {
   ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
-  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN
-} from "../constants/auth-tokens.inject-constants";
-import {JwtService} from "@nestjs/jwt";
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from '../constants/auth-tokens.inject-constants';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
@@ -19,7 +19,6 @@ export class AuthService {
   ) {}
 
   async createAccessAndRefreshTokens(userId: string, deviceId: string) {
-
     const accessToken = this.accessTokenContext.sign({ userId, deviceId });
     const refreshToken = this.refreshTokenContext.sign({ userId, deviceId });
 
@@ -32,6 +31,4 @@ export class AuthService {
     if (!tokenData) return null;
     return { accessToken, refreshToken, tokenData };
   }
-
-
 }

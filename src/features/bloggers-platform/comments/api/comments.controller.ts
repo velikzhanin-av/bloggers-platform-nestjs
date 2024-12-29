@@ -22,7 +22,7 @@ import { GetUser } from '../../../../core/decorators/get-user';
 import { CommentsService } from '../application/comments.service';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { CommentViewDto } from './output-dto/comment.view-dto';
-import {BearerAuthGuard} from "../../../../core/guards/custom/bearer-auth.guard";
+import { BearerAuthGuard } from '../../../../core/guards/custom/bearer-auth.guard';
 
 @Controller('/comments')
 export class CommentsController {

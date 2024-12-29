@@ -33,8 +33,8 @@ import { GetUser } from '../../../../core/decorators/get-user';
 import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
 import { CommentsService } from '../../comments/application/comments.service';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments-query.repository';
-import {OptionalJwtAuthGuard} from "../../../../core/guards/optional-jwt-auth.guard";
-import {BearerAuthGuard} from "../../../../core/guards/custom/bearer-auth.guard";
+import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
+import { BearerAuthGuard } from '../../../../core/guards/custom/bearer-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -114,7 +114,8 @@ export class PostsController {
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContext,
   ): Promise<CommentViewDto> {
-    const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
+    const post: PostViewDto | null =
+      await this.postsQueryRepository.getByIdOrNotFoundFail(postId);
     if (!post) throw new NotFoundException('post not found');
 
     const dto = { ...body, postId, userId: user.userId };
@@ -128,7 +129,8 @@ export class PostsController {
     @Param('postId') postId: string,
     @GetUser() user: UserContext,
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
-    const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
+    const post: PostViewDto | null =
+      await this.postsQueryRepository.getByIdOrNotFoundFail(postId);
     if (!post) throw new NotFoundException('post not found');
 
     const userId: string | null = user ? user.userId : null;

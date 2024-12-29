@@ -1,13 +1,14 @@
-import {Module} from '@nestjs/common';
-import {NotificationsService} from './application/notifications.service';
-import {NotificationsAdapter} from './infrastructure/notifications.adapter';
-import {CoreConfig} from "../../core/core.config";
-import {CoreModule} from "../../core/core.module";
+import { Module } from '@nestjs/common';
+import { NotificationsService } from './application/notifications.service';
+import { NotificationsAdapter } from './infrastructure/notifications.adapter';
+import { CoreConfig } from '../../core/core.config';
+import { CoreModule } from '../../core/core.module';
 
 @Module({
   imports: [CoreModule],
-  providers: [NotificationsService,
-    NotificationsAdapter
+  providers: [
+    NotificationsService,
+    NotificationsAdapter,
     // {
     //   useFactory: (
     //     coreConfig: CoreConfig,
@@ -20,5 +21,4 @@ import {CoreModule} from "../../core/core.module";
   controllers: [],
   exports: [NotificationsService],
 })
-export class NotificationsModule {
-}
+export class NotificationsModule {}

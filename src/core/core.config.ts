@@ -1,7 +1,7 @@
-import {Injectable} from "@nestjs/common";
-import {ConfigService} from "@nestjs/config";
-import {IsEnum, IsNotEmpty, IsNumber} from "class-validator";
-import {configValidationUtility} from "../setup/config-validation.utility";
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { IsEnum, IsNotEmpty, IsNumber } from 'class-validator';
+import { configValidationUtility } from '../setup/config-validation.utility';
 
 export enum Environments {
   DEVELOPMENT = 'development',
@@ -14,7 +14,7 @@ export enum Environments {
 export class CoreConfig {
   constructor(private configService: ConfigService<any, true>) {
     configValidationUtility.validateConfig(this);
-    console.log(`ENVIRONMENT: ${this.env}`)
+    console.log(`ENVIRONMENT: ${this.env}`);
   }
 
   @IsEnum(Environments, {
@@ -39,24 +39,32 @@ export class CoreConfig {
   dbURI: string = this.configService.get('DB_URI');
 
   @IsNotEmpty({
-    message: 'Set Env variable ACCESS_TOKEN_SECRET_KEY, dangerous for security!',
+    message:
+      'Set Env variable ACCESS_TOKEN_SECRET_KEY, dangerous for security!',
   })
-  accessTokenSecret: string = this.configService.get<string>('ACCESS_TOKEN_SECRET_KEY');
+  accessTokenSecret: string = this.configService.get<string>(
+    'ACCESS_TOKEN_SECRET_KEY',
+  );
 
   @IsNotEmpty({
-    message: 'Set Env variable REFRESH_TOKEN_SECRET_KEY, dangerous for security!',
+    message:
+      'Set Env variable REFRESH_TOKEN_SECRET_KEY, dangerous for security!',
   })
-  refreshTokenSecret: string = this.configService.get<string>('REFRESH_TOKEN_SECRET_KEY');
+  refreshTokenSecret: string = this.configService.get<string>(
+    'REFRESH_TOKEN_SECRET_KEY',
+  );
 
   @IsNotEmpty({
     message: 'Set Env variable ACCESS_TOKEN_TTL, example: 10sec, 20min',
   })
-  accessTokenExpiresIn: string = this.configService.get<string>('ACCESS_TOKEN_TTL');
+  accessTokenExpiresIn: string =
+    this.configService.get<string>('ACCESS_TOKEN_TTL');
 
   @IsNotEmpty({
     message: 'Set Env variable REFRESH_TOKEN_TTL, example: 10sec, 20min',
   })
-  refreshTokenExpiresIn: string = this.configService.get<string>('REFRESH_TOKEN_TTL');
+  refreshTokenExpiresIn: string =
+    this.configService.get<string>('REFRESH_TOKEN_TTL');
 
   @IsNotEmpty({
     message: 'Set Env variable GMAIL_PASS, dangerous for security!',
