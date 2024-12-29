@@ -5,6 +5,8 @@ import { CommandBus } from '@nestjs/cqrs';
 import { RefreshTokenAuthGuard } from '../../../core/guards/custom/refresh-token-auth.guard';
 import { AuthQueryRepository } from '../infrastructure/query/auth.query-repository';
 import { DeleteSessionByDeviceIdCommand } from '../application/use-cases/delete-session-by-deviceId.use-case';
+import { DeleteAllSessionsExceptCurrentCommand } from '../application/use-cases/delete-all-sessions-except-current.use-case';
+import { SkipThrottle } from '@nestjs/throttler';
 
 @Controller('security/devices')
 export class SecurityDevicesController {
@@ -13,12 +15,14 @@ export class SecurityDevicesController {
     private readonly authQueryRepository: AuthQueryRepository,
   ) {}
 
+  @SkipThrottle()
   @Get()
   @UseGuards(RefreshTokenAuthGuard)
   async getDevices(@ExtractUserFromRequest() user: UserContext) {
     return await this.authQueryRepository.findSessionsByUserId(user.userId);
   }
 
+  @SkipThrottle()
   @Delete(':deviceId')
   @UseGuards(RefreshTokenAuthGuard)
   async deleteDeviceById(
@@ -27,6 +31,17 @@ export class SecurityDevicesController {
   ): Promise<void> {
     await this.commandBus.execute(
       new DeleteSessionByDeviceIdCommand(user.userId, deviceId),
+    );
+  }
+
+  @SkipThrottle()
+  @Delete()
+  @UseGuards(RefreshTokenAuthGuard)
+  async deleteAllSessionsExceptCurrent(
+    @ExtractUserFromRequest() user: UserContext,
+  ) {
+    await this.commandBus.execute(
+      new DeleteAllSessionsExceptCurrentCommand(user.userId, user.deviceId),
     );
   }
 }

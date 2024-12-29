@@ -40,7 +40,7 @@ export class AuthQueryRepository {
     return {
       ip: sessions.ip,
       title: sessions.deviceName,
-      lastActiveDate: sessions.iat.toString(),
+      lastActiveDate: sessions.iat,
       deviceId: sessions.deviceId,
     };
   }

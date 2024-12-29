@@ -38,7 +38,7 @@ export class CreateNewTokensUseCase
     );
 
     session.updateIat(tokens!.tokenData.iat);
-    session.save();
+    await session.save();
 
     return tokens;
   }

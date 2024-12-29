@@ -1,6 +1,6 @@
 export class ActiveSessionsViewDto {
   ip: string;
   title: string;
-  lastActiveDate: string;
+  lastActiveDate: Date;
   deviceId: string;
 }

@@ -32,6 +32,9 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { DeleteSessionByDeviceIdUseCase } from './application/use-cases/delete-session-by-deviceId.use-case';
+import {
+  DeleteAllSessionsExceptCurrentUseCase
+} from './application/use-cases/delete-all-sessions-except-current.use-case';
 
 const useCases: Array<any> = [
   CreateUserUseCase,
@@ -43,6 +46,7 @@ const useCases: Array<any> = [
   CreateNewTokensUseCase,
   LogoutUseCase,
   DeleteSessionByDeviceIdUseCase,
+  DeleteAllSessionsExceptCurrentUseCase,
 ];
 
 const services: Array<any> = [

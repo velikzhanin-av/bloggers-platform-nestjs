@@ -34,8 +34,8 @@ export class RefreshTokenAuthGuard implements CanActivate {
       const user: UserContext = this.refreshTokenContext.verify(token);
       const session: SessionDocument | null =
         await this.authRepository.findSessionByIat(user.iat);
-      request.user = user;
       if (!session) throw new UnauthorizedException('Session not found');
+      request.user = user;
       return true; // Если токен валиден, доступ разрешен
     } catch (e) {
       // В случае ошибки (например, невалидный токен)

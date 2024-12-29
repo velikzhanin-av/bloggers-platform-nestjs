@@ -40,4 +40,14 @@ export class AuthRepository {
   async findSessionByIat(iat: number): Promise<SessionDocument | null> {
     return await this.SessionModel.findOne({ iat: new Date(iat * 1000) });
   }
+
+  async deleteSessions(
+    deviceId: string,
+    userId: string,
+  ): Promise<DeleteResult> {
+    return await this.SessionModel.deleteMany({
+      userId,
+      deviceId: { $ne: deviceId },
+    });
+  }
 }

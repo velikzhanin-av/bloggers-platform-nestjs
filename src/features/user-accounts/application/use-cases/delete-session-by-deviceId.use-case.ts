@@ -20,7 +20,7 @@ export class DeleteSessionByDeviceIdUseCase implements ICommand {
       await this.authRepository.findSessionByDeviceId(deviceId);
 
     if (!session) throw new NotFoundException();
-    if (session.userId === userId) throw new ForbiddenException();
+    if (session.userId !== userId) throw new ForbiddenException();
 
     await this.authRepository.deleteSessionByDeviceId(deviceId);
   }

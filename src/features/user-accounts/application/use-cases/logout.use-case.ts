@@ -1,6 +1,5 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserContext } from '../../../../core/dto/user-context';
-import { UsersRepository } from '../../infrastructure/users.repository';
 import { AuthRepository } from '../../infrastructure/auth.repository';
 
 export class LogoutCommand {
