@@ -1,4 +1,4 @@
-import { Controller, Delete, Get, Param, UseGuards } from '@nestjs/common';
+import { Controller, Delete, Get, HttpCode, HttpStatus, Param, UseGuards } from '@nestjs/common';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
 import { UserContext } from '../../../core/dto/user-context';
 import { CommandBus } from '@nestjs/cqrs';
@@ -24,6 +24,7 @@ export class SecurityDevicesController {
 
   @SkipThrottle()
   @Delete(':deviceId')
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(RefreshTokenAuthGuard)
   async deleteDeviceById(
     @ExtractUserFromRequest() user: UserContext,
@@ -36,6 +37,7 @@ export class SecurityDevicesController {
 
   @SkipThrottle()
   @Delete()
+  @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(RefreshTokenAuthGuard)
   async deleteAllSessionsExceptCurrent(
     @ExtractUserFromRequest() user: UserContext,

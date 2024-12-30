@@ -33,13 +33,15 @@ export class RefreshTokenAuthGuard implements CanActivate {
       // Декодируем и валидируем токен, добавляем данные пользователя в request
       const user: UserContext = this.refreshTokenContext.verify(token);
       const session: SessionDocument | null =
-        await this.authRepository.findSessionByIat(user.iat);
+        await this.authRepository.findSessionByIatAndDeviceId(
+          user.iat,
+          user.deviceId,
+        );
       if (!session) throw new UnauthorizedException('Session not found');
       request.user = user;
       return true; // Если токен валиден, доступ разрешен
-    } catch (e) {
+    } catch (error) {
       // В случае ошибки (например, невалидный токен)
-      console.log(e);
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
@@ -48,7 +50,7 @@ export class RefreshTokenAuthGuard implements CanActivate {
   private extractTokenFromCookie(request: any): string | null {
     const cookies = request.cookies;
     if (!cookies || !cookies.refreshToken) {
-      return null;
+      throw new UnauthorizedException('Refresh token is missing');
     }
     return cookies.refreshToken;
   }
