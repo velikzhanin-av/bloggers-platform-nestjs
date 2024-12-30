@@ -21,6 +21,20 @@ import { LoginUserUseCase } from './application/use-cases/login-user.use-case';
 import { RegistrationConfirmationUseCase } from './application/use-cases/registration-confirmation.use-case';
 import { RegistrationEmailResendingUseCase } from './application/use-cases/registration-email-resending.use-case';
 import { JwtService } from '@nestjs/jwt';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from './constants/auth-tokens.inject-constants';
+import { CoreConfig } from '../../core/core.config';
+import { CreateNewTokensUseCase } from './application/use-cases/create-new-tokens.use-case';
+import { LogoutUseCase } from './application/use-cases/logout.use-case';
+import { ThrottlerGuard } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
+import { SecurityDevicesController } from './api/security-devices.controller';
+import { DeleteSessionByDeviceIdUseCase } from './application/use-cases/delete-session-by-deviceId.use-case';
+import {
+  DeleteAllSessionsExceptCurrentUseCase
+} from './application/use-cases/delete-all-sessions-except-current.use-case';
 
 const useCases: Array<any> = [
   CreateUserUseCase,
@@ -29,6 +43,10 @@ const useCases: Array<any> = [
   LoginUserUseCase,
   RegistrationConfirmationUseCase,
   RegistrationEmailResendingUseCase,
+  CreateNewTokensUseCase,
+  LogoutUseCase,
+  DeleteSessionByDeviceIdUseCase,
+  DeleteAllSessionsExceptCurrentUseCase,
 ];
 
 const services: Array<any> = [
@@ -45,17 +63,45 @@ const services: Array<any> = [
     NotificationsModule,
     CqrsModule,
   ],
-  controllers: [UsersController, AuthController],
+  controllers: [UsersController, AuthController, SecurityDevicesController],
   providers: [
     UsersRepository,
     UsersQueryRepository,
     AuthRepository,
     AuthQueryRepository,
     JwtStrategy,
-    // JwtService,
+    CustomJwtService,
     ...useCases,
     ...services,
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard,
+    },
+    {
+      provide: ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (coreConfig: CoreConfig): JwtService => {
+        return new JwtService({
+          secret: coreConfig.accessTokenSecret,
+          signOptions: { expiresIn: coreConfig.accessTokenExpiresIn },
+        });
+      },
+      inject: [CoreConfig],
+    },
+    {
+      provide: REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+      useFactory: (coreConfig: CoreConfig): JwtService => {
+        return new JwtService({
+          secret: coreConfig.refreshTokenSecret,
+          signOptions: { expiresIn: coreConfig.refreshTokenExpiresIn },
+        });
+      },
+      inject: [CoreConfig],
+    },
   ],
-  exports: [MongooseModule, UsersRepository, JwtService],
+  exports: [
+    MongooseModule,
+    UsersRepository,
+    ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  ],
 })
 export class UserAccountsModule {}

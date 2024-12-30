@@ -1,33 +1,26 @@
-import { Injectable } from '@nestjs/common';
-import { UsersRepository } from '../infrastructure/users.repository';
-import { BcryptService } from './bcrypt.service';
+import { Inject, Injectable } from '@nestjs/common';
 import { CustomJwtService } from './jwt.service';
-import { AuthRepository } from '../infrastructure/auth.repository';
-import { Session, SessionModelType } from '../domain/sessions.entity';
+import { Session } from '../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
-import { NotificationsService } from '../../notifications/application/notifications.service';
+import {
+  ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
+  REFRESH_TOKEN_STRATEGY_INJECT_TOKEN,
+} from '../constants/auth-tokens.inject-constants';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   constructor(
-    @InjectModel(Session.name)
-    private SessionModel: SessionModelType,
-    private bcryptService: BcryptService,
     private customJwtService: CustomJwtService,
-    private usersRepository: UsersRepository,
-    private authRepository: AuthRepository,
-    private notificationsService: NotificationsService,
+    @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
+    private readonly accessTokenContext: JwtService,
+    @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
+    private readonly refreshTokenContext: JwtService,
   ) {}
 
   async createAccessAndRefreshTokens(userId: string, deviceId: string) {
-    const accessToken: string = await this.customJwtService.createJwt(
-      userId,
-      deviceId,
-    );
-    const refreshToken: string = await this.customJwtService.createRefreshToken(
-      userId,
-      deviceId,
-    );
+    const accessToken = this.accessTokenContext.sign({ userId, deviceId });
+    const refreshToken = this.refreshTokenContext.sign({ userId, deviceId });
 
     const tokenData: {
       iat: Date;

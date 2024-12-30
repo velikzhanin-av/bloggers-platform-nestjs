@@ -32,9 +32,9 @@ import { GetBlogsQueryParams } from './input-dto/get-blogs-query-params.input-dt
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
-import {OptionalJwtAuthGuard} from "../../../../core/guards/optional-jwt-auth.guard";
-import {GetUser} from "../../../../core/decorators/get-user";
-import {UserContext} from "../../../../core/dto/user-context";
+import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
+import { GetUser } from '../../../../core/decorators/get-user';
+import { UserContext } from '../../../../core/dto/user-context';
 
 @Controller('blogs')
 export class BlogsController {

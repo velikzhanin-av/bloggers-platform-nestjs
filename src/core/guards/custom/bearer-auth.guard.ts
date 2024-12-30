@@ -1,28 +1,30 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Inject, Injectable, UnauthorizedException } from '@nestjs/common';
 import { CanActivate, ExecutionContext } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../../features/user-accounts/constants/auth-tokens.inject-constants';
+import { ACCESS_TOKEN_STRATEGY_INJECT_TOKEN } from '../../../features/user-accounts/constants/auth-tokens.inject-constants';
 
 @Injectable()
-export class OptionalJwtAuthGuard implements CanActivate {
+export class BearerAuthGuard implements CanActivate {
   constructor(
     @Inject(ACCESS_TOKEN_STRATEGY_INJECT_TOKEN)
     private readonly accessTokenContext: JwtService,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
+    // Извлекаем request
     const request = context.switchToHttp().getRequest();
 
+    // Извлекаем токен из заголовков
     const token = this.extractToken(request);
-    if (!token) {
-      return true;
-    }
+    if (!token) throw new UnauthorizedException('Invalid or expired token');
 
     try {
+      // Декодируем и валидируем токен Добавляем данные пользователя в request
       request.user = this.accessTokenContext.verify(token);
-      return true;
+      return true; // Если токен валиден, доступ разрешен
     } catch (error) {
-      return true;
+      // В случае ошибки (невалидный токен)
+      throw new UnauthorizedException('Invalid or expired token');
     }
   }
 

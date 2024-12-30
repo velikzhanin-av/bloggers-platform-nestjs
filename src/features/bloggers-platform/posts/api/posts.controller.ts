@@ -24,19 +24,17 @@ import { GetPostsQueryParams } from './input-dto/get-posts-query-params.input-dt
 import { CreateCommentInputDto } from '../../comments/api/input-dto/create-comment.dto';
 import { ExtractUserFromRequest } from '../../../../core/decorators/extract-user-from-request';
 import { UserContext } from '../../../../core/dto/user-context';
-import { JwtAuthGuard } from '../../../../core/guards/jwt-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateCommentByPostIdCommand } from '../../comments/application/use-cases/create-comment-by-post-id.use-case';
 import { CommentViewDto } from '../../comments/api/output-dto/comment.view-dto';
 import { UpdateLikeStatusCommentDto } from '../../comments/api/input-dto/update-like-status-comment.dto';
 import { UpdatePostLikeStatusCommand } from '../application/use-cases/update-post-like-status';
-import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { GetUser } from '../../../../core/decorators/get-user';
 import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
 import { CommentsService } from '../../comments/application/comments.service';
-import { CommentDocument } from '../../comments/domain/comments.entity';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments-query.repository';
-import {PostDocument} from "../domain/posts.entity";
+import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
+import { BearerAuthGuard } from '../../../../core/guards/custom/bearer-auth.guard';
 
 @Controller('posts')
 export class PostsController {
@@ -110,13 +108,14 @@ export class PostsController {
   }
 
   @Post(':postId/comments')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerAuthGuard)
   async createComment(
     @Param('postId') postId: string,
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContext,
   ): Promise<CommentViewDto> {
-    const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
+    const post: PostViewDto | null =
+      await this.postsQueryRepository.getByIdOrNotFoundFail(postId);
     if (!post) throw new NotFoundException('post not found');
 
     const dto = { ...body, postId, userId: user.userId };
@@ -130,7 +129,8 @@ export class PostsController {
     @Param('postId') postId: string,
     @GetUser() user: UserContext,
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
-    const post: PostViewDto | null = await this.postsQueryRepository.getByIdOrNotFoundFail(postId)
+    const post: PostViewDto | null =
+      await this.postsQueryRepository.getByIdOrNotFoundFail(postId);
     if (!post) throw new NotFoundException('post not found');
 
     const userId: string | null = user ? user.userId : null;
@@ -142,7 +142,7 @@ export class PostsController {
   }
 
   @Put(':postId/like-status')
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async putLikeStatusPostById(
     @GetUser() user: UserContext,
