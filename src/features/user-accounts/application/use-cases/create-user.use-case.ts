@@ -1,9 +1,8 @@
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { InjectModel } from '@nestjs/mongoose';
-import { User, UserDocument, UserModelType } from '../../domain/users.entity';
-import { UsersRepository } from '../../infrastructure/users.repository';
 import bcrypt from 'bcrypt';
+import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
+import { randomUUID } from 'crypto';
 
 export class CreateUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -14,22 +13,20 @@ export class CreateUserUseCase
   implements ICommandHandler<CreateUserCommand, string>
 {
   constructor(
-    @InjectModel(User.name)
-    private UserModel: UserModelType,
-    private usersRepository: UsersRepository,
+    private readonly usersCommandRepository: UsersCommandRepository,
   ) {}
 
   async execute({ dto }: CreateUserCommand): Promise<string> {
     const passwordHash: string = await bcrypt.hash(dto.password, 10);
 
-    const user: UserDocument = this.UserModel.createInstance({
+    const user = {
+      userId: randomUUID(),
       email: dto.email,
       login: dto.login,
-      password: passwordHash,
-    });
+      passwordHash: passwordHash,
+    };
+    const newUser = await this.usersCommandRepository.createUser(user);
 
-    await this.usersRepository.save(user);
-
-    return user._id.toString();
+    return user.userId;
   }
 }

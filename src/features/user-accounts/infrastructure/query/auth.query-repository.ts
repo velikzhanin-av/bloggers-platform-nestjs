@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UsersQueryRepository } from './users.query-repository';
 import { UserMeViewDto } from '../../api/output-dto/users.view-dto';
 import { UserDocument } from '../../domain/users.entity';
 import {
@@ -9,6 +8,7 @@ import {
 } from '../../domain/sessions.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { ActiveSessionsViewDto } from '../../api/output-dto/active-sessions.view-dto';
+import { UsersQueryRepository } from '../postgresql/users.query-repository';
 
 @Injectable()
 export class AuthQueryRepository {

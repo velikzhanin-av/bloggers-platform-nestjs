@@ -5,12 +5,13 @@ import {
   Get,
   HttpCode,
   HttpStatus,
+  NotFoundException,
   Param,
   Post,
   Query,
   UseGuards,
 } from '@nestjs/common';
-import { UsersQueryRepository } from '../infrastructure/query/users.query-repository';
+
 import { CreateUserDto } from '../dto/create-user.dto';
 import { GetUsersQueryParams } from './input-dto/get-users-query-params.input-dto';
 import { UserViewDto } from './output-dto/users.view-dto';
@@ -19,8 +20,11 @@ import { BasicAuthGuard } from '../../../core/guards/basic-auth.guard';
 import { CommandBus } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../application/use-cases/create-user.use-case';
 import { DeleteUserCommand } from '../application/use-cases/delete-user.use-case';
+import { UsersQueryRepository } from '../infrastructure/postgresql/users.query-repository';
+import { SkipThrottle } from '@nestjs/throttler';
 
-@Controller('users')
+@SkipThrottle()
+@Controller('sa/users')
 @UseGuards(BasicAuthGuard)
 export class UsersController {
   constructor(
@@ -36,13 +40,16 @@ export class UsersController {
   }
 
   @Post()
-  async postUser(@Body() body: CreateUserDto): Promise<UserViewDto | null> {
+  async postUser(@Body() body: CreateUserDto): Promise<UserViewDto> {
     const userId: string = await this.commandBus.execute<
       CreateUserCommand,
       string
     >(new CreateUserCommand(body));
 
-    return await this.usersQueryRepository.getByIdOrNotFoundFail(userId);
+    const user: UserViewDto | null =
+      await this.usersQueryRepository.getByIdOrNotFoundFail(userId);
+    if (!user) throw new NotFoundException('user not found');
+    return user;
   }
 
   @Delete(':id')

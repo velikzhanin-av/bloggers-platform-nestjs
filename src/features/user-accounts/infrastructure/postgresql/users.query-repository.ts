@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, Query } from '@nestjs/common';
+import { Injectable, Query } from '@nestjs/common';
 import { User, UserDocument, UserModelType } from '../../domain/users.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { GetUsersQueryParams } from '../../api/input-dto/get-users-query-params.input-dto';
@@ -14,28 +14,29 @@ export class UsersQueryRepository {
     private readonly dataSource: DataSource,
   ) {}
 
-  async findAllUsers(
-    @Query() query: GetUsersQueryParams,
-  ) {
-    return await this.dataSource.query<User[]>(
+  async findAllUsers(@Query() query: GetUsersQueryParams) {
+    return await this.dataSource.query(
       `
-        SELECT * FROM users
+          SELECT *
+          FROM users
       `,
     );
   }
 
   async findById(id: string): Promise<UserDocument | null> {
-    return this.UserModel.findOne({
-      _id: id,
-      deletionStatus: { $ne: DeletionStatus.PermanentDeleted },
-    });
+    const user = await this.dataSource.query(
+      `SELECT *
+                                  FROM users
+                                  WHERE "userId" = $1 
+                                    AND "deletionStatus" != $2`,
+      [id, DeletionStatus.PermanentDeleted],
+    );
+    return user[0] ?? null;
   }
 
-  async getByIdOrNotFoundFail(userId: string): Promise<UserViewDto> {
+  async getByIdOrNotFoundFail(userId: string): Promise<UserViewDto | null> {
     const user: UserDocument | null = await this.findById(userId);
-    if (!user) {
-      throw new NotFoundException('user not found');
-    }
+    if (!user) return null;
 
     return UserViewDto.mapToView(user);
   }

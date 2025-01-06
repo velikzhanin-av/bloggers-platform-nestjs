@@ -2,7 +2,7 @@ import { AuthConfirmationCodeDto } from '../../api/input-dto/auth-confirmation-c
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserDocument } from '../../domain/users.entity';
 import { BadRequestException } from '@nestjs/common';
-import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
 
 export class RegistrationConfirmationCommand {
   constructor(public dto: AuthConfirmationCodeDto) {}
@@ -12,12 +12,14 @@ export class RegistrationConfirmationCommand {
 export class RegistrationConfirmationUseCase
   implements ICommandHandler<RegistrationConfirmationCommand>
 {
-  constructor(private readonly usersRepository: UsersRepository) {}
+  constructor(
+    private readonly UsersCommandRepository: UsersCommandRepository,
+  ) {}
 
   async execute({ dto }: RegistrationConfirmationCommand): Promise<void> {
-    const user: UserDocument =
-      await this.usersRepository.findUserByConfirmationCode(dto.code);
-    if (user.emailConfirmation.isConfirmed) {
+    const user: UserDocument | null =
+      await this.UsersCommandRepository.findUserByConfirmationCode(dto.code);
+    if (!user || user.emailConfirmation.isConfirmed)
       throw new BadRequestException({
         errorsMessages: [
           {
@@ -26,10 +28,9 @@ export class RegistrationConfirmationUseCase
           },
         ],
       });
-    }
 
     user.confirmEmail();
-    await this.usersRepository.save(user);
+    await this.UsersCommandRepository.save(user);
     return;
   }
 }

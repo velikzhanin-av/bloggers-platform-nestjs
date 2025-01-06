@@ -11,7 +11,7 @@ import {
   SessionDocument,
   SessionModelType,
 } from '../../domain/sessions.entity';
-import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
 import { BcryptService } from '../bcrypt.service';
 import { AuthService } from '../auth.service';
 import { InjectModel } from '@nestjs/mongoose';
@@ -32,7 +32,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   constructor(
     @InjectModel(Session.name)
     private readonly SessionModel: SessionModelType,
-    private readonly usersRepository: UsersRepository,
+    private readonly UsersCommandRepository: UsersCommandRepository,
     private readonly bcryptService: BcryptService,
     private readonly authService: AuthService,
   ) {}
@@ -40,7 +40,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
   async execute({ dto }: LoginUserCommand): Promise<any> {
     const { loginOrEmail, password, userAgent, ip } = dto;
     const user: UserDocument | null =
-      await this.usersRepository.findByLoginOrEmail(loginOrEmail);
+      await this.UsersCommandRepository.findByLoginOrEmail(loginOrEmail);
     if (!user)
       throw new UnauthorizedException('login/email or password is wrong');
 
@@ -62,14 +62,15 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
       throw new ForbiddenException('login/email or password is wrong');
 
     const { iat, exp } = tokens.tokenData;
-    const resultAccessToken: number = await this.usersRepository.addJwtToken(
-      userId,
-      tokens.accessToken,
-    );
-    const resultRefreshToken: number =
-      await this.usersRepository.addRefreshToken(userId, tokens.refreshToken);
-    if (!resultAccessToken || !resultRefreshToken)
-      throw new InternalServerErrorException('internal server error');
+    // const resultAccessToken: number =
+    //   await this.UsersCommandRepository.addJwtToken(userId, tokens.accessToken);
+    // const resultRefreshToken: number =
+    //   await this.UsersCommandRepository.addRefreshToken(
+    //     userId,
+    //     tokens.refreshToken,
+    //   );
+    // if (!resultAccessToken || !resultRefreshToken)
+    //   throw new InternalServerErrorException('internal server error');
 
     const session: SessionDocument = this.SessionModel.createInstance({
       userId,

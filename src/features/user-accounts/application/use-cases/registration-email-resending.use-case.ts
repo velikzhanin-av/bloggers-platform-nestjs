@@ -2,9 +2,9 @@ import { AuthRegistrationEmailResendingDto } from '../../api/input-dto/auth-regi
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserDocument } from '../../domain/users.entity';
 import { BadRequestException } from '@nestjs/common';
-import { UsersRepository } from '../../infrastructure/users.repository';
 import { randomUUID } from 'crypto';
 import { NotificationsService } from '../../../notifications/application/notifications.service';
+import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
 
 export class RegistrationEmailResendingCommand {
   constructor(public dto: AuthRegistrationEmailResendingDto) {}
@@ -13,15 +13,14 @@ export class RegistrationEmailResendingCommand {
 @CommandHandler(RegistrationEmailResendingCommand)
 export class RegistrationEmailResendingUseCase implements ICommandHandler {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly UsersCommandRepository: UsersCommandRepository,
     private readonly notificationsService: NotificationsService,
   ) {}
 
   async execute({ dto }: RegistrationEmailResendingCommand): Promise<void> {
-    const user: UserDocument = await this.usersRepository.findUserByEmail(
-      dto.email,
-    );
-    if (user.emailConfirmation.isConfirmed) {
+    const user: UserDocument =
+      await this.UsersCommandRepository.findUserByEmail(dto.email);
+    if (!user || user.emailConfirmation.isConfirmed) {
       throw new BadRequestException({
         errorsMessages: [
           {
@@ -34,7 +33,7 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler {
 
     const newConfirmationCode = randomUUID();
     user.setConfirmationCode(newConfirmationCode);
-    await this.usersRepository.save(user);
+    await this.UsersCommandRepository.save(user);
 
     await this.notificationsService.sendEmail(
       user.login,

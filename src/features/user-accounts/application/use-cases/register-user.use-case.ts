@@ -4,12 +4,13 @@ import {
   EventBus,
   ICommandHandler,
 } from '@nestjs/cqrs';
-import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
 import { CreateUserCommand } from './create-user.use-case';
 import { randomUUID } from 'crypto';
 import { UserDocument } from '../../domain/users.entity';
 import { NotificationsService } from '../../../notifications/application/notifications.service';
 import { CreateUserDto } from '../../dto/create-user.dto';
+import { BadRequestException, UnauthorizedException } from '@nestjs/common';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -22,12 +23,25 @@ export class RegisterUserUseCase
   constructor(
     private commandBus: CommandBus,
     private eventBus: EventBus,
-    private usersRepository: UsersRepository,
+    private UsersCommandRepository: UsersCommandRepository,
     private notificationsService: NotificationsService,
   ) {}
 
   async execute({ dto }: RegisterUserCommand): Promise<void> {
-    await this.usersRepository.doesExistByLoginOrEmail(dto.login, dto.email);
+    const doesExistByLoginOrEmail: string | null =
+      await this.UsersCommandRepository.doesExistByLoginOrEmail(
+        dto.login,
+        dto.email,
+      );
+    if (doesExistByLoginOrEmail)
+      throw new BadRequestException({
+        errorsMessages: [
+          {
+            message: doesExistByLoginOrEmail,
+            field: 'code',
+          },
+        ],
+      });
 
     const userId: string = await this.commandBus.execute(
       new CreateUserCommand(dto),
@@ -35,9 +49,9 @@ export class RegisterUserUseCase
     const confirmationCode = randomUUID();
 
     const user: UserDocument | null =
-      await this.usersRepository.findOrNotFoundFail(userId);
+      await this.UsersCommandRepository.findOrNotFoundFail(userId);
     user!.setConfirmationCode(confirmationCode);
-    await this.usersRepository.save(user!);
+    await this.UsersCommandRepository.save(user!);
 
     await this.notificationsService.sendEmail(
       dto.login,

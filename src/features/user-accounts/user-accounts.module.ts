@@ -2,8 +2,6 @@ import { Module } from '@nestjs/common';
 import { UsersController } from './api/users.controller';
 import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './domain/users.entity';
-import { UsersQueryRepository } from './infrastructure/query/users.query-repository';
-import { UsersRepository } from './infrastructure/users.repository';
 import { Session, SessionSchema } from './domain/sessions.entity';
 import { AuthController } from './api/auth.controller';
 import { AuthRepository } from './infrastructure/auth.repository';
@@ -32,9 +30,10 @@ import { ThrottlerGuard } from '@nestjs/throttler';
 import { APP_GUARD } from '@nestjs/core';
 import { SecurityDevicesController } from './api/security-devices.controller';
 import { DeleteSessionByDeviceIdUseCase } from './application/use-cases/delete-session-by-deviceId.use-case';
-import {
-  DeleteAllSessionsExceptCurrentUseCase
-} from './application/use-cases/delete-all-sessions-except-current.use-case';
+import { DeleteAllSessionsExceptCurrentUseCase } from './application/use-cases/delete-all-sessions-except-current.use-case';
+import { UsersQueryRepository } from './infrastructure/postgresql/users.query-repository';
+import { UsersCommandRepository } from './infrastructure/postgresql/users-command.repository';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 const useCases: Array<any> = [
   CreateUserUseCase,
@@ -65,7 +64,7 @@ const services: Array<any> = [
   ],
   controllers: [UsersController, AuthController, SecurityDevicesController],
   providers: [
-    UsersRepository,
+    UsersCommandRepository,
     UsersQueryRepository,
     AuthRepository,
     AuthQueryRepository,
@@ -100,7 +99,7 @@ const services: Array<any> = [
   ],
   exports: [
     MongooseModule,
-    UsersRepository,
+    UsersCommandRepository,
     ACCESS_TOKEN_STRATEGY_INJECT_TOKEN,
   ],
 })

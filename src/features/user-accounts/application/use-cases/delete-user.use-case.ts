@@ -1,7 +1,7 @@
 import { CommandBus, CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserDocument } from '../../domain/users.entity';
 import { NotFoundException } from '@nestjs/common';
-import { UsersRepository } from '../../infrastructure/users.repository';
+import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
 
 export class DeleteUserCommand {
   constructor(public userId: string) {}
@@ -9,15 +9,15 @@ export class DeleteUserCommand {
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private UsersCommandRepository: UsersCommandRepository) {}
   async execute(dto: DeleteUserCommand): Promise<void> {
     const user: UserDocument | null =
-      await this.usersRepository.findOrNotFoundFail(dto.userId);
+      await this.UsersCommandRepository.findOrNotFoundFail(dto.userId);
     if (!user) {
       throw new NotFoundException('user not found');
     }
     user.makeDeleted();
 
-    await this.usersRepository.save(user);
+    await this.UsersCommandRepository.save(user);
   }
 }
