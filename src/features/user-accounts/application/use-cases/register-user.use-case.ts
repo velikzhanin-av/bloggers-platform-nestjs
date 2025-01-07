@@ -11,6 +11,7 @@ import { UserDocument } from '../../domain/users.entity';
 import { NotificationsService } from '../../../notifications/application/notifications.service';
 import { CreateUserDto } from '../../dto/create-user.dto';
 import { BadRequestException, UnauthorizedException } from '@nestjs/common';
+import { add } from 'date-fns';
 
 export class RegisterUserCommand {
   constructor(public dto: CreateUserDto) {}
@@ -22,14 +23,13 @@ export class RegisterUserUseCase
 {
   constructor(
     private commandBus: CommandBus,
-    private eventBus: EventBus,
-    private UsersCommandRepository: UsersCommandRepository,
+    private usersCommandRepository: UsersCommandRepository,
     private notificationsService: NotificationsService,
   ) {}
 
   async execute({ dto }: RegisterUserCommand): Promise<void> {
     const doesExistByLoginOrEmail: string | null =
-      await this.UsersCommandRepository.doesExistByLoginOrEmail(
+      await this.usersCommandRepository.doesExistByLoginOrEmail(
         dto.login,
         dto.email,
       );
@@ -38,7 +38,7 @@ export class RegisterUserUseCase
         errorsMessages: [
           {
             message: doesExistByLoginOrEmail,
-            field: 'code',
+            field: doesExistByLoginOrEmail,
           },
         ],
       });
@@ -46,17 +46,27 @@ export class RegisterUserUseCase
     const userId: string = await this.commandBus.execute(
       new CreateUserCommand(dto),
     );
-    const confirmationCode = randomUUID();
+    const emailConfirmationCode = randomUUID();
 
-    const user: UserDocument | null =
-      await this.UsersCommandRepository.findOrNotFoundFail(userId);
-    user!.setConfirmationCode(confirmationCode);
-    await this.UsersCommandRepository.save(user!);
+    const user: any =
+      await this.usersCommandRepository.findOrNotFoundFail(userId);
+    const confirmationCodeData = {
+      emailConfirmationCode,
+      emailExpirationDate: add(new Date(), {
+        hours: 1,
+        minutes: 30,
+      }),
+      userId,
+    };
+
+    await this.usersCommandRepository.updateConfirmationCode(
+      confirmationCodeData,
+    );
 
     await this.notificationsService.sendEmail(
       dto.login,
       dto.email,
-      confirmationCode,
+      emailConfirmationCode,
     );
   }
 }

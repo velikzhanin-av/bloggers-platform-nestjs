@@ -5,6 +5,7 @@ import { BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NotificationsService } from '../../../notifications/application/notifications.service';
 import { UsersCommandRepository } from '../../infrastructure/postgresql/users-command.repository';
+import { add } from 'date-fns';
 
 export class RegistrationEmailResendingCommand {
   constructor(public dto: AuthRegistrationEmailResendingDto) {}
@@ -13,14 +14,13 @@ export class RegistrationEmailResendingCommand {
 @CommandHandler(RegistrationEmailResendingCommand)
 export class RegistrationEmailResendingUseCase implements ICommandHandler {
   constructor(
-    private readonly UsersCommandRepository: UsersCommandRepository,
+    private readonly usersCommandRepository: UsersCommandRepository,
     private readonly notificationsService: NotificationsService,
   ) {}
 
   async execute({ dto }: RegistrationEmailResendingCommand): Promise<void> {
-    const user: UserDocument =
-      await this.UsersCommandRepository.findUserByEmail(dto.email);
-    if (!user || user.emailConfirmation.isConfirmed) {
+    const user = await this.usersCommandRepository.findUserByEmail(dto.email);
+    if (!user || user.isConfirmed) {
       throw new BadRequestException({
         errorsMessages: [
           {
@@ -31,14 +31,22 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler {
       });
     }
 
-    const newConfirmationCode = randomUUID();
-    user.setConfirmationCode(newConfirmationCode);
-    await this.UsersCommandRepository.save(user);
+    const emailConfirmationCode = randomUUID();
+    const updateData = {
+      emailConfirmationCode,
+      emailExpirationDate: add(new Date(), {
+        hours: 1,
+        minutes: 30,
+      }),
+      userId: user.userId,
+    };
+
+    await this.usersCommandRepository.updateConfirmationCode(updateData);
 
     await this.notificationsService.sendEmail(
       user.login,
       user.email,
-      newConfirmationCode,
+      emailConfirmationCode,
     );
   }
 }

@@ -1,8 +1,6 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
-import { UpdateWriteOpResult } from 'mongoose';
+import { Injectable } from '@nestjs/common';
 import { DataSource } from 'typeorm';
-import { User, UserDocument, UserModelType } from '../../domain/users.entity';
+import { UserDocument } from '../../domain/users.entity';
 import { DeletionStatus } from '../../../../core/utils/status-enam';
 
 @Injectable()
@@ -17,10 +15,6 @@ export class UsersCommandRepository {
       [user.userId, user.login, user.email, user.passwordHash], // Параметры передаются вторым аргументом
     );
     return newUser[0];
-  }
-
-  async save(user: UserDocument): Promise<void> {
-    await user.save();
   }
 
   async findOrNotFoundFail(userId: string): Promise<UserDocument | null> {
@@ -66,15 +60,6 @@ export class UsersCommandRepository {
     login: string,
     email: string,
   ): Promise<string | null> {
-    const IsExistLogin = await this.dataSource.query(
-      `
-          SELECT login
-          FROM users
-          WHERE login = $1;`,
-      [login],
-    );
-    if (IsExistLogin) return 'login';
-
     const IsExistEmail = await this.dataSource.query(
       `
           SELECT email
@@ -82,7 +67,16 @@ export class UsersCommandRepository {
           WHERE email = $1;`,
       [email],
     );
-    if (IsExistEmail) return 'email';
+    if (IsExistEmail[0]) return 'email';
+
+    const IsExistLogin = await this.dataSource.query(
+      `
+          SELECT login
+          FROM users
+          WHERE login = $1;`,
+      [login],
+    );
+    if (IsExistLogin[0]) return 'login';
 
     return null;
   }
@@ -105,5 +99,32 @@ export class UsersCommandRepository {
       [email],
     );
     return user[0] ?? null;
+  }
+
+  async updateConfirmationCode(dto): Promise<void> {
+    await this.dataSource.query(
+      `UPDATE users
+       SET "emailConfirmationCode" = $1, "emailExpirationDate" = $2
+       where "userId" = $3;`,
+      [dto.emailConfirmationCode, dto.emailExpirationDate, dto.userId],
+    );
+  }
+
+  async updateIsConfirmed(userId: string): Promise<void> {
+    await this.dataSource.query(
+      `UPDATE users
+       SET "isConfirmed" = true
+       where "userId" = $1;`,
+      [userId],
+    );
+  }
+
+  async updateDeletionStatus(userId: string): Promise<void> {
+    await this.dataSource.query(
+      `UPDATE users
+       SET "deletionStatus" = $2
+       where "userId" = $1;`,
+      [userId, DeletionStatus.PermanentDeleted],
+    );
   }
 }

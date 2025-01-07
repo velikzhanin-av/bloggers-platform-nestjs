@@ -6,7 +6,7 @@ export class NotificationsService {
   constructor(private readonly notificationsAdapter: NotificationsAdapter) {}
 
   async sendEmail(login: string, email: string, confirmationCode: string) {
-    const result = await this.notificationsAdapter.sendEmail(
+    const result = this.notificationsAdapter.sendEmail(
       login,
       email,
       confirmationCode,

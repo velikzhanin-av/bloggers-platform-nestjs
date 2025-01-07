@@ -9,15 +9,16 @@ export class DeleteUserCommand {
 
 @CommandHandler(DeleteUserCommand)
 export class DeleteUserUseCase implements ICommandHandler<DeleteUserCommand> {
-  constructor(private UsersCommandRepository: UsersCommandRepository) {}
+  constructor(private usersCommandRepository: UsersCommandRepository) {}
+
   async execute(dto: DeleteUserCommand): Promise<void> {
-    const user: UserDocument | null =
-      await this.UsersCommandRepository.findOrNotFoundFail(dto.userId);
+    const user: any = await this.usersCommandRepository.findOrNotFoundFail(
+      dto.userId,
+    );
     if (!user) {
       throw new NotFoundException('user not found');
     }
-    user.makeDeleted();
 
-    await this.UsersCommandRepository.save(user);
+    await this.usersCommandRepository.updateDeletionStatus(user.userId);
   }
 }

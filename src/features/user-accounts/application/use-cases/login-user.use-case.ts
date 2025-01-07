@@ -39,7 +39,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
 
   async execute({ dto }: LoginUserCommand): Promise<any> {
     const { loginOrEmail, password, userAgent, ip } = dto;
-    const user: UserDocument | null =
+    const user: any =
       await this.UsersCommandRepository.findByLoginOrEmail(loginOrEmail);
     if (!user)
       throw new UnauthorizedException('login/email or password is wrong');
@@ -47,7 +47,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
     if (!(await this.bcryptService.checkPassword(password, user.passwordHash)))
       throw new UnauthorizedException('login/email or password is wrong');
 
-    const userId: string = user._id.toString();
+    const userId: string = user.userId;
     const deviceId: string = randomUUID();
 
     const tokens: {

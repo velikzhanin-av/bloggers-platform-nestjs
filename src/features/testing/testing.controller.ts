@@ -25,12 +25,12 @@ import {
   PostLike,
   PostLikeModelType,
 } from '../bloggers-platform/posts-likes/domain/post-like.entity';
+import { BcryptService } from '../user-accounts/application/bcrypt.service';
+import { DataSource } from 'typeorm';
 
 @Controller('testing')
 export class TestingController {
   constructor(
-    @InjectModel(User.name)
-    private UserModel: UserModelType,
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
     @InjectModel(Post.name)
@@ -43,12 +43,15 @@ export class TestingController {
     private CommentLikeModel: CommentLikeModelType,
     @InjectModel(PostLike.name)
     private PostLikeModel: PostLikeModelType,
+    private readonly dataSource: DataSource,
   ) {}
 
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll() {
-    await this.UserModel.deleteMany({});
+    await this.dataSource.query(`
+        DELETE
+        FROM users`);
     await this.BlogModel.deleteMany({});
     await this.PostModel.deleteMany({});
     await this.SessionModel.deleteMany({});
