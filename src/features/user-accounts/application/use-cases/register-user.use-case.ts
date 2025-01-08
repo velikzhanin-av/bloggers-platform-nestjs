@@ -63,7 +63,7 @@ export class RegisterUserUseCase
       confirmationCodeData,
     );
 
-    await this.notificationsService.sendEmail(
+    this.notificationsService.sendEmail(
       dto.login,
       dto.email,
       emailConfirmationCode,

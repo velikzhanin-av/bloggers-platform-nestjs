@@ -16,6 +16,7 @@ export class RegistrationConfirmationUseCase
   ) {}
 
   async execute({ dto }: RegistrationConfirmationCommand): Promise<void> {
+    console.log(`receved code: ${dto.code}`);
     const user = await this.usersCommandRepository.findUserByConfirmationCode(
       dto.code,
     );

@@ -32,6 +32,9 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler {
     }
 
     const emailConfirmationCode = randomUUID();
+    console.log(`new code: ${emailConfirmationCode}`);
+    console.log(`old code: ${user.emailConfirmationCode}`);
+    console.log(`user: ${user}`);
     const updateData = {
       emailConfirmationCode,
       emailExpirationDate: add(new Date(), {
@@ -43,7 +46,7 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler {
 
     await this.usersCommandRepository.updateConfirmationCode(updateData);
 
-    await this.notificationsService.sendEmail(
+    this.notificationsService.sendEmail(
       user.login,
       user.email,
       emailConfirmationCode,

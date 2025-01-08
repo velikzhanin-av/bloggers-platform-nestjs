@@ -93,7 +93,7 @@ export class UsersCommandRepository {
 
   async findUserByEmail(email: string) {
     const user = await this.dataSource.query(
-      `SELECT email
+      `SELECT *
        FROM users
        WHERE email = $1;`,
       [email],
@@ -105,7 +105,7 @@ export class UsersCommandRepository {
     await this.dataSource.query(
       `UPDATE users
        SET "emailConfirmationCode" = $1, "emailExpirationDate" = $2
-       where "userId" = $3;`,
+       WHERE "userId" = $3;`,
       [dto.emailConfirmationCode, dto.emailExpirationDate, dto.userId],
     );
   }

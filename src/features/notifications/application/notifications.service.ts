@@ -5,17 +5,8 @@ import { NotificationsAdapter } from '../infrastructure/notifications.adapter';
 export class NotificationsService {
   constructor(private readonly notificationsAdapter: NotificationsAdapter) {}
 
-  async sendEmail(login: string, email: string, confirmationCode: string) {
-    const result = this.notificationsAdapter.sendEmail(
-      login,
-      email,
-      confirmationCode,
-    );
-    if (!result) {
-      return;
-    } else {
-      return result.accepted;
-    }
+  sendEmail(login: string, email: string, confirmationCode: string) {
+    this.notificationsAdapter.sendEmail(login, email, confirmationCode);
   }
 
   async sendEmailRecoveryPassword(
