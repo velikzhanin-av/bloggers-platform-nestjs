@@ -7,12 +7,12 @@ export class UserViewDto {
   email: string;
   createdAt: Date;
 
-  static mapToView(user: UserDocument): UserViewDto {
+  static mapToView(user: any): UserViewDto {
     const dto = new UserViewDto();
 
     dto.email = user.email;
     dto.login = user.login;
-    dto.id = user._id.toString();
+    dto.id = user.userId;
     dto.createdAt = user.createdAt;
 
     return dto;

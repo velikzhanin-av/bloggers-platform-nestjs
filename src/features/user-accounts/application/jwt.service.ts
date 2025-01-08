@@ -1,11 +1,11 @@
 import jwt from 'jsonwebtoken';
 import { Config } from '../../../config/config';
-import { UsersRepository } from '../infrastructure/users.repository';
+import { UsersCommandRepository } from '../infrastructure/postgresql/users-command.repository';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class CustomJwtService {
-  constructor(private usersRepository: UsersRepository) {}
+  constructor(private UsersCommandRepository: UsersCommandRepository) {}
 
   async createJwt(userId: string, deviceId: string) {
     return jwt.sign({ userId, deviceId }, Config.TOKEN_SECRET_KEY, {
@@ -19,7 +19,7 @@ export class CustomJwtService {
   //   } catch (err) {
   //     return;
   //   }
-  //   return await this.usersRepository.verifyJwtToken(token);
+  //   return await this.UsersCommandRepository.verifyJwtToken(token);
   // }
 
   // async verifyRefreshToken(token: string) {
@@ -29,7 +29,7 @@ export class CustomJwtService {
   //     return;
   //   }
   //
-  //   return await this.usersRepository.verifyRefreshToken(token);
+  //   return await this.UsersCommandRepository.verifyRefreshToken(token);
   // }
 
   async createRefreshToken(userId: string, deviceId: string) {

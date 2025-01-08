@@ -4,7 +4,7 @@ import { CommentDocument } from '../../domain/comments.entity';
 
 import { LikeStatus } from '../../../../../core/utils/status-enam';
 import { UserDocument } from '../../../../user-accounts/domain/users.entity';
-import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
+import { UsersCommandRepository } from '../../../../user-accounts/infrastructure/postgresql/users-command.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { LikesRepository } from '../../../comments-likes/infrastructure/likes.repository';
 import {
@@ -25,7 +25,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
   constructor(
     private readonly commentsRepository: CommentsRepository,
     private readonly likesRepository: LikesRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly UsersCommandRepository: UsersCommandRepository,
     @InjectModel(CommentLike.name)
     private readonly LikeModel: CommentLikeModelType,
   ) {}
@@ -35,7 +35,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
     const comment: CommentDocument =
       await this.commentsRepository.findCommentById(commentId);
     const user: UserDocument | null =
-      await this.usersRepository.findOrNotFoundFail(userId);
+      await this.UsersCommandRepository.findOrNotFoundFail(userId);
 
     const findLike: CommentLikeDocument | null =
       await this.likesRepository.findLikeByCommentAndUser(userId, commentId);

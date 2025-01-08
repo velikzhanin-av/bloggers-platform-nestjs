@@ -2,7 +2,7 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 
 import { LikeStatus } from '../../../../../core/utils/status-enam';
 import { UserDocument } from '../../../../user-accounts/domain/users.entity';
-import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
+import { UsersCommandRepository } from '../../../../user-accounts/infrastructure/postgresql/users-command.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { PostsRepository } from '../../infrastructure/posts.repository';
 import {
@@ -24,7 +24,7 @@ export class UpdatePostLikeStatusCommand {
 export class UpdatePostLikeStatusUseCase implements ICommandHandler {
   constructor(
     private readonly postsRepository: PostsRepository,
-    private readonly usersRepository: UsersRepository,
+    private readonly UsersCommandRepository: UsersCommandRepository,
     private readonly postsLikesRepository: PostsLikesRepository,
     @InjectModel(PostLike.name)
     private readonly LikeModel: PostLikeModelType,
@@ -34,7 +34,7 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler {
     const { postId, userId, likeStatus } = dto;
     const post: PostDocument = await this.postsRepository.findPostById(postId);
     const user: UserDocument | null =
-      await this.usersRepository.findOrNotFoundFail(userId);
+      await this.UsersCommandRepository.findOrNotFoundFail(userId);
 
     const findLike: PostLikeDocument | null =
       await this.postsLikesRepository.findLikeByPostAndUser(postId, userId);

@@ -7,7 +7,7 @@ import { CoreConfig } from '../../../core/core.config';
 export class NotificationsAdapter {
   constructor(private readonly coreConfig: CoreConfig) {}
 
-  async sendEmail(login: string, email: string, confirmationCode: string) {
+  sendEmail(login: string, email: string, confirmationCode: string) {
     const transporter = nodemailer.createTransport({
       service: 'gmail',
       auth: {

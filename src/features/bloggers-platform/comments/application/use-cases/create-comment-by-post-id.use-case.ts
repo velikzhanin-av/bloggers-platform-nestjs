@@ -6,7 +6,7 @@ import {
   CommentDocument,
   CommentModelType,
 } from '../../domain/comments.entity';
-import { UsersRepository } from '../../../../user-accounts/infrastructure/users.repository';
+import { UsersCommandRepository } from '../../../../user-accounts/infrastructure/postgresql/users-command.repository';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateCommentDto } from '../../dto/create-comment.dto';
@@ -20,7 +20,7 @@ export class CreateCommentByPostIdCommand {
 @CommandHandler(CreateCommentByPostIdCommand)
 export class CreateCommentByPostIdUseCase implements ICommandHandler {
   constructor(
-    private readonly usersRepository: UsersRepository,
+    private readonly UsersCommandRepository: UsersCommandRepository,
     private readonly commentsRepository: CommentsRepository,
     private readonly commentsService: CommentsService,
     @InjectModel(Comment.name)
@@ -31,7 +31,7 @@ export class CreateCommentByPostIdUseCase implements ICommandHandler {
     dto,
   }: CreateCommentByPostIdCommand): Promise<CommentViewDto> {
     const user: UserDocument | null =
-      await this.usersRepository.findOrNotFoundFail(dto.userId);
+      await this.UsersCommandRepository.findOrNotFoundFail(dto.userId);
     const CreateCommentDto: CreateCommentDto = {
       content: dto.content,
       postId: dto.postId,

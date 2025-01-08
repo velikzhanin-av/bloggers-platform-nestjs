@@ -7,6 +7,7 @@ import { UserAccountsModule } from './features/user-accounts/user-accounts.modul
 import { CoreConfig } from './core/core.config';
 import { CoreModule } from './core/core.module';
 import { ThrottlerModule } from '@nestjs/throttler';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -26,6 +27,16 @@ import { ThrottlerModule } from '@nestjs/throttler';
         };
       },
       inject: [CoreConfig],
+    }),
+    TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: '',
+      password: '',
+      database: '',
+      autoLoadEntities: false,
+      synchronize: false,
     }),
     CoreModule,
     TestingModule,
