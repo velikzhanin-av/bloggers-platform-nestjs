@@ -4,7 +4,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { User, UserSchema } from './domain/users.entity';
 import { Session, SessionSchema } from './domain/sessions.entity';
 import { AuthController } from './api/auth.controller';
-import { AuthRepository } from './infrastructure/auth.repository';
 import { AuthService } from './application/auth.service';
 import { BcryptService } from './application/bcrypt.service';
 import { CustomJwtService } from './application/jwt.service';
@@ -33,7 +32,7 @@ import { DeleteSessionByDeviceIdUseCase } from './application/use-cases/delete-s
 import { DeleteAllSessionsExceptCurrentUseCase } from './application/use-cases/delete-all-sessions-except-current.use-case';
 import { UsersQueryRepository } from './infrastructure/postgresql/users.query-repository';
 import { UsersCommandRepository } from './infrastructure/postgresql/users-command.repository';
-import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthCommandRepository } from './infrastructure/postgresql/auth.command-repository';
 
 const useCases: Array<any> = [
   CreateUserUseCase,
@@ -66,7 +65,7 @@ const services: Array<any> = [
   providers: [
     UsersCommandRepository,
     UsersQueryRepository,
-    AuthRepository,
+    AuthCommandRepository,
     AuthQueryRepository,
     JwtStrategy,
     CustomJwtService,

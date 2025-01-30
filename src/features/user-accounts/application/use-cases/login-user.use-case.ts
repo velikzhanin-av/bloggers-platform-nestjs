@@ -15,6 +15,7 @@ import { UsersCommandRepository } from '../../infrastructure/postgresql/users-co
 import { BcryptService } from '../bcrypt.service';
 import { AuthService } from '../auth.service';
 import { InjectModel } from '@nestjs/mongoose';
+import { AuthCommandRepository } from '../../infrastructure/postgresql/auth.command-repository';
 
 export class LoginUserCommand {
   constructor(
@@ -33,6 +34,7 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
     @InjectModel(Session.name)
     private readonly SessionModel: SessionModelType,
     private readonly UsersCommandRepository: UsersCommandRepository,
+    private readonly authCommandRepository: AuthCommandRepository,
     private readonly bcryptService: BcryptService,
     private readonly authService: AuthService,
   ) {}
@@ -72,20 +74,31 @@ export class LoginUserUseCase implements ICommandHandler<LoginUserCommand> {
     // if (!resultAccessToken || !resultRefreshToken)
     //   throw new InternalServerErrorException('internal server error');
 
-    const session: SessionDocument = this.SessionModel.createInstance({
+    // const session: SessionDocument = this.SessionModel.createInstance({
+    //   userId,
+    //   deviceId,
+    //   iat,
+    //   exp,
+    //   ip,
+    //   deviceName: userAgent,
+    // });
+    // await session.save();
+
+    const id: string = randomUUID();
+    const session: any = await this.authCommandRepository.createSession({
+      id,
       userId,
       deviceId,
       iat,
       exp,
-      ip: ip,
+      ip,
       deviceName: userAgent,
     });
-    await session.save();
 
     return {
       accessToken: tokens.accessToken,
       refreshToken: tokens.refreshToken,
-      sessionId: session._id.toString(),
+      sessionId: session.id.toString(),
       deviceId,
     };
   }

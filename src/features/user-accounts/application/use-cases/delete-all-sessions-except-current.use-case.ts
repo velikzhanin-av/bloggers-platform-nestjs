@@ -1,5 +1,5 @@
-import { AuthRepository } from '../../infrastructure/auth.repository';
 import { CommandHandler, ICommand } from '@nestjs/cqrs';
+import { AuthCommandRepository } from '../../infrastructure/postgresql/auth.command-repository';
 
 export class DeleteAllSessionsExceptCurrentCommand implements ICommand {
   constructor(
@@ -10,10 +10,10 @@ export class DeleteAllSessionsExceptCurrentCommand implements ICommand {
 
 @CommandHandler(DeleteAllSessionsExceptCurrentCommand)
 export class DeleteAllSessionsExceptCurrentUseCase implements ICommand {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(private readonly authCommandRepository: AuthCommandRepository) {}
 
   async execute(dto: DeleteAllSessionsExceptCurrentCommand): Promise<void> {
     const { userId, deviceId } = dto;
-    await this.authRepository.deleteSessions(deviceId, userId);
+    await this.authCommandRepository.deleteSessions(deviceId, userId);
   }
 }

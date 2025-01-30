@@ -7,16 +7,15 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { REFRESH_TOKEN_STRATEGY_INJECT_TOKEN } from '../../../features/user-accounts/constants/auth-tokens.inject-constants';
-import { SessionDocument } from '../../../features/user-accounts/domain/sessions.entity';
-import { AuthRepository } from '../../../features/user-accounts/infrastructure/auth.repository';
 import { UserContext } from '../../dto/user-context';
+import { AuthCommandRepository } from '../../../features/user-accounts/infrastructure/postgresql/auth.command-repository';
 
 @Injectable()
 export class RefreshTokenAuthGuard implements CanActivate {
   constructor(
     @Inject(REFRESH_TOKEN_STRATEGY_INJECT_TOKEN)
     private readonly refreshTokenContext: JwtService,
-    private readonly authRepository: AuthRepository,
+    private readonly authCommandRepository: AuthCommandRepository,
   ) {}
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
@@ -32,8 +31,8 @@ export class RefreshTokenAuthGuard implements CanActivate {
     try {
       // Декодируем и валидируем токен, добавляем данные пользователя в request
       const user: UserContext = this.refreshTokenContext.verify(token);
-      const session: SessionDocument | null =
-        await this.authRepository.findSessionByIatAndDeviceId(
+      const session: object | null =
+        await this.authCommandRepository.findSessionByIatAndDeviceId(
           user.iat,
           user.deviceId,
         );
