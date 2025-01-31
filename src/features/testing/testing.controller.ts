@@ -1,6 +1,5 @@
 import { Controller, Delete, HttpCode, HttpStatus } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { User, UserModelType } from '../user-accounts/domain/users.entity';
 import {
   Blog,
   BlogModelType,
@@ -25,8 +24,8 @@ import {
   PostLike,
   PostLikeModelType,
 } from '../bloggers-platform/posts-likes/domain/post-like.entity';
-import { BcryptService } from '../user-accounts/application/bcrypt.service';
 import { DataSource } from 'typeorm';
+import { DeletionStatus } from '../../core/utils/status-enam';
 
 @Controller('testing')
 export class TestingController {
@@ -49,12 +48,18 @@ export class TestingController {
   @Delete('all-data')
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteAll() {
-    await this.dataSource.query(`
-        DELETE
-        FROM users`);
+    await this.dataSource.query(
+      `UPDATE users
+       SET "deletionStatus" = $1;`,
+      [DeletionStatus.PermanentDeleted],
+    );
+    await this.dataSource.query(
+      `UPDATE session
+       SET "deletionStatus" = $1;`,
+      [DeletionStatus.PermanentDeleted],
+    );
     await this.BlogModel.deleteMany({});
     await this.PostModel.deleteMany({});
-    await this.SessionModel.deleteMany({});
     await this.CommentModel.deleteMany({});
     await this.CommentLikeModel.deleteMany({});
     await this.PostLikeModel.deleteMany({});

@@ -1,12 +1,20 @@
-import { Controller, Delete, Get, HttpCode, HttpStatus, Param, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Delete,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Param,
+  UseGuards,
+} from '@nestjs/common';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
 import { UserContext } from '../../../core/dto/user-context';
 import { CommandBus } from '@nestjs/cqrs';
 import { RefreshTokenAuthGuard } from '../../../core/guards/custom/refresh-token-auth.guard';
-import { AuthQueryRepository } from '../infrastructure/query/auth.query-repository';
 import { DeleteSessionByDeviceIdCommand } from '../application/use-cases/delete-session-by-deviceId.use-case';
 import { DeleteAllSessionsExceptCurrentCommand } from '../application/use-cases/delete-all-sessions-except-current.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
+import { AuthQueryRepository } from '../infrastructure/postgresql/auth.query-repository';
 
 @Controller('security/devices')
 export class SecurityDevicesController {

@@ -8,7 +8,6 @@ import { AuthService } from './application/auth.service';
 import { BcryptService } from './application/bcrypt.service';
 import { CustomJwtService } from './application/jwt.service';
 import { JwtStrategy } from '../../core/guards/jwt.strategy';
-import { AuthQueryRepository } from './infrastructure/query/auth.query-repository';
 import { NotificationsModule } from '../notifications/notifications.module';
 import { CreateUserUseCase } from './application/use-cases/create-user.use-case';
 import { CqrsModule } from '@nestjs/cqrs';
@@ -33,6 +32,7 @@ import { DeleteAllSessionsExceptCurrentUseCase } from './application/use-cases/d
 import { UsersQueryRepository } from './infrastructure/postgresql/users.query-repository';
 import { UsersCommandRepository } from './infrastructure/postgresql/users-command.repository';
 import { AuthCommandRepository } from './infrastructure/postgresql/auth.command-repository';
+import { AuthQueryRepository } from './infrastructure/postgresql/auth.query-repository';
 
 const useCases: Array<any> = [
   CreateUserUseCase,

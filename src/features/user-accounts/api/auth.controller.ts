@@ -8,12 +8,12 @@ import {
   HttpCode,
   HttpStatus,
   UseGuards,
+  Logger,
 } from '@nestjs/common';
 import { AuthLoginInputDto } from './input-dto/auth-login.input-dto';
 import { Response, Request } from 'express';
 import { ExtractUserFromRequest } from '../../../core/decorators/extract-user-from-request';
 import { UserContext } from '../../../core/dto/user-context';
-import { AuthQueryRepository } from '../infrastructure/query/auth.query-repository';
 import { UserMeViewDto } from './output-dto/users.view-dto';
 import { CreateUserDto } from '../dto/create-user.dto';
 import { AuthConfirmationCodeDto } from './input-dto/auth-confirmation-code.dto';
@@ -28,12 +28,14 @@ import { CreateNewTokensCommand } from '../application/use-cases/create-new-toke
 import { RefreshTokenAuthGuard } from '../../../core/guards/custom/refresh-token-auth.guard';
 import { LogoutCommand } from '../application/use-cases/logout.use-case';
 import { SkipThrottle } from '@nestjs/throttler';
+import { AuthQueryRepository } from '../infrastructure/postgresql/auth.query-repository';
 
 @Controller('/auth')
 export class AuthController {
   constructor(
     private readonly authQueryRepository: AuthQueryRepository,
     private readonly commandBus: CommandBus,
+    // private readonly logger = new Logger(AuthController.name),
   ) {}
 
   @Post('/registration')

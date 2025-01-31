@@ -22,9 +22,9 @@ export class RegisterUserUseCase
   implements ICommandHandler<RegisterUserCommand>
 {
   constructor(
-    private commandBus: CommandBus,
-    private usersCommandRepository: UsersCommandRepository,
-    private notificationsService: NotificationsService,
+    private readonly commandBus: CommandBus,
+    private readonly usersCommandRepository: UsersCommandRepository,
+    private readonly notificationsService: NotificationsService,
   ) {}
 
   async execute({ dto }: RegisterUserCommand): Promise<void> {
@@ -33,7 +33,15 @@ export class RegisterUserUseCase
         dto.login,
         dto.email,
       );
-    if (doesExistByLoginOrEmail)
+    if (doesExistByLoginOrEmail) {
+      console.log({
+        errorsMessages: [
+          {
+            message: doesExistByLoginOrEmail,
+            field: doesExistByLoginOrEmail,
+          },
+        ],
+      });
       throw new BadRequestException({
         errorsMessages: [
           {
@@ -42,7 +50,7 @@ export class RegisterUserUseCase
           },
         ],
       });
-
+    }
     const userId: string = await this.commandBus.execute(
       new CreateUserCommand(dto),
     );
