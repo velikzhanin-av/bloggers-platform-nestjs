@@ -34,7 +34,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       port: 5432,
       username: '',
       password: '',
-      database: '',
+      database: 'bloggers_platform',
       autoLoadEntities: false,
       synchronize: false,
     }),

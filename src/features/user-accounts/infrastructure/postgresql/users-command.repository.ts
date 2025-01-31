@@ -64,8 +64,9 @@ export class UsersCommandRepository {
       `
           SELECT email
           FROM users
-          WHERE email = $1;`,
-      [email],
+          WHERE email = $1
+            AND "deletionStatus" != $2;`,
+      [email, DeletionStatus.PermanentDeleted],
     );
     if (IsExistEmail[0]) return 'email';
 
@@ -73,8 +74,9 @@ export class UsersCommandRepository {
       `
           SELECT login
           FROM users
-          WHERE login = $1;`,
-      [login],
+          WHERE login = $1
+            AND "deletionStatus" != $2;`,
+      [login, DeletionStatus.PermanentDeleted],
     );
     if (IsExistLogin[0]) return 'login';
 
@@ -85,8 +87,9 @@ export class UsersCommandRepository {
     const user = await this.dataSource.query(
       `SELECT *
        FROM users
-       WHERE "emailConfirmationCode" = $1;`,
-      [code],
+       WHERE "emailConfirmationCode" = $1
+         AND "deletionStatus" != $2;`,
+      [code, DeletionStatus.PermanentDeleted],
     );
     return user[0] ?? null;
   }
@@ -95,8 +98,9 @@ export class UsersCommandRepository {
     const user = await this.dataSource.query(
       `SELECT *
        FROM users
-       WHERE email = $1;`,
-      [email],
+       WHERE email = $1
+         AND "deletionStatus" != $2;`,
+      [email, DeletionStatus.PermanentDeleted],
     );
     return user[0] ?? null;
   }
@@ -104,9 +108,16 @@ export class UsersCommandRepository {
   async updateConfirmationCode(dto): Promise<void> {
     await this.dataSource.query(
       `UPDATE users
-       SET "emailConfirmationCode" = $1, "emailExpirationDate" = $2
-       WHERE "userId" = $3;`,
-      [dto.emailConfirmationCode, dto.emailExpirationDate, dto.userId],
+       SET "emailConfirmationCode" = $1,
+           "emailExpirationDate" = $2
+       WHERE "userId" = $3
+         AND "deletionStatus" != $4;`,
+      [
+        dto.emailConfirmationCode,
+        dto.emailExpirationDate,
+        dto.userId,
+        DeletionStatus.PermanentDeleted,
+      ],
     );
   }
 
@@ -114,8 +125,8 @@ export class UsersCommandRepository {
     await this.dataSource.query(
       `UPDATE users
        SET "isConfirmed" = true
-       where "userId" = $1;`,
-      [userId],
+       where "userId" = $1 AND "deletionStatus" != $2;`,
+      [userId, DeletionStatus.PermanentDeleted],
     );
   }
 

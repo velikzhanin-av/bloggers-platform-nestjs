@@ -27,7 +27,8 @@ export class UserMeViewDto extends OmitType(UserViewDto, ['createdAt']) {
 
     dto.email = user.email;
     dto.login = user.login;
-    dto.userId = user.id;
+    // @ts-ignore
+    dto.userId = user.userId;
 
     return dto;
   }

@@ -36,7 +36,7 @@ export class CoreConfig {
     message:
       'Set Env variable MONGO_URI, example: mongodb://localhost:27017/my-app-local-db',
   })
-  dbURI: string = this.configService.get('DB_URI');
+  dbURI: string = this.configService.get('MONGO_URI');
 
   @IsNotEmpty({
     message:

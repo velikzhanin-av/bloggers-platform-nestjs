@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UserContext } from '../../../../core/dto/user-context';
-import { AuthRepository } from '../../infrastructure/auth.repository';
+import { AuthCommandRepository } from '../../infrastructure/postgresql/auth.command-repository';
 
 export class LogoutCommand {
   constructor(public readonly dto: UserContext) {}
@@ -8,9 +8,9 @@ export class LogoutCommand {
 
 @CommandHandler(LogoutCommand)
 export class LogoutUseCase implements ICommandHandler {
-  constructor(private readonly authRepository: AuthRepository) {}
+  constructor(private readonly authCommandRepository: AuthCommandRepository) {}
 
   async execute({ dto }: LogoutCommand): Promise<void> {
-    await this.authRepository.deleteSessionByDeviceId(dto.deviceId);
+    await this.authCommandRepository.deleteSessionByDeviceId(dto.deviceId);
   }
 }
