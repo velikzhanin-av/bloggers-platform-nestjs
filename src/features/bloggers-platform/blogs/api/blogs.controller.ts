@@ -35,30 +35,40 @@ import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { GetUser } from '../../../../core/decorators/get-user';
 import { UserContext } from '../../../../core/dto/user-context';
+import { BlogsQueryRepositorySql } from '../infrastructure/postgres/blogs.query-repository';
 
-@Controller('blogs')
+@Controller()
 export class BlogsController {
   constructor(
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
+    private blogsQueryRepositorySql: BlogsQueryRepositorySql,
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
   ) {}
 
-  @Get()
+  @Get('blogs')
   async getBlogs(
     @Query() query: GetBlogsQueryParams,
   ): Promise<PaginatedViewDto<BlogViewDto[]>> {
-    return this.blogsQueryRepository.findAllBlogs(query);
+    return this.blogsQueryRepositorySql.findAllBlogs(query);
   }
 
-  @Post()
+  @Get('sa/blogs')
+  @UseGuards(BasicAuthGuard)
+  async getBlogsSA(
+    @Query() query: GetBlogsQueryParams,
+  ): Promise<PaginatedViewDto<BlogViewDto[]>> {
+    return this.blogsQueryRepositorySql.findAllBlogs(query);
+  }
+
+  @Post('sa/blogs')
   @UseGuards(BasicAuthGuard)
   async postBlogs(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId: string = await this.blogsService.createBlog(body);
     const blog: BlogViewDto | null =
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
-    if (!blog) throw new InternalServerErrorException();
+      await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
+    if (!blog) throw new InternalServerErrorException('123');
     return blog;
   }
 

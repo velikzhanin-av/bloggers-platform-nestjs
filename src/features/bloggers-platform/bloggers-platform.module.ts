@@ -34,6 +34,8 @@ import { PostsLikesRepository } from './posts-likes/infrastructure/posts-likes.r
 import { PostsLikesQueryRepository } from './posts-likes/infrastructure/posts-likes-query.repository';
 import { BlogIsExistConstraint } from '../../core/decorators/blog-is-exist';
 import { CommentsQueryRepository } from './comments/infrastructure/comments-query.repository';
+import { BlogsQueryRepositorySql } from './blogs/infrastructure/postgres/blogs.query-repository';
+import { BlogsCommandRepositorySql } from './blogs/infrastructure/postgres/blogs.command-repository';
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
@@ -63,6 +65,7 @@ const useCases: Array<any> = [
     BlogsRepository,
     BlogIsExistConstraint,
     BlogsQueryRepository,
+    BlogsQueryRepositorySql,
     PostsService,
     PostsRepository,
     PostsQueryRepository,
@@ -71,6 +74,7 @@ const useCases: Array<any> = [
     LikesRepository,
     PostsLikesRepository,
     PostsLikesQueryRepository,
+    BlogsCommandRepositorySql,
     CommentsQueryRepository,
     ...useCases,
   ],

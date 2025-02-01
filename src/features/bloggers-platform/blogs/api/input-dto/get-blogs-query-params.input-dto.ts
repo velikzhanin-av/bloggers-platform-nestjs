@@ -5,5 +5,5 @@ export class GetBlogsQueryParams extends BaseSortablePaginationParams<
   string | null
 > {
   sortBy: BlogsSortBy = BlogsSortBy.CreatedAt;
-  searchNameTerm: string | null = null;
+  searchNameTerm: string = '';
 }

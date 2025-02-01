@@ -1,27 +1,28 @@
-import { Blog, BlogDocument, BlogModelType } from '../domain/blogs.entity';
+import { Blog, BlogModelType } from '../domain/blogs.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateBlogInputDto } from '../api/input-dto/blogs.input-dto';
 import { BlogsRepository } from '../infrastructure/blogs.repository';
 import { NotFoundException } from '@nestjs/common';
+import { BlogsCommandRepositorySql } from '../infrastructure/postgres/blogs.command-repository';
+import { randomUUID } from 'crypto';
 
 export class BlogsService {
   constructor(
     @InjectModel(Blog.name)
     private BlogModel: BlogModelType,
     private blogsRepository: BlogsRepository,
+    private blogsCommandRepositorySql: BlogsCommandRepositorySql,
   ) {}
 
   async createBlog(dto: CreateBlogInputDto): Promise<string> {
-    const blog: BlogDocument = this.BlogModel.createInstance({
+    const id: string = randomUUID();
+    return await this.blogsCommandRepositorySql.createBlog({
+      id,
       name: dto.name,
       description: dto.description,
       websiteUrl: dto.websiteUrl,
       isMembership: false,
     });
-
-    await this.blogsRepository.save(blog);
-
-    return blog._id.toString();
   }
 
   async deleteBlog(blogId: string): Promise<void> {

@@ -1,6 +1,5 @@
 import { AuthRegistrationEmailResendingDto } from '../../api/input-dto/auth-registration-email-resending.dtp';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { UserDocument } from '../../domain/users.entity';
 import { BadRequestException } from '@nestjs/common';
 import { randomUUID } from 'crypto';
 import { NotificationsService } from '../../../notifications/application/notifications.service';
@@ -32,9 +31,6 @@ export class RegistrationEmailResendingUseCase implements ICommandHandler {
     }
 
     const emailConfirmationCode = randomUUID();
-    console.log(`new code: ${emailConfirmationCode}`);
-    console.log(`old code: ${user.emailConfirmationCode}`);
-    console.log(`user: ${user}`);
     const updateData = {
       emailConfirmationCode,
       emailExpirationDate: add(new Date(), {

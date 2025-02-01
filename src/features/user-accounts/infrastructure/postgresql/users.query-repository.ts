@@ -55,14 +55,6 @@ export class UsersQueryRepository {
       page: query.pageNumber,
       size: query.pageSize,
     });
-
-    //     const users: UserDocument[] | null = await this.UserModel.find({
-    //       ...filter,
-    //       deletionStatus: DeletionStatus.NotDeleted,
-    //     })
-    //       .sort({ [query.sortBy]: query.sortDirection })
-    //       .skip(query.calculateSkip())
-    //       .limit(query.pageSize);
   }
 
   async findById(id: string): Promise<UserDocument | null> {
