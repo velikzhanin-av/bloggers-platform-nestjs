@@ -2,16 +2,15 @@ import { Blog, BlogModelType } from '../domain/blogs.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { CreateBlogInputDto } from '../api/input-dto/blogs.input-dto';
 import { BlogsRepository } from '../infrastructure/blogs.repository';
-import { NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { BlogsCommandRepositorySql } from '../infrastructure/postgres/blogs.command-repository';
 import { randomUUID } from 'crypto';
+import { BlogDBType } from '../domain/types';
 
+@Injectable()
 export class BlogsService {
   constructor(
-    @InjectModel(Blog.name)
-    private BlogModel: BlogModelType,
-    private blogsRepository: BlogsRepository,
-    private blogsCommandRepositorySql: BlogsCommandRepositorySql,
+    private readonly blogsCommandRepositorySql: BlogsCommandRepositorySql,
   ) {}
 
   async createBlog(dto: CreateBlogInputDto): Promise<string> {
@@ -26,16 +25,20 @@ export class BlogsService {
   }
 
   async deleteBlog(blogId: string): Promise<void> {
-    const result: boolean = await this.blogsRepository.deleteBlog(blogId);
-    if (!result) {
+    const blog: BlogDBType | null =
+      await this.blogsCommandRepositorySql.findOrNotFoundFail(blogId);
+    if (!blog) {
       throw new NotFoundException(`Blog with id ${blogId} not found`);
     }
+    await this.blogsCommandRepositorySql.deleteBlog(blogId);
   }
 
   async updateBlog(blogId: string, body: CreateBlogInputDto): Promise<void> {
-    const result: boolean = await this.blogsRepository.updateBlog(blogId, body);
-    if (!result) {
+    const blog: BlogDBType | null =
+      await this.blogsCommandRepositorySql.findOrNotFoundFail(blogId);
+    if (!blog) {
       throw new NotFoundException(`Blog with id ${blogId} not found`);
     }
+    await this.blogsCommandRepositorySql.updateBlog(blogId, body);
   }
 }

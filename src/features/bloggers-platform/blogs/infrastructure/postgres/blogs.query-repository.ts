@@ -62,46 +62,6 @@ export class BlogsQueryRepositorySql {
          AND id = $2`,
       [DeletionStatus.PermanentDeleted, blogId],
     );
-    console.log(blogId);
-    return blog ?? null;
+    return blog[0] ?? null;
   }
-
-  // async findAllBlogs(
-  //   @Query() query: GetBlogsQueryParams,
-  // ): Promise<PaginatedViewDto<BlogViewDto[]>> {
-  //   const filter: FilterQuery<Blog> = {};
-  //
-  //   if (query.searchNameTerm) {
-  //     filter.$or = filter.$or || [];
-  //     filter.$or.push({
-  //       name: { $regex: query.searchNameTerm, $options: 'i' },
-  //     });
-  //   }
-  //
-  //   const blogs: BlogDocument[] | null = await this.BlogModel.find({
-  //     ...filter,
-  //   })
-  //     .sort({ [query.sortBy]: query.sortDirection })
-  //     .skip(query.calculateSkip())
-  //     .limit(query.pageSize);
-  //
-  //   const totalCount: number = await this.BlogModel.countDocuments(filter);
-  //
-  //   const items: BlogViewDto[] = blogs.map(BlogViewDto.mapToView);
-  //
-  //   return PaginatedViewDto.mapToView({
-  //     items,
-  //     totalCount,
-  //     page: query.pageNumber,
-  //     size: query.pageSize,
-  //   });
-  // }
-  //
-  // async getByIdOrNotFoundFail(blogId: string): Promise<BlogViewDto | null> {
-  //   const blog: BlogDocument | null = await this.BlogModel.findOne({
-  //     _id: blogId,
-  //   });
-  //   if (!blog) return null;
-  //   return BlogViewDto.mapToView(blog);
-  // }
 }

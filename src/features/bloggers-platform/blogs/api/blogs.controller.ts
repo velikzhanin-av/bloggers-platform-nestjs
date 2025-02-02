@@ -68,19 +68,19 @@ export class BlogsController {
     const blogId: string = await this.blogsService.createBlog(body);
     const blog: BlogViewDto | null =
       await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
-    if (!blog) throw new InternalServerErrorException('123');
+    if (!blog) throw new InternalServerErrorException('not create blog');
     return blog;
   }
 
-  @Get(':blogId')
+  @Get('blogs/:blogId')
   async getBlogById(@Param('blogId') blogId: string): Promise<BlogViewDto> {
     const blog: BlogViewDto | null =
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+      await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
     if (!blog) throw new NotFoundException('blog not found');
     return blog;
   }
 
-  @Put(':blogId')
+  @Put('sa/blogs/:blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
   async putBlogById(
@@ -91,7 +91,7 @@ export class BlogsController {
     return;
   }
 
-  @Delete(':blogId')
+  @Delete('sa/blogs/:blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
   async deleteBlogById(@Param('blogId') blogId: string): Promise<void> {
