@@ -35,29 +35,31 @@ import { CommentsService } from '../../comments/application/comments.service';
 import { CommentsQueryRepository } from '../../comments/infrastructure/comments-query.repository';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { BearerAuthGuard } from '../../../../core/guards/custom/bearer-auth.guard';
+import { PostsQueryRepositorySql } from '../infrastructure/postgres/posts.query-repository';
 
-@Controller('posts')
+@Controller()
 export class PostsController {
   constructor(
     private postsService: PostsService,
     private commentsService: CommentsService,
     private postsQueryRepository: PostsQueryRepository,
+    private readonly postsQueryRepositorySql: PostsQueryRepositorySql,
     private blogsQueryRepository: BlogsQueryRepository,
     private readonly commandBus: CommandBus,
     private readonly commentsQueryRepository: CommentsQueryRepository,
   ) {}
 
-  @Get()
+  @Get('posts')
   @UseGuards(OptionalJwtAuthGuard)
   async getAllPosts(
     @Query() query: GetPostsQueryParams,
     @GetUser() user: UserContext,
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const userId: string | null = user ? user.userId : null;
-    return this.postsQueryRepository.findAllPosts(query, userId);
+    return this.postsQueryRepositorySql.findAllPosts(query, userId);
   }
 
-  @Get(':postId')
+  @Get('posts/:postId')
   @UseGuards(OptionalJwtAuthGuard)
   async getPostById(
     @GetUser() user: UserContext,
@@ -72,7 +74,7 @@ export class PostsController {
     return post;
   }
 
-  @Put(':postId')
+  @Put('posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
   async putPostById(
@@ -83,7 +85,7 @@ export class PostsController {
     return;
   }
 
-  @Delete(':postId')
+  @Delete('posts/:postId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
   async deletePostById(@Param('postId') postId: string): Promise<void> {
@@ -91,7 +93,7 @@ export class PostsController {
     return;
   }
 
-  @Post()
+  @Post('posts')
   @UseGuards(BasicAuthGuard)
   async createPost(@Body() body: CreatePostInputDto): Promise<PostViewDto> {
     const blog: BlogViewDto | null =
@@ -122,7 +124,7 @@ export class PostsController {
     return await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
   }
 
-  @Get(':postId/comments')
+  @Get('posts/:postId/comments')
   @UseGuards(OptionalJwtAuthGuard)
   async getCommentById(
     @Query() query: GetPostsQueryParams,
@@ -141,7 +143,7 @@ export class PostsController {
     );
   }
 
-  @Put(':postId/like-status')
+  @Put('posts/:postId/like-status')
   @UseGuards(BearerAuthGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   async putLikeStatusPostById(

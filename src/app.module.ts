@@ -13,8 +13,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     ThrottlerModule.forRoot([
       {
-        ttl: 10000,
-        limit: 5,
+        ttl: 100000000,
+        limit: 50,
       },
     ]),
     BloggersPlatformModule,
@@ -32,8 +32,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       type: 'postgres',
       host: 'localhost',
       port: 5432,
-      username: 'myuser',
-      password: 'mypassword',
+      username: '',
+      password: '',
       database: 'bloggers_platform',
       autoLoadEntities: false,
       synchronize: false,

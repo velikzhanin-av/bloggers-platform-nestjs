@@ -58,8 +58,16 @@ export class TestingController {
        SET "deletionStatus" = $1;`,
       [DeletionStatus.PermanentDeleted],
     );
-    await this.BlogModel.deleteMany({});
-    await this.PostModel.deleteMany({});
+    await this.dataSource.query(
+      `UPDATE blogs
+       SET "deletionStatus" = $1;`,
+      [DeletionStatus.PermanentDeleted],
+    );
+    await this.dataSource.query(
+      `UPDATE posts
+       SET "deletionStatus" = $1;`,
+      [DeletionStatus.PermanentDeleted],
+    );
     await this.CommentModel.deleteMany({});
     await this.CommentLikeModel.deleteMany({});
     await this.PostLikeModel.deleteMany({});
