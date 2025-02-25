@@ -35,42 +35,55 @@ import { BasicAuthGuard } from '../../../../core/guards/basic-auth.guard';
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { GetUser } from '../../../../core/decorators/get-user';
 import { UserContext } from '../../../../core/dto/user-context';
+import { BlogsQueryRepositorySql } from '../infrastructure/postgres/blogs.query-repository';
+import { PostsQueryRepositorySql } from '../../posts/infrastructure/postgres/posts.query-repository';
+import { LikeStatus } from '../../../../core/utils/status-enam';
 
-@Controller('blogs')
+@Controller()
 export class BlogsController {
   constructor(
     private blogsService: BlogsService,
     private blogsQueryRepository: BlogsQueryRepository,
+    private blogsQueryRepositorySql: BlogsQueryRepositorySql,
     private postsService: PostsService,
     private postsQueryRepository: PostsQueryRepository,
+    private postsQueryRepositorySql: PostsQueryRepositorySql,
   ) {}
 
-  @Get()
+  @Get('blogs')
   async getBlogs(
     @Query() query: GetBlogsQueryParams,
   ): Promise<PaginatedViewDto<BlogViewDto[]>> {
-    return this.blogsQueryRepository.findAllBlogs(query);
+    return this.blogsQueryRepositorySql.findAllBlogs(query);
   }
 
-  @Post()
+  @Get('sa/blogs')
+  @UseGuards(BasicAuthGuard)
+  async getBlogsSA(
+    @Query() query: GetBlogsQueryParams,
+  ): Promise<PaginatedViewDto<BlogViewDto[]>> {
+    return this.blogsQueryRepositorySql.findAllBlogs(query);
+  }
+
+  @Post('sa/blogs')
   @UseGuards(BasicAuthGuard)
   async postBlogs(@Body() body: CreateBlogInputDto): Promise<BlogViewDto> {
     const blogId: string = await this.blogsService.createBlog(body);
     const blog: BlogViewDto | null =
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
-    if (!blog) throw new InternalServerErrorException();
+      await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
+    if (!blog) throw new InternalServerErrorException('not create blog');
     return blog;
   }
 
-  @Get(':blogId')
+  @Get('blogs/:blogId')
   async getBlogById(@Param('blogId') blogId: string): Promise<BlogViewDto> {
     const blog: BlogViewDto | null =
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+      await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
     if (!blog) throw new NotFoundException('blog not found');
     return blog;
   }
 
-  @Put(':blogId')
+  @Put('sa/blogs/:blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
   async putBlogById(
@@ -81,7 +94,7 @@ export class BlogsController {
     return;
   }
 
-  @Delete(':blogId')
+  @Delete('sa/blogs/:blogId')
   @HttpCode(HttpStatus.NO_CONTENT)
   @UseGuards(BasicAuthGuard)
   async deleteBlogById(@Param('blogId') blogId: string): Promise<void> {
@@ -89,22 +102,32 @@ export class BlogsController {
     return;
   }
 
-  @Post(':blogId/posts')
+  @Post('sa/blogs/:blogId/posts')
   @UseGuards(BasicAuthGuard)
   async createPostByBlogId(
     @Param('blogId') blogId: string,
     @Body() body: CreatePostByBlogIdInputDto,
   ): Promise<PostViewDto | null> {
     const blog: BlogViewDto | null =
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+      await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
     if (!blog) throw new NotFoundException('blog not found');
 
     const dto: CreatePostDto = { ...body, blogId, blogName: blog.name };
     const postId: string = await this.postsService.createPost(dto);
-    return this.postsQueryRepository.getByIdOrNotFoundFail(postId);
+    const post: PostViewDto | null =
+      await this.postsQueryRepositorySql.getByIdOrNotFoundFail(postId);
+    if (!post) throw new InternalServerErrorException('not create post');
+    // stub
+    post.extendedLikesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
+      myStatus: LikeStatus.None,
+      newestLikes: [],
+    };
+    return post;
   }
 
-  @Get(':blogId/posts')
+  @Get('blogs/:blogId/posts')
   @UseGuards(OptionalJwtAuthGuard)
   async getPostsByBlogId(
     @GetUser() user: UserContext,
@@ -113,10 +136,10 @@ export class BlogsController {
   ): Promise<PaginatedViewDto<PostViewDto[]>> {
     const userId: string | null = user ? user.userId : null;
     const blog: BlogViewDto | null =
-      await this.blogsQueryRepository.getByIdOrNotFoundFail(blogId);
+      await this.blogsQueryRepositorySql.getByIdOrNotFoundFail(blogId);
 
     if (!blog) throw new NotFoundException('blog not found');
 
-    return this.postsQueryRepository.findAllPosts(query, userId, blogId);
+    return this.postsQueryRepositorySql.findAllPosts(query, userId, blogId);
   }
 }

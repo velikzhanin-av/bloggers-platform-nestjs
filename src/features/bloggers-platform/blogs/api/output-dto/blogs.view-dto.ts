@@ -15,7 +15,7 @@ export class BlogViewDto {
     dto.description = blog.description;
     dto.websiteUrl = blog.websiteUrl;
     dto.isMembership = blog.isMembership;
-    dto.id = blog._id.toString();
+    dto.id = blog.id;
     dto.createdAt = blog.createdAt;
 
     return dto;

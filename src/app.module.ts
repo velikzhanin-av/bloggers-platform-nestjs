@@ -13,8 +13,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     ThrottlerModule.forRoot([
       {
-        ttl: 10000,
-        limit: 5,
+        ttl: 100000000,
+        limit: 50,
       },
     ]),
     BloggersPlatformModule,

@@ -8,7 +8,8 @@ import { PostsLikesQueryRepository } from '../../posts-likes/infrastructure/post
 import { PostLikeDocument } from '../../posts-likes/domain/post-like.entity';
 import { NewestLikesDto } from '../dto/newest-likes.dto';
 import { LikeStatus } from '../../../../core/utils/status-enam';
-import { GetPostsQueryParams } from '../api/input-dto/get-posts-query-params.input-dto';
+import { PostsCommandRepositorySql } from '../infrastructure/postgres/posts.command-repository';
+import { randomUUID } from 'crypto';
 
 export class PostsService {
   constructor(
@@ -16,13 +17,15 @@ export class PostsService {
     private PostModel: PostModelType,
     private postsRepository: PostsRepository,
     private readonly postsLikesQueryRepository: PostsLikesQueryRepository,
+    private readonly postsCommandRepositorySql: PostsCommandRepositorySql,
   ) {}
 
   async createPost(dto: CreatePostDto): Promise<string> {
-    const post: PostDocument = this.PostModel.createInstance(dto);
-
-    await this.postsRepository.save(post);
-    return post._id.toString();
+    const id: string = randomUUID();
+    return await this.postsCommandRepositorySql.createPost({
+      id,
+      ...dto,
+    });
   }
 
   async updatePost(postId: string, body: CreatePostInputDto): Promise<void> {
@@ -40,10 +43,14 @@ export class PostsService {
   }
 
   async findPostById(postId: string, userId: string | null): Promise<any> {
-    const post: PostDocument = await this.postsRepository.findPostById(postId);
+    const post: PostDocument =
+      await this.postsCommandRepositorySql.findPostById(postId);
+    if (!post) throw new NotFoundException(`Post with id ${postId} not found`);
 
-    const newestLikes: Array<NewestLikesDto> | null =
-      await this.postsLikesQueryRepository.findNewestLikes(postId);
+    // const newestLikes: Array<NewestLikesDto> | null =
+    //   await this.postsLikesQueryRepository.findNewestLikes(postId);
+    // stub
+    const newestLikes = [];
     // TODO поправить any
     const postOut: any = this.mapToOutputPostsFromBd(
       post,
@@ -53,12 +60,14 @@ export class PostsService {
 
     if (!userId) return postOut;
 
-    const like: PostLikeDocument | null =
-      await this.postsLikesQueryRepository.findLikeByCommentAndUser(
-        postId,
-        userId,
-      );
-    if (!like) return postOut;
+    // const like: PostLikeDocument | null =
+    //   await this.postsLikesQueryRepository.findLikeByCommentAndUser(
+    //     postId,
+    //     userId,
+    //   );
+    // if (!like) return postOut;
+    // stub
+    const like = { status: LikeStatus.None };
 
     return this.mapToOutputPostsFromBd(post, like.status, newestLikes);
   }
@@ -77,8 +86,11 @@ export class PostsService {
       blogName: post.blogName,
       createdAt: post.createdAt,
       extendedLikesInfo: {
-        dislikesCount: post.extendedLikesInfo.dislikesCount,
-        likesCount: post.extendedLikesInfo.likesCount,
+        // stub
+        // dislikesCount: post.extendedLikesInfo.dislikesCount,
+        // likesCount: post.extendedLikesInfo.likesCount,
+        dislikesCount: 0,
+        likesCount: 0,
         myStatus: likeStatus,
         newestLikes,
       },
