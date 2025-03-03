@@ -38,6 +38,8 @@ import { BlogsQueryRepositorySql } from './blogs/infrastructure/postgres/blogs.q
 import { BlogsCommandRepositorySql } from './blogs/infrastructure/postgres/blogs.command-repository';
 import { PostsCommandRepositorySql } from './posts/infrastructure/postgres/posts.command-repository';
 import { PostsQueryRepositorySql } from './posts/infrastructure/postgres/posts.query-repository';
+import { CommentsCommandRepositorySql } from './comments/infrastructure/postgres/comments.command-repository';
+import { CommentsQueryRepositorySql } from './comments/infrastructure/postgres/comments.query-repository';
 
 const useCases: Array<any> = [
   CreateCommentByPostIdUseCase,
@@ -73,6 +75,7 @@ const useCases: Array<any> = [
     PostsQueryRepository,
     CommentsService,
     CommentsRepository,
+    CommentsCommandRepositorySql,
     LikesRepository,
     PostsLikesRepository,
     PostsLikesQueryRepository,
@@ -80,6 +83,7 @@ const useCases: Array<any> = [
     PostsQueryRepositorySql,
     BlogsCommandRepositorySql,
     CommentsQueryRepository,
+    CommentsQueryRepositorySql,
     ...useCases,
   ],
   exports: [MongooseModule, BlogsQueryRepository],

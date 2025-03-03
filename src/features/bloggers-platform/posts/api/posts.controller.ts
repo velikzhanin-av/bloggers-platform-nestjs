@@ -36,6 +36,7 @@ import { CommentsQueryRepository } from '../../comments/infrastructure/comments-
 import { OptionalJwtAuthGuard } from '../../../../core/guards/optional-jwt-auth.guard';
 import { BearerAuthGuard } from '../../../../core/guards/custom/bearer-auth.guard';
 import { PostsQueryRepositorySql } from '../infrastructure/postgres/posts.query-repository';
+import { CommentsQueryRepositorySql } from '../../comments/infrastructure/postgres/comments.query-repository';
 
 @Controller()
 export class PostsController {
@@ -47,6 +48,7 @@ export class PostsController {
     private blogsQueryRepository: BlogsQueryRepository,
     private readonly commandBus: CommandBus,
     private readonly commentsQueryRepository: CommentsQueryRepository,
+    private readonly commentsQueryRepositorySql: CommentsQueryRepositorySql,
   ) {}
 
   @Get('posts')
@@ -109,19 +111,25 @@ export class PostsController {
     return post;
   }
 
-  @Post(':postId/comments')
+  @Post('posts/:postId/comments')
   @UseGuards(BearerAuthGuard)
   async createComment(
     @Param('postId') postId: string,
     @Body() body: CreateCommentInputDto,
     @ExtractUserFromRequest() user: UserContext,
-  ): Promise<CommentViewDto> {
+  ): Promise<any> {
     const post: PostViewDto | null =
-      await this.postsQueryRepository.getByIdOrNotFoundFail(postId);
+      await this.postsQueryRepositorySql.getByIdOrNotFoundFail(postId);
     if (!post) throw new NotFoundException('post not found');
 
     const dto = { ...body, postId, userId: user.userId };
-    return await this.commandBus.execute(new CreateCommentByPostIdCommand(dto));
+    const commentId: string = await this.commandBus.execute(
+      new CreateCommentByPostIdCommand(dto),
+    );
+    const comment =
+      await this.commentsQueryRepositorySql.getCommentById(commentId);
+    if (!comment) throw new NotFoundException('comment not found');
+    return comment;
   }
 
   @Get('posts/:postId/comments')

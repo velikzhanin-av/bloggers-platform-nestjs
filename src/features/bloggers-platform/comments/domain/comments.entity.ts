@@ -44,18 +44,18 @@ export class Comment {
   @Prop({ enum: DeletionStatus, default: DeletionStatus.NotDeleted })
   deletionStatus: DeletionStatus;
 
-  static createInstance(dto: CreateCommentDto): CommentDocument {
-    const comment = new this();
-    comment.content = dto.content;
-    comment.postId = dto.postId;
-    comment.commentatorInfo = {
-      userId: dto.commentatorInfo.userId,
-      userLogin: dto.commentatorInfo.userLogin,
-    };
-    comment.likesInfo = { likesCount: 0, dislikesCount: 0 };
-
-    return comment as CommentDocument;
-  }
+  // static createInstance(dto: CreateCommentDto): CommentDocument {
+  //   const comment = new this();
+  //   comment.content = dto.content;
+  //   comment.postId = dto.postId;
+  //   comment.commentatorInfo = {
+  //     userId: dto.commentatorInfo.userId,
+  //     userLogin: dto.commentatorInfo.userLogin,
+  //   };
+  //   comment.likesInfo = { likesCount: 0, dislikesCount: 0 };
+  //
+  //   return comment as CommentDocument;
+  // }
 
   makeDeleted() {
     this.deletionStatus = DeletionStatus.PermanentDeleted;

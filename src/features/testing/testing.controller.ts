@@ -68,7 +68,11 @@ export class TestingController {
        SET "deletionStatus" = $1;`,
       [DeletionStatus.PermanentDeleted],
     );
-    await this.CommentModel.deleteMany({});
+    await this.dataSource.query(
+      `UPDATE comment
+       SET "deletionStatus" = $1;`,
+      [DeletionStatus.PermanentDeleted],
+    );
     await this.CommentLikeModel.deleteMany({});
     await this.PostLikeModel.deleteMany({});
   }
