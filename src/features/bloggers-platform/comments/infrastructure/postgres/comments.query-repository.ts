@@ -1,14 +1,19 @@
 import { LikesRepository } from '../../../comments-likes/infrastructure/likes.repository';
-import { DeletionStatus } from '../../../../../core/utils/status-enam';
+import {
+  DeletionStatus,
+  LikeStatus,
+} from '../../../../../core/utils/status-enam';
 import { DataSource } from 'typeorm';
 import { Injectable } from '@nestjs/common';
+import { CommentViewDto } from '../../api/output-dto/comment.view-dto';
 
 @Injectable()
 export class CommentsQueryRepositorySql {
   constructor(
     private readonly dataSource: DataSource,
     private readonly commentLikeRepository: LikesRepository,
-  ) {}
+  ) {
+  }
 
   // async getCommentsByPostId(
   //   @Query() query: GetPostsQueryParams,
@@ -52,16 +57,26 @@ export class CommentsQueryRepositorySql {
 
   async getCommentById(commentId: string): Promise<any | null> {
     const comment = await this.dataSource.query(
-      `SELECT c.id, c.content, c."postId", c."userId", c."createdAt", u.login
+      `SELECT c.id, c.content, c."postId", c."userId", c."createdAt", u.login as "userLogin"
        FROM comment c
-       INNER JOIN users u
-       ON c."userId" = u."userId"
+                LEFT JOIN users u
+                          ON c."userId" = u."userId"
        WHERE c."deletionStatus" != $1
          AND c.id = $2`,
       [DeletionStatus.PermanentDeleted, commentId],
     );
-    return comment[0] ?? null;
-  }
+    if (!comment[0]) return null;
 
-  map
+    const commentLikes = await this.dataSource.query(
+      `SELECT *
+       FROM "like" l
+                LEFT JOIN users u
+                          ON l."userId" = u."userId"
+       WHERE l."deletionStatus" != $1
+         AND l."likedEntityId" = $2`,
+      [DeletionStatus.PermanentDeleted, commentId],
+    );
+
+    return CommentViewDto.commentMapToViewNew(comment[0], LikeStatus.None);
+  }
 }

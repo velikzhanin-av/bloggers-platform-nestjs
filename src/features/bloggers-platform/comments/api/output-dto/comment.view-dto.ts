@@ -21,16 +21,37 @@ export class CommentViewDto {
   ): CommentViewDto {
     const dto = new CommentViewDto();
 
-    (dto.id = comment._id.toString()),
-      (dto.content = comment.content),
-      (dto.commentatorInfo = {
+    dto.id = comment._id.toString(),
+      dto.content = comment.content,
+      dto.commentatorInfo = {
         userId: comment.commentatorInfo.userId,
         userLogin: comment.commentatorInfo.userLogin,
-      });
+      };
     dto.createdAt = comment.createdAt;
     dto.likesInfo = {
       likesCount: comment.likesInfo.likesCount,
       dislikesCount: comment.likesInfo.dislikesCount,
+      myStatus: likeStatus,
+    };
+    return dto;
+  }
+
+  static commentMapToViewNew(
+    comment: any,
+    likeStatus: LikeStatus,
+  ): CommentViewDto {
+    const dto = new CommentViewDto();
+
+    dto.id = comment.id,
+      dto.content = comment.content,
+      dto.commentatorInfo = {
+        userId: comment.userId,
+        userLogin: comment.userLogin,
+      };
+    dto.createdAt = comment.createdAt;
+    dto.likesInfo = {
+      likesCount: 0,
+      dislikesCount: 0,
       myStatus: likeStatus,
     };
     return dto;
