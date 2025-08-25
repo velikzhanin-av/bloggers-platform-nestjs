@@ -140,11 +140,11 @@ export class PostsController {
     @GetUser() user: UserContext,
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
     const post: PostViewDto | null =
-      await this.postsQueryRepository.getByIdOrNotFoundFail(postId);
+      await this.postsQueryRepositorySql.getByIdOrNotFoundFail(postId);
     if (!post) throw new NotFoundException('post not found');
 
     const userId: string | null = user ? user.userId : null;
-    return await this.commentsQueryRepository.getCommentsByPostId(
+    return await this.commentsQueryRepositorySql.getCommentsByPostId(
       query,
       postId,
       userId,

@@ -79,7 +79,7 @@ export class CommentsController {
 
   @Get(':id')
   @UseGuards(OptionalJwtAuthGuard)
-  async getCommentsByPostId(
+  async getCommentsById(
     @GetUser() user: UserContext,
     @Param('id') commentId: string,
   ): Promise<CommentViewDto> {
