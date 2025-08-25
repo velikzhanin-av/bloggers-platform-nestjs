@@ -70,4 +70,14 @@ export class CoreConfig {
     message: 'Set Env variable GMAIL_PASS, dangerous for security!',
   })
   mailPassword: string = this.configService.get<string>('GMAIL_PASS');
+
+  @IsNotEmpty({
+    message: 'Set Env variable DB_USERNAME',
+  })
+  dbUsername: string = this.configService.get<string>('DB_USERNAME');
+
+  @IsNotEmpty({
+    message: 'Set Env variable DB_PASSWORD',
+  })
+  dbPassword: string = this.configService.get<string>('DB_PASSWORD');
 }

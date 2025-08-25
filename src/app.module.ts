@@ -21,9 +21,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     MongooseModule.forRootAsync({
       useFactory: (coreConfig: CoreConfig) => {
         const uri: string = coreConfig.dbURI;
-        console.log(`BD_URI: uri`);
+        console.log(`BD_URI: ${uri}`);
         return {
           uri: uri,
+          user: coreConfig.dbUsername, // 👈 имя пользователя
+          pass: coreConfig.dbPassword, // 👈 пароль
+          authSource: 'admin',
         };
       },
       inject: [CoreConfig],

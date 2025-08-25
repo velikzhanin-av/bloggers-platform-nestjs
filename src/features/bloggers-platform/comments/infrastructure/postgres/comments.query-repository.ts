@@ -12,8 +12,7 @@ export class CommentsQueryRepositorySql {
   constructor(
     private readonly dataSource: DataSource,
     private readonly commentLikeRepository: LikesRepository,
-  ) {
-  }
+  ) {}
 
   // async getCommentsByPostId(
   //   @Query() query: GetPostsQueryParams,

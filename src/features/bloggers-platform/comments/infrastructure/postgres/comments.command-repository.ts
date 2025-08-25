@@ -1,5 +1,4 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { InjectModel } from '@nestjs/mongoose';
 import {
   Comment,
   CommentDocument,
@@ -25,15 +24,27 @@ export class CommentsCommandRepositorySql {
     return commentId[0].id;
   }
 
-  // async findCommentById(commentId: string): Promise<CommentDocument> {
-  //   const comment: CommentDocument | null = await this.CommentModel.findOne({
-  //     _id: commentId,
-  //     deletionStatus: { $ne: DeletionStatus.PermanentDeleted },
-  //   });
-  //   if (!comment)
-  //     throw new NotFoundException(`Comment with id ${commentId} not found`);
-  //   return comment;
-  // }
+  async findCommentById(commentId: string): Promise<CommentDocument> {
+    const comment = await this.dataSource.query(
+      `
+        SELECT
+          c.*,
+          u.login as "userLogin",
+          u."userId"
+        FROM comment as c
+               LEFT JOIN "users" as u ON c."userId" = u."userId"
+        WHERE 
+          c."deletionStatus" != $1 
+          AND
+          c.id = $2
+      `,
+      [DeletionStatus.PermanentDeleted, commentId],
+    );
+
+    if (!comment)
+      throw new NotFoundException(`Comment with id ${commentId} not found`);
+    return comment;
+  }
 
   // const items: [] = await Promise.all(
   //   comments.map(async (comment: CommentDocument) => {

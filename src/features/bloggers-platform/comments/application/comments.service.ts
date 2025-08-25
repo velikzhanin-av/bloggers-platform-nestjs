@@ -9,18 +9,20 @@ import { CommentLikeDocument } from '../../comments-likes/domain/comment-like.en
 import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { FilterQuery } from 'mongoose';
 import { Post } from '../../posts/domain/posts.entity';
+import { CommentsCommandRepositorySql } from '../infrastructure/postgres/comments.command-repository';
 
 @Injectable()
 export class CommentsService {
   constructor(
     private readonly commentsRepository: CommentsRepository,
+    private readonly commentsCommandRepositorySql: CommentsCommandRepositorySql,
     private readonly likesRepository: LikesRepository,
   ) {}
 
   async getCommentById(dto: GetCommentById): Promise<CommentViewDto> {
     const { commentId, userId } = dto;
     const comment: CommentDocument =
-      await this.commentsRepository.findCommentById(commentId);
+      await this.commentsCommandRepositorySql.findCommentById(commentId);
 
     let result: CommentViewDto = this.mapToUserViewComment(
       comment,
@@ -37,22 +39,19 @@ export class CommentsService {
     return result;
   }
 
-  mapToUserViewComment(
-    comment: CommentDocument,
-    likeStatus: LikeStatus,
-  ): CommentViewDto {
+  mapToUserViewComment(comment: any, likeStatus: LikeStatus): CommentViewDto {
     //
     return {
       id: comment._id?.toString(),
       content: comment.content,
       commentatorInfo: {
-        userId: comment.commentatorInfo.userId,
-        userLogin: comment.commentatorInfo.userLogin,
+        userId: comment.userId,
+        userLogin: comment.userLogin,
       },
       createdAt: comment.createdAt,
       likesInfo: {
-        likesCount: comment.likesInfo.likesCount,
-        dislikesCount: comment.likesInfo.dislikesCount,
+        likesCount: 0,
+        dislikesCount: 0,
         myStatus: likeStatus,
       },
     };
