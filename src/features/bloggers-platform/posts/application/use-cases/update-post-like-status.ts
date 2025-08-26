@@ -13,6 +13,11 @@ import {
 import { PostDocument } from '../../domain/posts.entity';
 import { PostsLikesRepository } from '../../../posts-likes/infrastructure/posts-likes.repository';
 import { CreateLikeDto } from '../../../posts-likes/dto/create-like.dto';
+import { PostsCommandRepositorySql } from '../../infrastructure/postgres/posts.command-repository';
+import { LikesCommandRepositorySql } from '../../../comments-likes/infrastructure/postgres/likes.command-repository';
+import {
+  LikesPostsCommandRepository
+} from '../../../posts-likes/infrastructure/postgres/likes-posts.command-repository';
 
 export class UpdatePostLikeStatusCommand {
   constructor(
@@ -24,21 +29,31 @@ export class UpdatePostLikeStatusCommand {
 export class UpdatePostLikeStatusUseCase implements ICommandHandler {
   constructor(
     private readonly postsRepository: PostsRepository,
-    private readonly UsersCommandRepository: UsersCommandRepository,
+    private readonly usersCommandRepository: UsersCommandRepository,
     private readonly postsLikesRepository: PostsLikesRepository,
+    private readonly likesCommandRepositorySql: LikesCommandRepositorySql,
+    private readonly likesPostsCommandRepository: LikesPostsCommandRepository,
+    private readonly postsCommandRepositorySql: PostsCommandRepositorySql,
     @InjectModel(PostLike.name)
     private readonly LikeModel: PostLikeModelType,
   ) {}
 
   async execute({ dto }: UpdatePostLikeStatusCommand): Promise<void> {
     const { postId, userId, likeStatus } = dto;
-    const post: PostDocument = await this.postsRepository.findPostById(postId);
-    const user: UserDocument | null =
-      await this.UsersCommandRepository.findOrNotFoundFail(userId);
+    const post: PostDocument =
+      await this.postsCommandRepositorySql.findPostById(postId);
 
-    const findLike: PostLikeDocument | null =
-      await this.postsLikesRepository.findLikeByPostAndUser(postId, userId);
-    if (!findLike) {
+    const user: UserDocument | null =
+      await this.usersCommandRepository.findOrNotFoundFail(userId);
+
+    const like: PostLikeDocument | null =
+      await this.likesPostsCommandRepository.findLikeByPostAndUser(
+        postId,
+        userId,
+      );
+
+    // TODO нужно переделать обработку лайков на постгрес
+    if (!like) {
       if (likeStatus === LikeStatus.Like) post.increaseLike();
       else if (likeStatus === LikeStatus.Dislike) post.increaseDislike();
       await this.postsRepository.save(post);
@@ -53,8 +68,8 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler {
         this.LikeModel.createInstance(newLike);
       await this.postsLikesRepository.save(createLike);
     } else {
-      if (findLike.status !== likeStatus) {
-        switch (findLike.status) {
+      if (like.status !== likeStatus) {
+        switch (like.status) {
           case LikeStatus.Like:
             switch (likeStatus) {
               case LikeStatus.Dislike:
@@ -95,8 +110,8 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler {
 
         await this.postsRepository.save(post);
 
-        findLike.updateLikeStatus(likeStatus);
-        await this.postsLikesRepository.save(findLike);
+        like.updateLikeStatus(likeStatus);
+        await this.postsLikesRepository.save(like);
       }
     }
   }

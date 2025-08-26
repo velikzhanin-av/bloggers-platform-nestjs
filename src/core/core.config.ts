@@ -80,4 +80,10 @@ export class CoreConfig {
     message: 'Set Env variable DB_PASSWORD',
   })
   dbPassword: string = this.configService.get<string>('DB_PASSWORD');
+
+  @IsNotEmpty({
+    message: 'Set Env variable POSTGRES_DATABASE',
+  })
+  postgresDatabase: string =
+    this.configService.get<string>('POSTGRES_DATABASE');
 }

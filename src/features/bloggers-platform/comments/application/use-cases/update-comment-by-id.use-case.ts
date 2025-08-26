@@ -3,6 +3,7 @@ import { CommentDocument } from '../../domain/comments.entity';
 import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { ForbiddenException } from '@nestjs/common';
 import { UpdateCommentDto } from '../../dto/update-comment.dto';
+import { CommentsCommandRepositorySql } from '../../infrastructure/postgres/comments.command-repository';
 
 export class UpdateCommentByIdCommand {
   constructor(public dto: UpdateCommentDto) {}
@@ -10,15 +11,19 @@ export class UpdateCommentByIdCommand {
 
 @CommandHandler(UpdateCommentByIdCommand)
 export class UpdateCommentByPostIdUseCase implements ICommandHandler {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(
+    private readonly commentsCommandRepositorySql: CommentsCommandRepositorySql,
+  ) {}
 
   async execute({ dto }: UpdateCommentByIdCommand): Promise<void> {
-    const comment: CommentDocument =
-      await this.commentsRepository.findCommentById(dto.commentId);
-    if (comment.commentatorInfo.userId !== dto.userId)
+    const comment: Array<any> =
+      await this.commentsCommandRepositorySql.findCommentById(dto.commentId);
+    if (comment.length && comment[0].userId !== dto.userId)
       throw new ForbiddenException();
 
-    comment.updateContent(dto.content);
-    await this.commentsRepository.save(comment);
+    await this.commentsCommandRepositorySql.updateComment(
+      dto.commentId,
+      dto.content,
+    );
   }
 }

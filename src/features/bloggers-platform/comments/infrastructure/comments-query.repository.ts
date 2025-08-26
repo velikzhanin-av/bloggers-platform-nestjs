@@ -11,12 +11,14 @@ import { CommentViewDto } from '../api/output-dto/comment.view-dto';
 import { CommentLikeDocument } from '../../comments-likes/domain/comment-like.entity';
 import { LikesRepository } from '../../comments-likes/infrastructure/likes.repository';
 import { PaginatedViewDto } from '../../../../core/dto/base.paginated.view-dto';
+import { LikesCommandRepositorySql } from '../../comments-likes/infrastructure/postgres/likes.command-repository';
 
 export class CommentsQueryRepository {
   constructor(
     @InjectModel(Comment.name)
     private readonly CommentModel: CommentModelType,
     private readonly commentLikeRepository: LikesRepository,
+    private readonly likesCommandRepositorySql: LikesCommandRepositorySql,
   ) {}
 
   async getCommentsByPostId(
@@ -41,9 +43,9 @@ export class CommentsQueryRepository {
         if (!userId)
           return CommentViewDto.commentMapToView(comment, LikeStatus.None);
         const like: CommentLikeDocument | null =
-          await this.commentLikeRepository.findLikeByCommentAndUser(
+          await this.likesCommandRepositorySql.findLikeByCommentAndUser(
             userId,
-            comment.id.toString(),
+            comment.id,
           );
         if (!like)
           return CommentViewDto.commentMapToView(comment, LikeStatus.None);

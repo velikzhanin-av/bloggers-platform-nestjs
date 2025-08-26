@@ -9,7 +9,6 @@ import { CommentViewDto } from '../../api/output-dto/comment.view-dto';
 import { GetPostsQueryParams } from '../../../posts/api/input-dto/get-posts-query-params.input-dto';
 import { PaginatedViewDto } from '../../../../../core/dto/base.paginated.view-dto';
 import { CommentDocument } from '../../domain/comments.entity';
-import { CommentLikeDocument } from '../../../comments-likes/domain/comment-like.entity';
 
 @Injectable()
 export class CommentsQueryRepositorySql {
@@ -19,7 +18,6 @@ export class CommentsQueryRepositorySql {
     private readonly commentLikeRepository: LikesRepository,
   ) {}
 
-  // TODO hразобраться, падает при не пустых комментариях, при лимит и офсет не находит комменты
   async getCommentsByPostId(
     @Query() query: GetPostsQueryParams,
     postId: string,
@@ -27,16 +25,22 @@ export class CommentsQueryRepositorySql {
   ): Promise<PaginatedViewDto<CommentViewDto[]>> {
     const comments: any[] = await this.dataSource.query(
       `
-        SELECT *
-        FROM comment as c
-        WHERE c."deletionStatus" = $1
+        SELECT 
+          c.*,
+          u.login AS "userLogin"
+        FROM 
+          comment AS c
+        LEFT JOIN 
+            users AS u ON c."userId" = u."userId"
+        WHERE c."deletionStatus" != $1
           AND c."postId" = $2
+        ORDER BY "${query.sortBy}" ${query.sortDirection}
         LIMIT $3 OFFSET $4`,
       [
         DeletionStatus.PermanentDeleted,
         postId,
-        query.pageNumber,
         query.pageSize,
+        query.calculateSkip(),
       ],
     );
 
@@ -54,11 +58,10 @@ export class CommentsQueryRepositorySql {
       comments.map(async (comment: CommentDocument) => {
         if (!userId)
           return CommentViewDto.commentMapToView(comment, LikeStatus.None);
-        const like: CommentLikeDocument | null =
-          await this.commentLikeRepository.findLikeByCommentAndUser(
-            userId,
-            comment.id.toString(),
-          );
+        const like = await this.commentLikeRepository.findLikeByCommentAndUser(
+          userId,
+          comment.id,
+        );
         if (!like)
           return CommentViewDto.commentMapToView(comment, LikeStatus.None);
         return CommentViewDto.commentMapToView(comment, like.status);
@@ -87,11 +90,11 @@ export class CommentsQueryRepositorySql {
 
     const commentLikes = await this.dataSource.query(
       `SELECT *
-       FROM "like" l
+       FROM like_comment l
               LEFT JOIN users u
                         ON l."userId" = u."userId"
        WHERE l."deletionStatus" != $1
-         AND l."likedEntityId" = $2`,
+         AND l."commentId" = $2`,
       [DeletionStatus.PermanentDeleted, commentId],
     );
 

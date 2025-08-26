@@ -3,6 +3,7 @@ import { CommentDocument } from '../../domain/comments.entity';
 import { DeletionStatus } from '../../../../../core/utils/status-enam';
 import { DataSource } from 'typeorm';
 import { CreateCommentDto } from '../../dto/create-comment.dto';
+import { CreateBlogInputDto } from '../../../blogs/api/input-dto/blogs.input-dto';
 
 @Injectable()
 export class CommentsCommandRepositorySql {
@@ -19,8 +20,29 @@ export class CommentsCommandRepositorySql {
     return commentId[0].id;
   }
 
-  async findCommentById(commentId: string): Promise<CommentDocument> {
-    const comment = await this.dataSource.query(
+  async deleteComment(commentId: string): Promise<void> {
+    await this.dataSource.query(
+      `
+          UPDATE comment
+          SET "deletionStatus" = $2
+          WHERE id = $1;`,
+      [commentId, DeletionStatus.PermanentDeleted],
+    );
+  }
+
+  async updateComment(commentId: string, content: string): Promise<void> {
+    await this.dataSource.query(
+      `
+        UPDATE comment
+        SET content = $1
+            WHERE id = $2
+              AND "deletionStatus" != $3;`,
+      [content, commentId, DeletionStatus.PermanentDeleted],
+    );
+  }
+
+  async findCommentById(commentId: string): Promise<Array<any>> {
+    const comment: Array<any> = await this.dataSource.query(
       `
         SELECT c.*,
                u.login as "userLogin",
@@ -33,8 +55,10 @@ export class CommentsCommandRepositorySql {
       [DeletionStatus.PermanentDeleted, commentId],
     );
 
-    if (!comment)
+    if (!comment.length) {
       throw new NotFoundException(`Comment with id ${commentId} not found`);
+    }
+
     return comment;
   }
 

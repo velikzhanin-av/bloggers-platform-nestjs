@@ -31,15 +31,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       },
       inject: [CoreConfig],
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'ubuntu',
-      password: 'ubuntu_password',
-      database: 'bloggers_platform',
-      autoLoadEntities: false,
-      synchronize: false,
+    TypeOrmModule.forRootAsync({
+      useFactory: (coreConfig: CoreConfig) => {
+        console.log(`Postgres database: ${coreConfig.postgresDatabase}`);
+        return {
+          type: 'postgres',
+          host: 'localhost',
+          username: coreConfig.dbUsername,
+          password: coreConfig.dbPassword,
+          database: coreConfig.postgresDatabase,
+        };
+      },
+      inject: [CoreConfig],
     }),
     CoreModule,
     TestingModule,

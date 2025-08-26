@@ -13,6 +13,7 @@ import {
   CommentLikeModelType,
 } from '../../../comments-likes/domain/comment-like.entity';
 import { CreateLikeDto } from '../../../comments-likes/dto/create.like.dto';
+import { LikesCommandRepositorySql } from '../../../comments-likes/infrastructure/postgres/likes.command-repository';
 
 export class UpdateLikeStatusCommand {
   constructor(
@@ -25,6 +26,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
   constructor(
     private readonly commentsRepository: CommentsRepository,
     private readonly likesRepository: LikesRepository,
+    private readonly likesCommandRepositorySql: LikesCommandRepositorySql,
     private readonly UsersCommandRepository: UsersCommandRepository,
     @InjectModel(CommentLike.name)
     private readonly LikeModel: CommentLikeModelType,
@@ -38,7 +40,7 @@ export class UpdateLikeStatusUseCase implements ICommandHandler {
       await this.UsersCommandRepository.findOrNotFoundFail(userId);
 
     const findLike: CommentLikeDocument | null =
-      await this.likesRepository.findLikeByCommentAndUser(userId, commentId);
+      await this.likesCommandRepositorySql.findLikeByCommentAndUser(userId, commentId);
     if (!findLike) {
       if (likeStatus === LikeStatus.Like) comment.increaseLike();
       else if (likeStatus === LikeStatus.Dislike) comment.increaseDislike();

@@ -1,8 +1,7 @@
 import { DeleteCommentDto } from '../../dto/delete-comment.dto';
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
-import { CommentDocument } from '../../domain/comments.entity';
-import { CommentsRepository } from '../../infrastructure/comments.repository';
 import { ForbiddenException } from '@nestjs/common';
+import { CommentsCommandRepositorySql } from '../../infrastructure/postgres/comments.command-repository';
 
 export class DeleteCommentByIdCommand {
   constructor(public dto: DeleteCommentDto) {}
@@ -10,15 +9,15 @@ export class DeleteCommentByIdCommand {
 
 @CommandHandler(DeleteCommentByIdCommand)
 export class DeleteCommentByPostIdUseCase implements ICommandHandler {
-  constructor(private readonly commentsRepository: CommentsRepository) {}
+  constructor(
+    private readonly commentsCommandRepositorySql: CommentsCommandRepositorySql,
+  ) {}
 
   async execute({ dto }: DeleteCommentByIdCommand): Promise<void> {
-    const comment: CommentDocument =
-      await this.commentsRepository.findCommentById(dto.commentId);
-    if (comment.commentatorInfo.userId !== dto.userId)
+    const comment: Array<any> =
+      await this.commentsCommandRepositorySql.findCommentById(dto.commentId);
+    if (comment.length && comment[0].userId !== dto.userId)
       throw new ForbiddenException();
-
-    comment.makeDeleted();
-    await this.commentsRepository.save(comment);
+    await this.commentsCommandRepositorySql.deleteComment(dto.commentId);
   }
 }

@@ -2,8 +2,10 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 17.2 (Debian 17.2-1.pgdg120+1)
--- Dumped by pg_dump version 17.2 (Debian 17.2-1.pgdg120+1)
+\restrict P6IdiinxwIfP5tF1wZSd0zkgl8c4fe055pZ8fLVbETDjK6i5CCyhASkzaHkzlsE
+
+-- Dumped from database version 17.6 (Debian 17.6-1.pgdg13+1)
+-- Dumped by pg_dump version 17.6 (Debian 17.6-1.pgdg13+1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -26,13 +28,13 @@ SET default_table_access_method = heap;
 --
 
 CREATE TABLE public.blogs (
-    id character varying NOT NULL COLLATE pg_catalog."C",
-    name character varying NOT NULL COLLATE pg_catalog."C",
-    description character varying NOT NULL COLLATE pg_catalog."C",
-    "websiteUrl" character varying NOT NULL COLLATE pg_catalog."C",
-    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "isMembership" boolean NOT NULL,
-    "deletionStatus" character varying DEFAULT 'not-deleted'::character varying NOT NULL
+                              id character varying NOT NULL COLLATE pg_catalog."C",
+                              name character varying NOT NULL COLLATE pg_catalog."C",
+                              description character varying NOT NULL COLLATE pg_catalog."C",
+                              "websiteUrl" character varying NOT NULL COLLATE pg_catalog."C",
+                              "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                              "isMembership" boolean NOT NULL,
+                              "deletionStatus" character varying DEFAULT 'not-deleted'::character varying NOT NULL
 );
 
 
@@ -43,30 +45,60 @@ ALTER TABLE public.blogs OWNER TO ubuntu;
 --
 
 CREATE TABLE public.comment (
-    id character varying NOT NULL,
-    content text NOT NULL,
-    "postId" character varying,
-    "userId" character varying,
-    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    "deletionStatus" character varying DEFAULT 'not-deleted'::character varying
+                                id character varying NOT NULL,
+                                content text NOT NULL,
+                                "postId" character varying,
+                                "userId" character varying,
+                                "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+                                "deletionStatus" character varying DEFAULT 'not-deleted'::character varying
 );
 
 
 ALTER TABLE public.comment OWNER TO ubuntu;
 
 --
+-- Name: like_comment; Type: TABLE; Schema: public; Owner: ubuntu
+--
+
+CREATE TABLE public.like_comment (
+                                     id character varying NOT NULL,
+                                     "userId" character varying,
+                                     status character varying DEFAULT 'None'::character varying,
+                                     "deletionStatus" character varying DEFAULT 'not-deleted'::character varying,
+                                     "commentId" character varying,
+                                     "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP
+);
+
+
+ALTER TABLE public.like_comment OWNER TO ubuntu;
+
+--
+-- Name: like_post; Type: TABLE; Schema: public; Owner: ubuntu
+--
+
+CREATE TABLE public.like_post (
+                                  id character varying NOT NULL,
+                                  "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                                  "likeStatus" character varying DEFAULT 'None'::character varying NOT NULL,
+                                  "deletionStatus" character varying DEFAULT 'not-deleted'::character varying NOT NULL
+);
+
+
+ALTER TABLE public.like_post OWNER TO ubuntu;
+
+--
 -- Name: posts; Type: TABLE; Schema: public; Owner: ubuntu
 --
 
 CREATE TABLE public.posts (
-    id character varying NOT NULL,
-    title character varying NOT NULL,
-    "shortDescription" character varying NOT NULL,
-    content text NOT NULL,
-    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
-    "blogId" character varying NOT NULL,
-    "blogName" character varying NOT NULL,
-    "deletionStatus" character varying DEFAULT 'not-deleted'::character varying NOT NULL
+                              id character varying NOT NULL,
+                              title character varying NOT NULL,
+                              "shortDescription" character varying NOT NULL,
+                              content text NOT NULL,
+                              "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                              "blogId" character varying NOT NULL,
+                              "blogName" character varying NOT NULL,
+                              "deletionStatus" character varying DEFAULT 'not-deleted'::character varying NOT NULL
 );
 
 
@@ -77,14 +109,14 @@ ALTER TABLE public.posts OWNER TO ubuntu;
 --
 
 CREATE TABLE public.session (
-    id character varying NOT NULL COLLATE pg_catalog."C",
-    "deviceId" character varying NOT NULL COLLATE pg_catalog."C",
-    "userId" character varying NOT NULL COLLATE pg_catalog."C",
-    iat timestamp with time zone NOT NULL,
-    exp timestamp with time zone NOT NULL,
-    ip character varying NOT NULL COLLATE pg_catalog."C",
-    "deviceName" character varying NOT NULL COLLATE pg_catalog."C",
-    "deletionStatus" character varying DEFAULT 'not-deleted'::character varying
+                                id character varying NOT NULL COLLATE pg_catalog."C",
+                                "deviceId" character varying NOT NULL COLLATE pg_catalog."C",
+                                "userId" character varying NOT NULL COLLATE pg_catalog."C",
+                                iat timestamp with time zone NOT NULL,
+                                exp timestamp with time zone NOT NULL,
+                                ip character varying NOT NULL COLLATE pg_catalog."C",
+                                "deviceName" character varying NOT NULL COLLATE pg_catalog."C",
+                                "deletionStatus" character varying DEFAULT 'not-deleted'::character varying
 );
 
 
@@ -95,15 +127,15 @@ ALTER TABLE public.session OWNER TO ubuntu;
 --
 
 CREATE TABLE public.users (
-    "userId" character varying NOT NULL COLLATE pg_catalog."C",
-    login character varying COLLATE pg_catalog."C",
-    email character varying COLLATE pg_catalog."C",
-    "deletionStatus" character varying DEFAULT 'not-deleted'::character varying COLLATE pg_catalog."C",
-    "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    "passwordHash" character varying COLLATE pg_catalog."C",
-    "emailConfirmationCode" character varying,
-    "emailExpirationDate" timestamp with time zone,
-    "isConfirmed" boolean DEFAULT false
+                              "userId" character varying NOT NULL COLLATE pg_catalog."C",
+                              login character varying COLLATE pg_catalog."C",
+                              email character varying COLLATE pg_catalog."C",
+                              "deletionStatus" character varying DEFAULT 'not-deleted'::character varying COLLATE pg_catalog."C",
+                              "createdAt" timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+                              "passwordHash" character varying COLLATE pg_catalog."C",
+                              "emailConfirmationCode" character varying,
+                              "emailExpirationDate" timestamp with time zone,
+                              "isConfirmed" boolean DEFAULT false
 );
 
 
@@ -123,6 +155,22 @@ ALTER TABLE ONLY public.blogs
 
 ALTER TABLE ONLY public.comment
     ADD CONSTRAINT comment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: like_comment like_comment_pkey; Type: CONSTRAINT; Schema: public; Owner: ubuntu
+--
+
+ALTER TABLE ONLY public.like_comment
+    ADD CONSTRAINT like_comment_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: like_post like_post_pkey; Type: CONSTRAINT; Schema: public; Owner: ubuntu
+--
+
+ALTER TABLE ONLY public.like_post
+    ADD CONSTRAINT like_post_pkey PRIMARY KEY (id);
 
 
 --
@@ -166,6 +214,22 @@ ALTER TABLE ONLY public.comment
 
 
 --
+-- Name: like_comment like_comment_commentId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ubuntu
+--
+
+ALTER TABLE ONLY public.like_comment
+    ADD CONSTRAINT "like_comment_commentId_fkey" FOREIGN KEY ("commentId") REFERENCES public.comment(id) NOT VALID;
+
+
+--
+-- Name: like_comment like_comment_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ubuntu
+--
+
+ALTER TABLE ONLY public.like_comment
+    ADD CONSTRAINT "like_comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES public.users("userId") NOT VALID;
+
+
+--
 -- Name: session session_userId_fkey; Type: FK CONSTRAINT; Schema: public; Owner: ubuntu
 --
 
@@ -176,3 +240,5 @@ ALTER TABLE ONLY public.session
 --
 -- PostgreSQL database dump complete
 --
+
+\unrestrict P6IdiinxwIfP5tF1wZSd0zkgl8c4fe055pZ8fLVbETDjK6i5CCyhASkzaHkzlsE

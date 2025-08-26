@@ -10,6 +10,7 @@ import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-p
 import { FilterQuery } from 'mongoose';
 import { Post } from '../../posts/domain/posts.entity';
 import { CommentsCommandRepositorySql } from '../infrastructure/postgres/comments.command-repository';
+import { LikesCommandRepositorySql } from '../../comments-likes/infrastructure/postgres/likes.command-repository';
 
 @Injectable()
 export class CommentsService {
@@ -17,32 +18,36 @@ export class CommentsService {
     private readonly commentsRepository: CommentsRepository,
     private readonly commentsCommandRepositorySql: CommentsCommandRepositorySql,
     private readonly likesRepository: LikesRepository,
+    private readonly likesCommandRepositorySql: LikesCommandRepositorySql,
   ) {}
 
   async getCommentById(dto: GetCommentById): Promise<CommentViewDto> {
     const { commentId, userId } = dto;
-    const comment: CommentDocument =
+    const comment: Array<any> =
       await this.commentsCommandRepositorySql.findCommentById(commentId);
 
     let result: CommentViewDto = this.mapToUserViewComment(
-      comment,
+      comment[0],
       LikeStatus.None,
     );
 
     if (!userId) return result;
 
-    const like: CommentLikeDocument | null =
-      await this.likesRepository.findLikeByCommentAndUser(userId, commentId);
-    if (!like) return result;
+    const like: Array<any> =
+      await this.likesCommandRepositorySql.findLikeByCommentAndUser(
+        userId,
+        commentId,
+      );
+    if (!like.length) return result;
 
-    result = this.mapToUserViewComment(comment, like.status);
+    result = this.mapToUserViewComment(comment, like[0].status);
     return result;
   }
 
   mapToUserViewComment(comment: any, likeStatus: LikeStatus): CommentViewDto {
     //
     return {
-      id: comment._id?.toString(),
+      id: comment.id,
       content: comment.content,
       commentatorInfo: {
         userId: comment.userId,
