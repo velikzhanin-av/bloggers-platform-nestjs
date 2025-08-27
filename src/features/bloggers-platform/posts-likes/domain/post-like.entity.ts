@@ -32,7 +32,6 @@ export class PostLike {
     const like = new this();
     like.postId = dto.postId;
     like.userId = dto.userId;
-    like.userLogin = dto.userLogin;
     like.status = dto.status;
 
     return like as PostLikeDocument;

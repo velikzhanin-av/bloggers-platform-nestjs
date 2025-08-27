@@ -14,7 +14,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
     ThrottlerModule.forRoot([
       {
         ttl: 100000000,
-        limit: 50,
+        limit: 150,
       },
     ]),
     BloggersPlatformModule,

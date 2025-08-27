@@ -3,25 +3,20 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { LikeStatus } from '../../../../../core/utils/status-enam';
 import { UserDocument } from '../../../../user-accounts/domain/users.entity';
 import { UsersCommandRepository } from '../../../../user-accounts/infrastructure/postgresql/users-command.repository';
-import { InjectModel } from '@nestjs/mongoose';
 import { PostsRepository } from '../../infrastructure/posts.repository';
-import {
-  PostLike,
-  PostLikeDocument,
-  PostLikeModelType,
-} from '../../../posts-likes/domain/post-like.entity';
+import { PostLikeDocument } from '../../../posts-likes/domain/post-like.entity';
 import { PostDocument } from '../../domain/posts.entity';
 import { PostsLikesRepository } from '../../../posts-likes/infrastructure/posts-likes.repository';
 import { CreateLikeDto } from '../../../posts-likes/dto/create-like.dto';
 import { PostsCommandRepositorySql } from '../../infrastructure/postgres/posts.command-repository';
-import { LikesCommandRepositorySql } from '../../../comments-likes/infrastructure/postgres/likes.command-repository';
-import {
-  LikesPostsCommandRepository
-} from '../../../posts-likes/infrastructure/postgres/likes-posts.command-repository';
+import { LikesCommentCommandRepositorySql } from '../../../comments-likes/infrastructure/postgres/likes.command-repository';
+import { LikesPostsCommandRepositorySql } from '../../../posts-likes/infrastructure/postgres/likes-posts.command-repository';
+import { randomUUID } from 'crypto';
+import { NotFoundException } from '@nestjs/common';
 
 export class UpdatePostLikeStatusCommand {
   constructor(
-    public dto: { postId: string; userId: string; likeStatus: LikeStatus },
+    public dto: { postId: string; userId: string; status: LikeStatus },
   ) {}
 }
 
@@ -31,88 +26,39 @@ export class UpdatePostLikeStatusUseCase implements ICommandHandler {
     private readonly postsRepository: PostsRepository,
     private readonly usersCommandRepository: UsersCommandRepository,
     private readonly postsLikesRepository: PostsLikesRepository,
-    private readonly likesCommandRepositorySql: LikesCommandRepositorySql,
-    private readonly likesPostsCommandRepository: LikesPostsCommandRepository,
+    private readonly likesCommentCommandRepositorySql: LikesCommentCommandRepositorySql,
+    private readonly likesPostsCommandRepositorySql: LikesPostsCommandRepositorySql,
     private readonly postsCommandRepositorySql: PostsCommandRepositorySql,
-    @InjectModel(PostLike.name)
-    private readonly LikeModel: PostLikeModelType,
   ) {}
 
   async execute({ dto }: UpdatePostLikeStatusCommand): Promise<void> {
-    const { postId, userId, likeStatus } = dto;
+    const { postId, userId, status } = dto;
     const post: PostDocument =
       await this.postsCommandRepositorySql.findPostById(postId);
+    if (!post) {
+      throw new NotFoundException('Post not found');
+    }
 
     const user: UserDocument | null =
       await this.usersCommandRepository.findOrNotFoundFail(userId);
 
     const like: PostLikeDocument | null =
-      await this.likesPostsCommandRepository.findLikeByPostAndUser(
+      await this.likesPostsCommandRepositorySql.findLikeByPostAndUser(
         postId,
         userId,
       );
 
-    // TODO нужно переделать обработку лайков на постгрес
     if (!like) {
-      if (likeStatus === LikeStatus.Like) post.increaseLike();
-      else if (likeStatus === LikeStatus.Dislike) post.increaseDislike();
-      await this.postsRepository.save(post);
-
+      const id: string = randomUUID();
       const newLike: CreateLikeDto = {
+        id,
         postId,
         userId,
-        userLogin: user!.login,
-        status: likeStatus,
+        status: status,
       };
-      const createLike: PostLikeDocument =
-        this.LikeModel.createInstance(newLike);
-      await this.postsLikesRepository.save(createLike);
+      await this.likesPostsCommandRepositorySql.createLike(newLike);
     } else {
-      if (like.status !== likeStatus) {
-        switch (like.status) {
-          case LikeStatus.Like:
-            switch (likeStatus) {
-              case LikeStatus.Dislike:
-                post.decreaseLike();
-                post.increaseDislike();
-                break;
-              case LikeStatus.None:
-                post.clearLikesCount();
-                post.clearDislikesCount();
-                break;
-            }
-            break;
-
-          case LikeStatus.Dislike:
-            switch (likeStatus) {
-              case LikeStatus.Like:
-                post.decreaseDislike();
-                post.increaseLike();
-                break;
-              case LikeStatus.None:
-                post.clearLikesCount();
-                post.clearDislikesCount();
-                break;
-            }
-            break;
-
-          case LikeStatus.None:
-            switch (likeStatus) {
-              case LikeStatus.Like:
-                post.increaseLike();
-                break;
-              case LikeStatus.Dislike:
-                post.increaseDislike();
-                break;
-            }
-            break;
-        }
-
-        await this.postsRepository.save(post);
-
-        like.updateLikeStatus(likeStatus);
-        await this.postsLikesRepository.save(like);
-      }
+      await this.likesPostsCommandRepositorySql.updateLike(dto);
     }
   }
 }

@@ -2,6 +2,8 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { DataSource } from 'typeorm';
 import { CreatePostDto, CreatePostWithIdDto } from '../../dto/create-post.dto';
 import { DeletionStatus } from '../../../../../core/utils/status-enam';
+import { NewestLikesDto } from '../../dto/newest-likes.dto';
+import { PostLikeDocument } from '../../../posts-likes/domain/post-like.entity';
 
 @Injectable()
 export class PostsCommandRepositorySql {
@@ -27,12 +29,45 @@ export class PostsCommandRepositorySql {
 
   async findPostById(postId: string): Promise<any> {
     const post = await this.dataSource.query(
-      `SELECT *
-       FROM posts
-       WHERE id = $1 AND "deletionStatus" != $2`,
+      `SELECT 
+                p.*,
+                l.status
+       FROM posts AS p
+              LEFT JOIN like_post AS l ON p.id = l."postId"
+       WHERE p.id = $1
+         AND p."deletionStatus" != $2`,
       [postId, DeletionStatus.PermanentDeleted],
     );
     return post[0] ?? null;
+  }
+
+  async findNewestLikes(postId: string): Promise<NewestLikesDto[]> {
+    const posts = await this.dataSource.query(
+      `
+      SELECT l."createdAt", 
+             u.login AS "userLogin",
+             u."userId"
+      FROM like_post AS l
+      LEFT JOIN users AS u ON u."userId" = l."userId"
+      WHERE l."postId" = $1 AND l.status = 'Like'
+      ORDER BY l."createdAt" DESC
+      LIMIT 3
+
+    `,
+      [postId],
+    );
+
+    return posts.map((like: PostLikeDocument): NewestLikesDto => {
+      return this.mapToOutputNewestLikes(like);
+    });
+  }
+
+  mapToOutputNewestLikes(like): NewestLikesDto {
+    return {
+      addedAt: like.createdAt.toString(),
+      userId: like.userId,
+      login: like.userLogin,
+    };
   }
 
   // async updatePost(postId: string, body: CreatePostInputDto): Promise<boolean> {

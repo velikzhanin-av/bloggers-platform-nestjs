@@ -163,7 +163,7 @@ export class PostsController {
       new UpdatePostLikeStatusCommand({
         postId,
         userId: user.userId,
-        likeStatus: body.likeStatus,
+        status: body.likeStatus,
       }),
     );
   }

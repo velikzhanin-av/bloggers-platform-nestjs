@@ -10,6 +10,10 @@ import { NewestLikesDto } from '../dto/newest-likes.dto';
 import { LikeStatus } from '../../../../core/utils/status-enam';
 import { PostsCommandRepositorySql } from '../infrastructure/postgres/posts.command-repository';
 import { randomUUID } from 'crypto';
+import {
+  LikesPostsCommandRepositorySql
+} from '../../posts-likes/infrastructure/postgres/likes-posts.command-repository';
+import * as string_decoder from 'node:string_decoder';
 
 export class PostsService {
   constructor(
@@ -18,6 +22,7 @@ export class PostsService {
     private postsRepository: PostsRepository,
     private readonly postsLikesQueryRepository: PostsLikesQueryRepository,
     private readonly postsCommandRepositorySql: PostsCommandRepositorySql,
+    private readonly likesPostsCommandRepositorySql: LikesPostsCommandRepositorySql,
   ) {}
 
   async createPost(dto: CreatePostDto): Promise<string> {
@@ -47,35 +52,54 @@ export class PostsService {
       await this.postsCommandRepositorySql.findPostById(postId);
     if (!post) throw new NotFoundException(`Post with id ${postId} not found`);
 
-    // const newestLikes: Array<NewestLikesDto> | null =
-    //   await this.postsLikesQueryRepository.findNewestLikes(postId);
-    // stub
-    const newestLikes = [];
+    const countLikes: number =
+      await this.likesPostsCommandRepositorySql.findLikeOrDislikePost(
+        postId,
+        'Like',
+      );
+
+    const countDisLikes: number =
+      await this.likesPostsCommandRepositorySql.findLikeOrDislikePost(
+        postId,
+        'Dislike',
+      );
+
+    const newestLikes: Array<NewestLikesDto> | null =
+      await this.postsCommandRepositorySql.findNewestLikes(postId);
     // TODO поправить any
     const postOut: any = this.mapToOutputPostsFromBd(
       post,
       LikeStatus.None,
       newestLikes,
+      countLikes,
+      countDisLikes,
     );
 
     if (!userId) return postOut;
 
-    // const like: PostLikeDocument | null =
-    //   await this.postsLikesQueryRepository.findLikeByCommentAndUser(
-    //     postId,
-    //     userId,
-    //   );
-    // if (!like) return postOut;
-    // stub
-    const like = { status: LikeStatus.None };
+    const like =
+      await this.likesPostsCommandRepositorySql.findLikeByPostAndUser(
+        postId,
+        userId,
+      );
 
-    return this.mapToOutputPostsFromBd(post, like.status, newestLikes);
+    if (!like) return postOut;
+
+    return this.mapToOutputPostsFromBd(
+      post,
+      like.status,
+      newestLikes,
+      countLikes,
+      countDisLikes,
+    );
   }
 
   mapToOutputPostsFromBd(
     post: any,
     likeStatus: string,
     newestLikes: Array<any> | undefined,
+    countLikes: number,
+    countDisLikes: number,
   ) {
     return {
       id: post.id,
@@ -89,8 +113,8 @@ export class PostsService {
         // stub
         // dislikesCount: post.extendedLikesInfo.dislikesCount,
         // likesCount: post.extendedLikesInfo.likesCount,
-        dislikesCount: 0,
-        likesCount: 0,
+        dislikesCount: countDisLikes,
+        likesCount: countLikes,
         myStatus: likeStatus,
         newestLikes,
       },

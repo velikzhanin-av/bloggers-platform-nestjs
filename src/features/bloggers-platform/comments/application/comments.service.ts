@@ -10,7 +10,7 @@ import { GetPostsQueryParams } from '../../posts/api/input-dto/get-posts-query-p
 import { FilterQuery } from 'mongoose';
 import { Post } from '../../posts/domain/posts.entity';
 import { CommentsCommandRepositorySql } from '../infrastructure/postgres/comments.command-repository';
-import { LikesCommandRepositorySql } from '../../comments-likes/infrastructure/postgres/likes.command-repository';
+import { LikesCommentCommandRepositorySql } from '../../comments-likes/infrastructure/postgres/likes.command-repository';
 
 @Injectable()
 export class CommentsService {
@@ -18,7 +18,7 @@ export class CommentsService {
     private readonly commentsRepository: CommentsRepository,
     private readonly commentsCommandRepositorySql: CommentsCommandRepositorySql,
     private readonly likesRepository: LikesRepository,
-    private readonly likesCommandRepositorySql: LikesCommandRepositorySql,
+    private readonly likesCommentCommandRepositorySql: LikesCommentCommandRepositorySql,
   ) {}
 
   async getCommentById(dto: GetCommentById): Promise<CommentViewDto> {
@@ -34,7 +34,7 @@ export class CommentsService {
     if (!userId) return result;
 
     const like: Array<any> =
-      await this.likesCommandRepositorySql.findLikeByCommentAndUser(
+      await this.likesCommentCommandRepositorySql.findLikeByCommentAndUser(
         userId,
         commentId,
       );
